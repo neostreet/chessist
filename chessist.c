@@ -40,6 +40,8 @@ static HDC hdc_compatible[2];
 
 static OPENFILENAME OpenFileName;
 static TCHAR szFile[MAX_PATH];
+static OPENFILENAME WriteFileName;
+static TCHAR szWriteFileName[MAX_PATH];
 
 static char chess_filter[] = "\
 Chess files\0\
@@ -967,6 +969,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       OpenFileName.lpfnHook          = NULL;
       OpenFileName.lpTemplateName    = NULL;
 
+      WriteFileName.lStructSize = sizeof(OPENFILENAME);
+      WriteFileName.hwndOwner = hWnd;
+      WriteFileName.hInstance = hInst;
+      WriteFileName.lpstrFilter = chess_filter;
+      WriteFileName.lpstrCustomFilter = NULL;
+      WriteFileName.nMaxCustFilter = 0;
+      WriteFileName.nFilterIndex = 1;
+      WriteFileName.lpstrFile = szWriteFileName;
+      WriteFileName.nMaxFile = sizeof szWriteFileName;
+      WriteFileName.lpstrFileTitle = NULL;
+      WriteFileName.nMaxFileTitle = 0;
+      WriteFileName.lpstrInitialDir = NULL;
+      WriteFileName.lpstrTitle = NULL;
+      WriteFileName.Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY |
+        OFN_EXTENSIONDIFFERENT;
+      WriteFileName.nFileOffset = 0;
+      WriteFileName.nFileExtension = 0;
+      WriteFileName.lpstrDefExt = ch_ext;
+      WriteFileName.lCustData = 0;
+      WriteFileName.lpfnHook = NULL;
+      WriteFileName.lpTemplateName = NULL;
+
       // create toolbar control
       hWndToolBar = CreateToolbarEx(
           hWnd,                   // parent
@@ -1130,6 +1154,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
           break;
 
         case IDM_OPEN:
+        case IDM_OPEN_BINARY_GAME:
 	  // Call the common dialog function.
           bHaveName = FALSE;
           bHaveGame = FALSE;
@@ -1150,7 +1175,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
 
             if (bHaveName) {
-              retval = read_game(name,&curr_game,err_msg);
+              if (wmId == IDM_OPEN)
+                retval = read_game(name,&curr_game,err_msg);
+              else
+                retval = read_binary_game(name,&curr_game);
 
               if (!retval) {
                 bHaveGame = TRUE;
@@ -1241,10 +1269,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           break;
 
+        case IDM_SAVE:
+          write_binary_game(szFile,&curr_game);
+
+          break;
+
+        case IDM_SAVEAS:
+	  // Call the common dialog function.
+          bHaveName = FALSE;
+          bHaveGame = FALSE;
+
+          if (GetOpenFileName(&WriteFileName)) {
+            bHaveName = TRUE;
+            lstrcpy(szFile,szWriteFileName);
+            write_binary_game(szFile,&curr_game);
+          }
+
+          break;
+
         // Here are all the other possible menu options,
         // all of these are currently disabled:
-        case IDM_SAVE:
-        case IDM_SAVEAS:
         case IDM_PRINT:
         case IDM_PRINTSETUP:
 

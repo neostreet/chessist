@@ -54,7 +54,8 @@ BEGIN
     POPUP "&File"
     BEGIN
         MENUITEM "&New",                        IDM_NEW
-        MENUITEM "&Open...",                    IDM_OPEN
+        MENUITEM "&Open text game...",          IDM_OPEN
+        MENUITEM "Open &binary game...",        IDM_OPEN_BINARY_GAME
         MENUITEM "&Save",                       IDM_SAVE
         MENUITEM "Save &As...",                 IDM_SAVEAS
         MENUITEM SEPARATOR
