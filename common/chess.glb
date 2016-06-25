@@ -1,0 +1,16 @@
+#ifdef MAKE_GLOBALS_HERE
+#define GLOBAL /* nothing = real object declaration */
+#else
+#define GLOBAL extern
+#endif
+
+GLOBAL char err_msg[80];
+
+GLOBAL int dbg_move;
+
+GLOBAL int bBig;
+
+GLOBAL int highlight_rank;
+GLOBAL int highlight_file;
+
+GLOBAL int move_start_piece;
