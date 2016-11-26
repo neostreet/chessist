@@ -1578,6 +1578,11 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
           else
             direction = -1;           /* black's move */
 
+          if (highlight_file != file) {
+            algebraic[0] = 'a' + highlight_file;
+            algebraic[1] = 'a' + file;
+          }
+
           retval = do_pawn_move(&curr_game,direction,algebraic,2);
 
           if (!retval) {
