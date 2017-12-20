@@ -17,14 +17,14 @@
 #include "bitfuns.h"
 
 static unsigned char initial_board[] = {
-  (char)0x23, (char)0x45, (char)0x64, (char)0x32,
-  (char)0x11, (char)0x11, (char)0x11, (char)0x11,
-  (char)0x00, (char)0x00, (char)0x00, (char)0x00,
-  (char)0x00, (char)0x00, (char)0x00, (char)0x00,
-  (char)0x00, (char)0x00, (char)0x00, (char)0x00,
-  (char)0x00, (char)0x00, (char)0x00, (char)0x00,
-  (char)0xff, (char)0xff, (char)0xff, (char)0xff,
-  (char)0xed, (char)0xcb, (char)0xac, (char)0xde
+  (unsigned char)0x23, (unsigned char)0x45, (unsigned char)0x64, (unsigned char)0x32,
+  (unsigned char)0x11, (unsigned char)0x11, (unsigned char)0x11, (unsigned char)0x11,
+  (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00,
+  (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00,
+  (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00,
+  (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00,
+  (unsigned char)0xff, (unsigned char)0xff, (unsigned char)0xff, (unsigned char)0xff,
+  (unsigned char)0xed, (unsigned char)0xcb, (unsigned char)0xac, (unsigned char)0xde
 };
 
 static int force_values[] = {
@@ -410,10 +410,48 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt)
 
 void update_board(struct game *gamept,short bCalcCounts)
 {
-  set_piece1(gamept,gamept->moves[gamept->curr_move].to,
-    get_piece1(gamept,gamept->moves[gamept->curr_move].from));
+  if (gamept->moves[gamept->curr_move].special_move_info == SPECIAL_MOVE_KINGSIDE_CASTLE) {
+    if (gamept->curr_move & 0x1) {
+      /* black's move */
 
-  set_piece1(gamept,gamept->moves[gamept->curr_move].from,0);  /* vacate previous square */
+      set_piece1(gamept,60,0);
+      set_piece1(gamept,61,ROOK_ID * -1);
+      set_piece1(gamept,62,KING_ID * -1);
+      set_piece1(gamept,63,0);
+    }
+    else {
+      /* white's move */
+
+      set_piece1(gamept,4,0);
+      set_piece1(gamept,5,ROOK_ID);
+      set_piece1(gamept,6,KING_ID);
+      set_piece1(gamept,7,0);
+    }
+  }
+  else if (gamept->moves[gamept->curr_move].special_move_info == SPECIAL_MOVE_QUEENSIDE_CASTLE) {
+    if (gamept->curr_move & 0x1) {
+      /* black's move */
+
+      set_piece1(gamept,56,0);
+      set_piece1(gamept,58,KING_ID * -1);
+      set_piece1(gamept,59,ROOK_ID * -1);
+      set_piece1(gamept,60,0);
+    }
+    else {
+      /* white's move */
+
+      set_piece1(gamept,0,0);
+      set_piece1(gamept,2,KING_ID);
+      set_piece1(gamept,3,ROOK_ID);
+      set_piece1(gamept,4,0);
+    }
+  }
+  else {
+    set_piece1(gamept,gamept->moves[gamept->curr_move].to,
+      get_piece1(gamept,gamept->moves[gamept->curr_move].from));
+
+    set_piece1(gamept,gamept->moves[gamept->curr_move].from,0);  /* vacate previous square */
+  }
 
   if (bCalcCounts)
     calculate_seirawan_counts(gamept);
