@@ -1,8 +1,5 @@
-chessist: chessist.o chessatk.o chessdbg.o chessimg.o chessmsc.o chessmvs.o chessrd.o bitfuns.o ioutil.o chessist.res
-	g++ -mwindows -g -L"/cygdrive/c/Program Files (x86)/Windows Kits/8.0/Lib/win8/um/x86" -o chessist chessist.o chessatk.o chessimg.o chessmsc.o chessdbg.o chessmvs.o chessrd.o ioutil.o bitfuns.o chessist.res -lGdi32 -lcurses -lComDlg32 -lComCtl32
-
-chessist.o: chessist.c
-	g++ -g -c -I./common chessist.c
+chessist: chessist.o chessatk.o chessdbg.o chessmsc.o chessmvs.o chessrd.o bitfuns.o ioutil.o chessist.res
+	g++ -mwindows -g -L"/cygdrive/c/Program Files (x86)/Windows Kits/8.0/Lib/win8/um/x86" -o chessist chessist.o chessatk.o chessmsc.o chessdbg.o chessmvs.o chessrd.o ioutil.o bitfuns.o chessist.res -lGdi32 -lcurses -lComDlg32 -lComCtl32
 
 chessist.o: chessist.c
 	g++ -g -c -I./common chessist.c
@@ -12,9 +9,6 @@ chessatk.o: ./common/chessatk.c
 
 chessdbg.o: ./common/chessdbg.c
 	g++ -g -c -I./common ./common/chessdbg.c
-
-chessimg.o: ./common/chessimg.c
-	g++ -g -c -I./common ./common/chessimg.c
 
 chessmsc.o: ./common/chessmsc.c
 	g++ -g -c -I./common ./common/chessmsc.c
