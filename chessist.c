@@ -730,7 +730,7 @@ void do_paint(HWND hWnd)
   EndPaint(hWnd,&ps);
 }
 
-static void do_move(HWND hWnd,int board_rank,int board_file)
+static void do_move(HWND hWnd)
 {
   int prev_invalidated[4];
   int prev_invalidated_ix;
@@ -884,7 +884,7 @@ void prev_move(HWND hWnd)
 
 void next_move(HWND hWnd)
 {
-  do_move(hWnd,0,0);
+  do_move(hWnd);
 }
 
 void start_of_game(HWND hWnd)
