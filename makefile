@@ -27,3 +27,6 @@ ioutil.o: ./common/ioutil.c
 
 chessist.res: ./common/chessist.rc
 	windres ./common/chessist.rc -O coff -o chessist.res
+
+clean:
+	rm *.o *.res *.exe
