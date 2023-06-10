@@ -1,8 +1,8 @@
 /*** chess macros ***/
 
-#define RANK_OF(pos) ((pos) / 8)
-#define FILE_OF(pos) ((pos) % 8)
+#define RANK_OF(pos) ((pos) / NUM_FILES)
+#define FILE_OF(pos) ((pos) % NUM_FILES)
 
-#define POS_OF(rank,file) ((rank) * 8 + file)
+#define POS_OF(rank,file) ((rank) * NUM_FILES + file)
 
 #define ABS_VAL(a,b) (((a) > (b)) ? (a - b) : (b - a))
