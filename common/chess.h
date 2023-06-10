@@ -20,24 +20,14 @@
 #define QUEEN_ID      5
 #define KING_ID       6
 
-#define FORCE_VALUE_QUEEN  9
-#define FORCE_VALUE_ROOK   5
-#define FORCE_VALUE_KNIGHT 3
-#define FORCE_VALUE_BISHOP 3
-#define FORCE_VALUE_PAWN   1
-#define FORCE_VALUE_KING   0
-
-#define SPECIAL_MOVE_KINGSIDE_CASTLE  0x01
-#define SPECIAL_MOVE_QUEENSIDE_CASTLE 0x02
-#define SPECIAL_MOVE_CAPTURE          0x04
-#define SPECIAL_MOVE_EN_PASSANT       0x08
-#define SPECIAL_MOVE_PROMOTION_QUEEN  0x10
-#define SPECIAL_MOVE_PROMOTION_ROOK   0x20
-#define SPECIAL_MOVE_PROMOTION_KNIGHT 0x40
-#define SPECIAL_MOVE_PROMOTION_BISHOP 0x80
-
-#define ORIG_FORCE_VALUE (FORCE_VALUE_QUEEN + 2 * FORCE_VALUE_ROOK + \
-2 * FORCE_VALUE_KNIGHT + 2 * FORCE_VALUE_BISHOP + 8 * FORCE_VALUE_PAWN)
+#define SPECIAL_MOVE_KINGSIDE_CASTLE  201
+#define SPECIAL_MOVE_QUEENSIDE_CASTLE 202
+#define SPECIAL_MOVE_CAPTURE          203
+#define SPECIAL_MOVE_EN_PASSANT       204
+#define SPECIAL_MOVE_PROMOTION_QUEEN  205
+#define SPECIAL_MOVE_PROMOTION_ROOK   206
+#define SPECIAL_MOVE_PROMOTION_KNIGHT 207
+#define SPECIAL_MOVE_PROMOTION_BISHOP 208
 
 #define WORDLEN 80
 #define MAX_MOVES 400
@@ -56,7 +46,7 @@
 struct move {
   char from;
   char to;
-  char special_move_info;
+  int special_move_info;
 };
 
 #define BITS_PER_BOARD_SQUARE 4
@@ -77,13 +67,17 @@ struct move {
 struct game {
   char chessfilename[MAX_FILE_NAME_LEN];
   char title[80];
-  int black_to_play;
   int orientation;
   int num_moves;
   int curr_move;
-  unsigned char board[CHARS_IN_BOARD];  /* 8 columns * 8 rows / 2 (nibbles per char) */
-  short seirawan_count[NUM_PLAYERS];
-  short force_count[NUM_PLAYERS];
+  int bBig;
+  int highlight_rank;
+  int highlight_file;
+  int move_start_square;
+  int move_start_square_piece;
+  int move_end_square;
+  int move_end_square_piece;
+  unsigned char board[CHARS_IN_BOARD];  /* 10 columns * 10 rows / 2 (nibbles per char) */
   struct move moves[MAX_MOVES];
 };
 
