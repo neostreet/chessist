@@ -49,13 +49,12 @@ IDB_TOOLBAR             BITMAP  DISCARDABLE     "toolbar.bmp"
 // Menu
 //
 
-CHESSISTANT MENU DISCARDABLE 
+CHESSISTANT MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
         MENUITEM "&New",                        IDM_NEW
-        MENUITEM "&Open text game...",          IDM_OPEN
-        MENUITEM "Open &binary game...",        IDM_OPEN_BINARY_GAME
+        MENUITEM "Open &game...",               IDM_OPEN
         MENUITEM "&Save",                       IDM_SAVE
         MENUITEM "Save &As...",                 IDM_SAVEAS
         MENUITEM SEPARATOR
@@ -63,10 +62,6 @@ BEGIN
         MENUITEM "P&rint Setup...",             IDM_PRINTSETUP, GRAYED
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       IDM_EXIT
-    END
-    POPUP "&Edit"
-    BEGIN
-        MENUITEM "&Set last move",              IDM_SET_LAST_MOVE
     END
     POPUP "&View"
     BEGIN
@@ -77,9 +72,10 @@ BEGIN
     BEGIN
         MENUITEM "Go to &start of game (Home)", IDM_START_OF_GAME
         MENUITEM "Go to &end of game (End)",    IDM_END_OF_GAME
-        MENUITEM "fprint_game_&bin",            IDM_FPRINT_GAME_BIN
-        MENUITEM "fprint_&game",                IDM_FPRINT_GAME
-        MENUITEM "fprint_b&d",                  IDM_FPRINT_BD
+        MENUITEM "Set &last move",              IDM_SET_LAST_MOVE
+        MENUITEM "Print &board",                IDM_PRINT_BOARD
+        MENUITEM "Print &game",                 IDM_PRINT_GAME
+        MENUITEM "Print &moves",                IDM_PRINT_MOVES
     END
     POPUP "&Help"
     BEGIN
@@ -99,8 +95,8 @@ CAPTION "About Chessistant"
 FONT 8, "System"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,36,35,32,14,WS_GROUP
-    CTEXT           "Chessistant 4.0",IDC_COMPANY,6,6,100,8
-    CTEXT           "c 2017 Ambergris Software",IDC_COMPANY2,3,20,100,8
+    CTEXT           "Chessistant 5.0",IDC_COMPANY,6,6,100,8
+    CTEXT           "c 2023 Ambergris Software",IDC_COMPANY2,3,20,100,8
 END
 
 
