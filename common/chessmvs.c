@@ -6,315 +6,119 @@
 #include "chess.mac"
 #include "chess.fun"
 
-int do_castle(struct game *gamept,int direction,char *word,int wordlen)
+int do_pawn_move(struct game *gamept)
 {
-  int rank;
+  bool bWhiteMove;
+  int start_rank;
+  int start_file;
+  int end_rank;
+  int end_file;
+  int rank_diff;
+  int file_diff;
 
-  if (direction == 1)  /* if white's move: */
-    rank = 0;
-  else
-    rank = 7;
+  bWhiteMove = (gamept->move_start_square_piece > 0);
 
-  /* make sure the king is on his original square: */
-  if (get_piece2(gamept,rank,4) != 6 * direction)
-    return 1;
+  if (bWhiteMove) {
+    // white pawn move
 
-  if (wordlen == 3) {  /* kingside castle */
-    /* make sure there is a rook in the corner: */
-    if (get_piece2(gamept,rank,7) != 2 * direction)
-      return 2;
-
-    /* make sure there are empty squares between king and rook: */
-    if (get_piece2(gamept,rank,5) || get_piece2(gamept,rank,6))
-      return 3;
-
-    gamept->moves[gamept->curr_move].special_move_info =
-      SPECIAL_MOVE_KINGSIDE_CASTLE;
+    if (gamept->move_start_square > gamept->move_end_square)
+      return 1; // failure
   }
-  else if (wordlen == 5) {  /* queenside castle */
-    /* make sure there is a rook in the corner: */
-    if (get_piece2(gamept,rank,0) != 2 * direction)
-      return 4;
+  else {
+    // black pawn move
 
-    /* make sure there are empty squares between king and rook: */
-    if (get_piece2(gamept,rank,1) || get_piece2(gamept,rank,2) || get_piece2(gamept,rank,3))
-      return 5;
-
-    gamept->moves[gamept->curr_move].special_move_info =
-      SPECIAL_MOVE_QUEENSIDE_CASTLE;
+    if (gamept->move_start_square < gamept->move_end_square)
+      return 2; // failure
   }
+
+  start_rank = RANK_OF(gamept->move_start_square);
+  start_file = FILE_OF(gamept->move_start_square);
+  end_rank = RANK_OF(gamept->move_end_square);
+  end_file = FILE_OF(gamept->move_end_square);
+
+  if (start_rank >= end_rank)
+    rank_diff = start_rank - end_rank;
   else
-    return 6;
+    rank_diff = end_rank - start_rank;
 
-  return 0;  /* success */
-}
+  if (start_file >= end_file)
+    file_diff = start_file - end_file;
+  else
+    file_diff = end_file - start_file;
 
-int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen)
-{
-  int n;
-  int file;
-  int to_rank;
-  int rank;
-  int capture_file;
-  int piece;
-  int which_piece;
+  if (file_diff == 0) {
+    if (gamept->move_end_square_piece)
+      return 3; // failure
+  }
 
-  /*printf("%s\n",word);/*for now*/
-  file = word[0] - 'a';
+  if (rank_diff == 0)
+    return 4; // failure
 
-  if ((file < 0) || (file > 7))
-    return 1;
+  if (file_diff > 1)
+    return 5; // failure
 
-  /* pawn advance or capture: */
-  rank = word[1] - '1';
+  if (rank_diff > 2)
+    return 6; // failure
 
-  if ((rank >= 0) && (rank <= 7)) {
-    to_rank = rank;
+  if (rank_diff > 1) {
+    if (file_diff)
+      return 7; // failure
 
-    /* pawn advance */
-    gamept->moves[gamept->curr_move].special_move_info = 0;
-    gamept->moves[gamept->curr_move].to = POS_OF(rank,file);
-
-    for (n = 0; n < 2; n++) {
-      rank -= direction;
-
-      if ((rank >= 1) && (rank <= 6)) {
-        piece = get_piece2(gamept,rank,file);
-
-        if (piece == direction)
-          break;
-
-        if (piece)
-          return 2;
-      }
-    }
-
-    if (n == 2)
-      return 3;
-
-    if (n == 1) {
-      /* only allow two square move from initial position */
-      if (direction == 1) {
-        if (rank != 1)
-          return 4;
-      }
-      else if (rank != 6)
-        return 5;
-    }
-
-    gamept->moves[gamept->curr_move].from = POS_OF(rank,file);
-
-    /* handle pawn promotion */
-    if (direction == 1) {
-      /* white's move */
-      if (to_rank == 7) {
-        if (wordlen != 3)
-          return 6;
-
-        which_piece = get_piece_id_ix(word[2]);
-
-        if (which_piece == NUM_PIECE_TYPES)
-          return 7;
-
-        gamept->moves[gamept->curr_move].special_move_info =
-          which_piece + 2;
-      }
+    if (bWhiteMove) {
+      if (start_rank != 1)
+        return 8; // failure
     }
     else {
-      /* black's move */
-      if (to_rank == 0) {
-        if (wordlen != 3)
-          return 8;
-
-        which_piece = get_piece_id_ix(word[2]);
-
-        if (which_piece == NUM_PIECE_TYPES)
-          return 9;
-
-        gamept->moves[gamept->curr_move].special_move_info =
-          (which_piece + 2) * -1;
-      }
-    }
-
-    return 0;
-  }
-
-  /* pawn capture */
-  capture_file = word[1] - 'a';
-
-  if ((capture_file < 0) || (capture_file > 7))
-    return 10;
-
-  if (capture_file > file) {
-    if (capture_file - file != 1)
-      return 11;
-  }
-  else if (file - capture_file != 1)
-    return 12;
-
-  if ((wordlen == 2) || (wordlen == 3)) {
-    if (direction == 1)
-      rank = 1;
-    else
-      rank = 6;
-
-    for (n = 0; n < 6; n++, rank += direction) {
-      /*printf("%d %d\n",get_piece2(gamept,rank,file),
-        get_piece2(gamept,rank+direction,capture_file));/*for now*/
-      if ((get_piece2(gamept,rank,file) == direction) &&
-        (get_piece2(gamept,rank+direction,capture_file) * direction < 0)) {
-
-        if (wordlen == 3)
-          if (word[2] - '1' != rank+direction)
-            continue;
-
-        gamept->moves[gamept->curr_move].special_move_info =
-          SPECIAL_MOVE_CAPTURE;
-        gamept->moves[gamept->curr_move].from = POS_OF(rank,file);
-        gamept->moves[gamept->curr_move].to = POS_OF(rank+direction,capture_file);
-        return 0;
-      }
-    }
-
-    return 13;
-  }
-
-  /* en passant case: */
-  if (wordlen == 6) {
-    if (!strcmp(&word[wordlen - 4],"e.p.")) {
-      if (direction == 1)
-        rank = 4;
-      else
-        rank = 3;
-
-      if ((get_piece2(gamept,rank,file) == direction) &&
-        (get_piece2(gamept,rank,capture_file) * direction < 0)) {
-        gamept->moves[gamept->curr_move].special_move_info =
-          SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT;
-        gamept->moves[gamept->curr_move].from = POS_OF(rank,file);
-        gamept->moves[gamept->curr_move].to = POS_OF(rank+direction,capture_file);
-        return 0;
-      }
-      else
-        return 14;
+      if (start_rank != 6)
+        return 9; // failure
     }
   }
-  else
-    return 15;
 
-  return 0;
+  if (file_diff == 1) {
+    if (rank_diff != 1)
+      return 10; // failure
+
+    if (!gamept->move_end_square_piece)
+      return 11; // failure
+  }
+
+  gamept->moves[gamept->curr_move].from = gamept->move_start_square;
+  gamept->moves[gamept->curr_move].to = gamept->move_end_square;
+
+  return 0; // success
 }
 
 char piece_ids[] = "RNBQK";
 
-int get_piece_id_ix(char piece)
-{
-  int which_piece;
-
-  /* calculate the id to search for: */
-  for (which_piece = 0; which_piece < NUM_PIECE_TYPES; which_piece++) {
-    if (piece_ids[which_piece] == piece)
-      break;
-  }
-
-  return which_piece;
-}
-
-int (*piece_functions[])(struct game *,int,int,int,int) = {
-  rook_move,
-  knight_move,
-  bishop_move,
-  queen_move,
-  king_move
+int (*piece_functions[])(struct game *) = {
+  rook_move2,
+  knight_move2,
+  bishop_move2,
+  queen_move2,
+  king_move2
 };
 
-int do_piece_move(struct game *gamept,int direction,char *word,int wordlen)
+int do_piece_move(struct game *gamept)
 {
   int which_piece;
-  int search_piece;
-  int curr_file;
-  int file_start;
-  int file_end;
-  int curr_rank;
-  int rank_start;
-  int rank_end;
-  int where;
-  int to_file;
-  int to_rank;
-  int to_piece;
   int retval;
 
-  if (wordlen == 4) {
-    where = word[1];
+  which_piece = gamept->move_start_square_piece;
 
-    if ((where >= 'a') && (where <= 'h')) {
-      file_start = where - 'a';
-      file_end = file_start + 1;
-      rank_start = 0;
-      rank_end = 8;
-    }
-    else if ((where >= '1') && (where <= '8')) {
-      file_start = 0;
-      file_end = 8;
-      rank_start = where - '1';
-      rank_end = rank_start + 1;
-    }
-    else
-      return 1;
-  }
-  else {
-    file_start = 0;
-    file_end = 8;
-    rank_start = 0;
-    rank_end = 8;
+  if (which_piece < 0)
+    which_piece *= -1;
+
+  which_piece -= ROOK_ID;
+
+  retval = (*piece_functions[which_piece])(gamept);
+
+  if (!retval) {
+    gamept->moves[gamept->curr_move].from = gamept->move_start_square;
+    gamept->moves[gamept->curr_move].to = gamept->move_end_square;
+    return 0;  /* success */
   }
 
-  if (!get_to_position(word,wordlen,&to_file,&to_rank))
-    return 2;
-
-  which_piece = get_piece_id_ix(word[0]);
-
-  /* error if not found (should never happen): */
-  if (which_piece == NUM_PIECE_TYPES)
-    return 3;
-
-  search_piece = (which_piece + 2) * direction; /* calculate search id */
-  to_piece = get_piece2(gamept,to_rank,to_file);
-
-  /* don't allow a capture of same color piece*/
-  if (to_piece * direction > 0)
-    return 4;
-
-  if (to_piece != 0) {
-    /* a capture; move the captured piece off the board: */
-    gamept->moves[gamept->curr_move].special_move_info =
-      SPECIAL_MOVE_CAPTURE;
-  }
-  else
-    gamept->moves[gamept->curr_move].special_move_info = 0;
-
-  /* search the board for the search piece: */
-  for (curr_rank = rank_start; curr_rank < rank_end; curr_rank++) {
-    for (curr_file = file_start; curr_file < file_end; curr_file++) {
-      if (get_piece2(gamept,curr_rank,curr_file) == search_piece) {
-        if ((curr_file == to_file) && (curr_rank == to_rank))
-          continue;
-        else {
-          /* see if a possible piece move: */
-          retval = (*piece_functions[which_piece])(
-            gamept,curr_file,curr_rank,to_file,to_rank);
-
-          if (!retval) {
-            gamept->moves[gamept->curr_move].from = POS_OF(curr_rank,curr_file);
-            gamept->moves[gamept->curr_move].to = POS_OF(to_rank,to_file);
-            return 0;  /* success */
-          }
-        }
-      }
-    }
-  }
-
-  return 5;
+  return 1;
 }
 
 int get_to_position(char *word,int wordlen,int *to_filept,int *to_rankpt)
@@ -373,6 +177,23 @@ int rook_move(
   return 3;  /* failure */
 }
 
+int rook_move2(
+  struct game *gamept
+)
+{
+  int retval;
+
+  retval = rook_move(
+    gamept,
+    FILE_OF(gamept->move_start_square),
+    RANK_OF(gamept->move_start_square),
+    FILE_OF(gamept->move_end_square),
+    RANK_OF(gamept->move_end_square)
+    );
+
+  return retval;
+}
+
 int knight_move(
   struct game *gamept,
   int file1,
@@ -401,6 +222,23 @@ int knight_move(
     return 0;  /* success */
 
   return 1;    /* failure */
+}
+
+int knight_move2(
+  struct game *gamept
+)
+{
+  int retval;
+
+  retval = knight_move(
+    gamept,
+    FILE_OF(gamept->move_start_square),
+    RANK_OF(gamept->move_start_square),
+    FILE_OF(gamept->move_end_square),
+    RANK_OF(gamept->move_end_square)
+    );
+
+  return retval;
 }
 
 int bishop_move(
@@ -453,6 +291,23 @@ int bishop_move(
   return 0;  /* success */
 }
 
+int bishop_move2(
+  struct game *gamept
+)
+{
+  int retval;
+
+  retval = bishop_move(
+    gamept,
+    FILE_OF(gamept->move_start_square),
+    RANK_OF(gamept->move_start_square),
+    FILE_OF(gamept->move_end_square),
+    RANK_OF(gamept->move_end_square)
+    );
+
+  return retval;
+}
+
 int queen_move(
   struct game *gamept,
   int file1,
@@ -470,6 +325,23 @@ int queen_move(
   return 1;    /* failure */
 }
 
+int queen_move2(
+  struct game *gamept
+)
+{
+  int retval;
+
+  retval = queen_move(
+    gamept,
+    FILE_OF(gamept->move_start_square),
+    RANK_OF(gamept->move_start_square),
+    FILE_OF(gamept->move_end_square),
+    RANK_OF(gamept->move_end_square)
+    );
+
+  return retval;
+}
+
 int king_move(
   struct game *gamept,
   int file1,
@@ -480,6 +352,38 @@ int king_move(
 {
   int dist1;
   int dist2;
+
+  // first, check if this is a castling move
+  if (!(gamept->curr_move % 2)) {
+    // it's White's move
+
+    // check for kingside castle
+    if ((file1 == 4) && (rank1 == 0) && (file2 == 6) && (rank2 == 0)) {
+      gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
+      return 0;
+    }
+
+    // check for queenside castle
+    if ((file1 == 4) && (rank1 == 0) && (file2 == 2) && (rank2 == 0)) {
+      gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
+      return 0;
+    }
+  }
+  else {
+    // it's Black's move
+
+    // check for kingside castle
+    if ((file1 == 4) && (rank1 == 7) && (file2 == 6) && (rank2 == 7)) {
+      gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
+      return 0;
+    }
+
+    // check for queenside castle
+    if ((file1 == 4) && (rank1 == 7) && (file2 == 2) && (rank2 == 7)) {
+      gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
+      return 0;
+    }
+  }
 
   dist1 = (file1 - file2);
 
@@ -495,4 +399,21 @@ int king_move(
     return 0;  /* success */
 
   return 1;  /* failure */
+}
+
+int king_move2(
+  struct game *gamept
+)
+{
+  int retval;
+
+  retval = king_move(
+    gamept,
+    FILE_OF(gamept->move_start_square),
+    RANK_OF(gamept->move_start_square),
+    FILE_OF(gamept->move_end_square),
+    RANK_OF(gamept->move_end_square)
+    );
+
+  return retval;
 }
