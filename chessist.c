@@ -382,9 +382,10 @@ int get_piece_offset(int piece,int rank,int file)
   int retval;
 
   if (debug_level == 2) {
-    if (debug_fptr != NULL)
+    if (debug_fptr != NULL) {
       fprintf(debug_fptr,"dbg1 rank = %d, file = %d, piece = %2d, ",
         rank,file,piece);
+    }
   }
 
   if (!piece) {
@@ -1319,6 +1320,10 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
   int retval;
   int invalid_squares[4];
   int num_invalid_squares;
+
+  if (debug_fptr != NULL) {
+    fprintf(debug_fptr,"do_lbuttondown: rank = %d, file = %d\n",rank,file);
+  }
 
   if ((file >= 0) && (file < NUM_FILES) &&
       (rank >= 0) && (rank < NUM_RANKS))
