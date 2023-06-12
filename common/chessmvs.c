@@ -358,7 +358,7 @@ int king_move(
     // it's White's move
 
     // check for kingside castle
-    if ((file1 == 4) && (rank1 == 0) && (file2 == 6) && (rank2 == 0)) {
+    if ((file1 == 4) && (rank1 == 0) && (file2 == 6) && (rank2 == 0) && !get_piece1(gamept,5)) {
       gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
       return 0;
     }
