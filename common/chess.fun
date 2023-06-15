@@ -33,8 +33,7 @@ void set_initial_board(struct game *gamept);
 void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares);
 int get_piece1(struct game *gamept,int board_offset);
 int get_piece2(struct game *gamept,int row,int column);
-void set_piece1(struct game *gamept,int board_offset,int piece);
-void set_piece2(struct game *gamept,int row,int column,int piece);
+void set_piece(struct game *gamept,int board_offset,int piece);
 
 void print_bd(struct game *gamept);
 void fprint_game(struct game *gamept,char *filename);
