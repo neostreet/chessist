@@ -110,12 +110,6 @@ static char szTitle[100];    // The title bar text
 static int bHaveGame;
 static struct game curr_game;
 
-static int debug_level;
-static FILE *debug_fptr;
-
-static char space_fmt[] = "Space: %2d - %2d";
-static char force_fmt[] = "Force: %2d - %2d";
-
 static TBBUTTON tbButtons[] = {
     { 0, IDM_NEW,                      TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
     { 1, IDM_OPEN,                     TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
@@ -165,8 +159,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   cpt = getenv("DEBUG_CHESSIST");
 
   if (cpt != NULL) {
-    debug_level = atoi(cpt);
-    debug_fptr = fopen("chessist.dbg","w");
+    curr_game.debug_level = atoi(cpt);
+    curr_game.debug_fptr = fopen("chessist.dbg","w");
+  }
+  else {
+    curr_game.debug_level = 0;
+    curr_game.debug_fptr = NULL;
   }
 
   if ((cpt = getenv("TOP_MARGIN")) != NULL)
@@ -254,8 +252,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     DispatchMessage(&msg);
   }
 
-  if (debug_fptr)
-    fclose(debug_fptr);
+  if (curr_game.debug_fptr)
+    fclose(curr_game.debug_fptr);
 
   return (msg.wParam);
 }
@@ -352,15 +350,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
   initial_x_pos = debug_x_offset + ((spi_rect.right - spi_rect.left) - chess_window_width) / 2;
   initial_y_pos = debug_y_offset + ((spi_rect.bottom - spi_rect.top) - chess_window_height) / 2;
 
-  if (debug_fptr) {
-    fprintf(debug_fptr,"initial_x_pos = %d\n",initial_x_pos);
-    fprintf(debug_fptr,"initial_y_pos = %d\n",initial_y_pos);
-    fprintf(debug_fptr,"window_extra_width = %d\n",window_extra_width);
-    fprintf(debug_fptr,"window_extra_height = %d\n",window_extra_height);
-    fprintf(debug_fptr,"chess_window_width = %d\n",chess_window_width);
-    fprintf(debug_fptr,"chess_window_height = %d\n",chess_window_height);
-  }
-
   hWnd = CreateWindow(szAppName, szTitle, WS_OVERLAPPEDWINDOW,
      initial_x_pos, initial_y_pos,
      chess_window_width,chess_window_height,
@@ -381,9 +370,9 @@ int get_piece_offset(int piece,int rank,int file)
   int offset;
   int retval;
 
-  if (debug_level == 2) {
-    if (debug_fptr != NULL) {
-      fprintf(debug_fptr,"dbg1 rank = %d, file = %d, piece = %2d, ",
+  if (curr_game.debug_level == 2) {
+    if (curr_game.debug_fptr != NULL) {
+      fprintf(curr_game.debug_fptr,"dbg1 rank = %d, file = %d, piece = %2d, ",
         rank,file,piece);
     }
   }
@@ -421,9 +410,9 @@ int get_piece_offset(int piece,int rank,int file)
       retval = -1;
   }
 
-  if (debug_level == 2) {
-    if (debug_fptr != NULL)
-      fprintf(debug_fptr,"retval = %2d\n",retval);
+  if (curr_game.debug_level == 2) {
+    if (curr_game.debug_fptr != NULL)
+      fprintf(curr_game.debug_fptr,"retval = %2d\n",retval);
   }
 
   return retval;
@@ -438,8 +427,8 @@ void invalidate_rect(HWND hWnd,int rank,int file)
   rect.right = rect.left + width_in_pixels;
   rect.bottom = rect.top + height_in_pixels;
 
-  if (debug_fptr) {
-    fprintf(debug_fptr,"invalidate_rect(): left = %d, top = %d, right = %d, bottom = %d\n",
+  if (curr_game.debug_fptr) {
+    fprintf(curr_game.debug_fptr,"invalidate_rect(): left = %d, top = %d, right = %d, bottom = %d\n",
       rect.left,rect.top,rect.right,rect.bottom);
   }
 
@@ -459,8 +448,8 @@ void invalidate_square(HWND hWnd,int square)
   else
     file = (NUM_FILES - 1) - file;
 
-  if (debug_fptr) {
-    fprintf(debug_fptr,"invalidate_square(): rank = %d, file = %d\n",
+  if (curr_game.debug_fptr) {
+    fprintf(curr_game.debug_fptr,"invalidate_square(): rank = %d, file = %d\n",
       rank,file);
   }
 
@@ -534,11 +523,11 @@ void do_paint(HWND hWnd)
 
   hdc = BeginPaint(hWnd,&ps);
 
-  if (debug_level == 2) {
-    if (debug_fptr) {
-      fprintf(debug_fptr,"do_paint():\n");
-      fprintf(debug_fptr,"  highlight_rank = %d\n",curr_game.highlight_rank);
-      fprintf(debug_fptr,"  highlight_file = %d\n",curr_game.highlight_file);
+  if (curr_game.debug_level == 2) {
+    if (curr_game.debug_fptr) {
+      fprintf(curr_game.debug_fptr,"do_paint():\n");
+      fprintf(curr_game.debug_fptr,"  highlight_rank = %d\n",curr_game.highlight_rank);
+      fprintf(curr_game.debug_fptr,"  highlight_file = %d\n",curr_game.highlight_file);
     }
   }
 
@@ -552,12 +541,12 @@ void do_paint(HWND hWnd)
       if (!RectVisible(hdc,&rect))
         continue;
 
-      if (debug_level == 2) {
-        if (debug_fptr) {
-          fprintf(debug_fptr,"  rank = %d, file = %d\n",m,n);
-          fprintf(debug_fptr,"  rect.left = %d, rect.top = %d\n",
+      if (curr_game.debug_level == 2) {
+        if (curr_game.debug_fptr) {
+          fprintf(curr_game.debug_fptr,"  rank = %d, file = %d\n",m,n);
+          fprintf(curr_game.debug_fptr,"  rect.left = %d, rect.top = %d\n",
             rect.left,rect.top);
-          fprintf(debug_fptr,"  rect.right = %d, rect.bottom = %d\n",
+          fprintf(curr_game.debug_fptr,"  rect.right = %d, rect.bottom = %d\n",
             rect.right,rect.bottom);
         }
       }
@@ -567,9 +556,9 @@ void do_paint(HWND hWnd)
       else
         piece = get_piece2(&curr_game,m,(NUM_FILES - 1) - n);
 
-      if (debug_level == 2) {
-        if (debug_fptr)
-          fprintf(debug_fptr,"  piece = %d\n",piece);
+      if (curr_game.debug_level == 2) {
+        if (curr_game.debug_fptr)
+          fprintf(curr_game.debug_fptr,"  piece = %d\n",piece);
       }
 
       piece_offset = get_piece_offset(piece,m,n);
@@ -601,9 +590,9 @@ void do_paint(HWND hWnd)
   rect.bottom = TOOLBAR_HEIGHT + 16;
 
   if (RectVisible(hdc,&rect)) {
-    if (debug_level == 2) {
-      if (debug_fptr)
-        fprintf(debug_fptr,"  printing the title\n");
+    if (curr_game.debug_level == 2) {
+      if (curr_game.debug_fptr)
+        fprintf(curr_game.debug_fptr,"  printing the title\n");
     }
 
     if (!bSetBkColor && (bk_color != COLOR_WHITE)) {
@@ -712,10 +701,10 @@ static void do_move(HWND hWnd)
   for (n = 0; n < num_invalid_squares; n++)
     invalidate_square(hWnd,invalid_squares[n]);
 
-  if (debug_level == 2) {
-    if (debug_fptr) {
-      fprintf(debug_fptr,"do_move\n");
-      fprint_bd2(&curr_game,debug_fptr);
+  if (curr_game.debug_level == 2) {
+    if (curr_game.debug_fptr) {
+      fprintf(curr_game.debug_fptr,"do_move\n");
+      fprint_bd2(&curr_game,curr_game.debug_fptr);
     }
   }
 
@@ -768,11 +757,11 @@ static void toggle_board_size(HWND hWnd)
 {
   RECT rect;
 
-  if (debug_fptr) {
-    fprintf(debug_fptr,"toggle_board_size()\n");
-    fprintf(debug_fptr,"  bBig = %d\n",curr_game.bBig);
-    fprintf(debug_fptr,"  highlight_rank = %d\n",curr_game.highlight_rank);
-    fprintf(debug_fptr,"  highlight_file = %d\n",curr_game.highlight_file);
+  if (curr_game.debug_fptr) {
+    fprintf(curr_game.debug_fptr,"toggle_board_size()\n");
+    fprintf(curr_game.debug_fptr,"  bBig = %d\n",curr_game.bBig);
+    fprintf(curr_game.debug_fptr,"  highlight_rank = %d\n",curr_game.highlight_rank);
+    fprintf(curr_game.debug_fptr,"  highlight_file = %d\n",curr_game.highlight_file);
   }
 
   if (!curr_game.bBig) {
@@ -793,10 +782,10 @@ static void toggle_board_size(HWND hWnd)
   rect.left = ((spi_rect.right - spi_rect.left) - chess_window_width) / 2;
   rect.top = ((spi_rect.bottom - spi_rect.top) - chess_window_height) / 2;
 
-  if (debug_fptr) {
-    fprintf(debug_fptr,"  width_in_pixels = %d\n",width_in_pixels);
-    fprintf(debug_fptr,"  height_in_pixels = %d\n",height_in_pixels);
-    fprintf(debug_fptr,"  bBig = %d\n",curr_game.bBig);
+  if (curr_game.debug_fptr) {
+    fprintf(curr_game.debug_fptr,"  width_in_pixels = %d\n",width_in_pixels);
+    fprintf(curr_game.debug_fptr,"  height_in_pixels = %d\n",height_in_pixels);
+    fprintf(curr_game.debug_fptr,"  bBig = %d\n",curr_game.bBig);
   }
 
   MoveWindow(hWnd,rect.left,rect.top,
@@ -1090,25 +1079,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
           break;
 
         case IDM_PRINT_BOARD:
-          if (debug_level == 2) {
-            if (debug_fptr)
-              fprint_bd2(&curr_game,debug_fptr);
+          if (curr_game.debug_level == 2) {
+            if (curr_game.debug_fptr)
+              fprint_bd2(&curr_game,curr_game.debug_fptr);
           }
 
           break;
 
         case IDM_PRINT_GAME:
-          if (debug_level == 2) {
-            if (debug_fptr)
-              fprint_game2(&curr_game,debug_fptr);
+          if (curr_game.debug_level == 2) {
+            if (curr_game.debug_fptr)
+              fprint_game2(&curr_game,curr_game.debug_fptr);
           }
 
           break;
 
         case IDM_PRINT_MOVES:
-          if (debug_level == 2) {
-            if (debug_fptr)
-              fprint_moves2(&curr_game,debug_fptr);
+          if (curr_game.debug_level == 2) {
+            if (curr_game.debug_fptr)
+              fprint_moves2(&curr_game,curr_game.debug_fptr);
           }
 
           break;
@@ -1321,8 +1310,8 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
   int invalid_squares[4];
   int num_invalid_squares;
 
-  if (debug_fptr != NULL) {
-    fprintf(debug_fptr,"do_lbuttondown: rank = %d, file = %d\n",rank,file);
+  if (curr_game.debug_fptr != NULL) {
+    fprintf(curr_game.debug_fptr,"do_lbuttondown: rank = %d, file = %d\n",rank,file);
   }
 
   if ((file >= 0) && (file < NUM_FILES) &&
@@ -1367,19 +1356,38 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
   }
 
   if (curr_game.highlight_rank == -1) {
+    if (curr_game.debug_fptr) {
+      fprintf(curr_game.debug_fptr,"do_lbuttondown:   start_square_piece = %d, curr_move = %d\n",
+        curr_game.move_start_square_piece,curr_game.curr_move);
+    }
+
     if ( ((curr_game.move_start_square_piece > 0) && !((curr_game.curr_move) % 2)) ||
          ((curr_game.move_start_square_piece < 0) &&  ((curr_game.curr_move) % 2)) ) {
+      if (curr_game.debug_fptr) {
+        fprintf(curr_game.debug_fptr,"do_lbuttondown:   setting highlight: rank = %d, file = %d\n",rank,file);
+      }
+
       curr_game.highlight_file = file;
       curr_game.highlight_rank = rank;
 
       invalidate_rect(hWnd,rank,file);
-      return;
     }
+    else {
+      if (curr_game.debug_fptr) {
+        fprintf(curr_game.debug_fptr,"do_lbuttondown:   not setting highlight: rank = %d, file = %d\n",rank,file);
+      }
+    }
+
+    return;
   }
 
   // exit early if the square to be moved to contains a piece of the same color as the piece to be moved
   if ((curr_game.move_start_square_piece * curr_game.move_end_square_piece) > 0)
     return;
+
+  if (curr_game.debug_fptr) {
+    fprintf(curr_game.debug_fptr,"do_lbuttondown:   attempting move: rank = %d,file = %d\n",rank,file);
+  }
 
   if ((curr_game.move_start_square_piece == PAWN_ID) ||
       (curr_game.move_start_square_piece == PAWN_ID * -1)) {
