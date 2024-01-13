@@ -167,6 +167,14 @@ void fprint_moves2(struct game *gamept,FILE *fptr)
   }
 }
 
+void populate_initial_board(struct game *gamept)
+{
+  int n;
+
+  for (n = 0; n < CHARS_IN_BOARD; n++)
+    initial_board[n] = gamept->board[n];
+}
+
 void set_initial_board(struct game *gamept)
 {
   int n;
