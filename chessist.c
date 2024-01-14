@@ -858,6 +858,30 @@ void end_of_game(HWND hWnd)
   redisplay_counts(hWnd,NULL);
 }
 
+void do_read(HWND hWnd,LPSTR name,struct game *gamept)
+{
+  int retval;
+  char buf[256];
+
+  retval = read_binary_game(name,gamept);
+
+  if (!retval) {
+    bHaveGame = TRUE;
+
+    wsprintf(szTitle,"%s - %s",szAppName,
+      trim_name(name));
+    SetWindowText(hWnd,szTitle);
+    gamept->highlight_rank = -1;
+    gamept->highlight_file = -1;
+    InvalidateRect(hWnd,NULL,TRUE);
+  }
+  else {
+    wsprintf(buf,read_game_failure,
+      name,retval,gamept->curr_move);
+    MessageBox(hWnd,buf,NULL,MB_OK);
+  }
+}
+
 //
 //  FUNCTION: WndProc(HWND, unsigned, WORD, LONG)
 //
@@ -963,7 +987,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
           16,16,                  // width & height of the bitmaps
           sizeof(TBBUTTON));      // structure size
 
-      do_new(hWnd,&curr_game);
+      if (szFile[0])
+        do_read(hWnd,szFile,&curr_game);
+      else
+        do_new(hWnd,&curr_game);
 
       curr_game.highlight_rank = -1;
       curr_game.highlight_file = -1;
@@ -1033,34 +1060,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           if (GetOpenFileName(&OpenFileName)) {
             name = OpenFileName.lpstrFile;
-
-            retval = read_binary_game(name,&curr_game);
-
-            if (!retval) {
-              bHaveGame = TRUE;
-
-              if (bHome)
-                position_game(FALSE);
-
-              wsprintf(szTitle,"%s - %s",szAppName,
-                trim_name(name));
-              SetWindowText(hWnd,szTitle);
-              curr_game.highlight_rank = -1;
-              curr_game.highlight_file = -1;
-              InvalidateRect(hWnd,NULL,TRUE);
-            }
-            else {
-              hdc = GetDC(hWnd);
-              rect.left = 0;
-              rect.top = 0;
-              rect.right = chess_window_width;
-              rect.bottom = 16;
-              wsprintf(buf,"read_game() of %s: %d",
-                name,retval);
-              wsprintf(buf,read_game_failure,
-                name,retval,curr_game.curr_move);
-              TextOut(hdc,rect.left,rect.top,buf,lstrlen(buf));
-            }
+            do_read(hWnd,name,&curr_game);
           }
 
           break;
