@@ -297,9 +297,9 @@ void set_piece(struct game *gamept,int board_offset,int piece)
   if (dbg_set_piece_call == set_piece_calls)
     dbg = 0;
 
-  if (gamept->debug_level == 2) {
-    if (gamept->debug_fptr != NULL)
-      fprintf(gamept->debug_fptr,"set_piece: board_offset = %d, piece %d\n",board_offset,piece);
+  if (debug_level == 2) {
+    if (debug_fptr != NULL)
+      fprintf(debug_fptr,"set_piece: board_offset = %d, piece %d\n",board_offset,piece);
   }
 
   bit_offset = board_offset * BITS_PER_BOARD_SQUARE;
