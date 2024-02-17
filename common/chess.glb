@@ -5,5 +5,14 @@
 #endif
 
 GLOBAL char err_msg[80];
-
 GLOBAL int dbg_move;
+GLOBAL int debug_level;
+GLOBAL FILE *debug_fptr;
+
+GLOBAL int bBig;
+GLOBAL int highlight_rank;
+GLOBAL int highlight_file;
+GLOBAL int move_start_square;
+GLOBAL int move_start_square_piece;
+GLOBAL int move_end_square;
+GLOBAL int move_end_square_piece;
