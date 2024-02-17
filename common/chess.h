@@ -62,24 +62,16 @@ struct move {
 #define ANNOTATION_X (8 * XLEN + 2 + FONT_WIDTH)
 #define ANNOTATION_Y 5
 
-#define MAX_FILE_NAME_LEN 256
+#define MAX_FILE_NAME_LEN 128
+#define MAX_TITLE_LEN 128
 
 struct game {
   char chessfilename[MAX_FILE_NAME_LEN];
-  char title[80];
+  char title[MAX_TITLE_LEN];
   int orientation;
   int num_moves;
   int curr_move;
-  int bBig;
-  int highlight_rank;
-  int highlight_file;
-  int move_start_square;
-  int move_start_square_piece;
-  int move_end_square;
-  int move_end_square_piece;
-  unsigned char board[CHARS_IN_BOARD];  /* 10 columns * 10 rows / 2 (nibbles per char) */
-  int debug_level;
-  FILE *debug_fptr;
+  unsigned char board[CHARS_IN_BOARD];  /* 8 columns * 8 rows / 2 (nibbles per char) */
   struct move moves[MAX_MOVES];
 };
 
