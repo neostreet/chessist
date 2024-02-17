@@ -16,25 +16,25 @@ int do_pawn_move(struct game *gamept)
   int rank_diff;
   int file_diff;
 
-  bWhiteMove = (gamept->move_start_square_piece > 0);
+  bWhiteMove = (move_start_square_piece > 0);
 
   if (bWhiteMove) {
     // white pawn move
 
-    if (gamept->move_start_square > gamept->move_end_square)
+    if (move_start_square > move_end_square)
       return 1; // failure
   }
   else {
     // black pawn move
 
-    if (gamept->move_start_square < gamept->move_end_square)
+    if (move_start_square < move_end_square)
       return 2; // failure
   }
 
-  start_rank = RANK_OF(gamept->move_start_square);
-  start_file = FILE_OF(gamept->move_start_square);
-  end_rank = RANK_OF(gamept->move_end_square);
-  end_file = FILE_OF(gamept->move_end_square);
+  start_rank = RANK_OF(move_start_square);
+  start_file = FILE_OF(move_start_square);
+  end_rank = RANK_OF(move_end_square);
+  end_file = FILE_OF(move_end_square);
 
   if (start_rank >= end_rank)
     rank_diff = start_rank - end_rank;
@@ -47,7 +47,7 @@ int do_pawn_move(struct game *gamept)
     file_diff = end_file - start_file;
 
   if (file_diff == 0) {
-    if (gamept->move_end_square_piece)
+    if (move_end_square_piece)
       return 3; // failure
   }
 
@@ -78,12 +78,12 @@ int do_pawn_move(struct game *gamept)
     if (rank_diff != 1)
       return 10; // failure
 
-    if (!gamept->move_end_square_piece)
+    if (!move_end_square_piece)
       return 11; // failure
   }
 
-  gamept->moves[gamept->curr_move].from = gamept->move_start_square;
-  gamept->moves[gamept->curr_move].to = gamept->move_end_square;
+  gamept->moves[gamept->curr_move].from = move_start_square;
+  gamept->moves[gamept->curr_move].to = move_end_square;
 
   return 0; // success
 }
@@ -103,7 +103,7 @@ int do_piece_move(struct game *gamept)
   int which_piece;
   int retval;
 
-  which_piece = gamept->move_start_square_piece;
+  which_piece = move_start_square_piece;
 
   if (which_piece < 0)
     which_piece *= -1;
@@ -113,8 +113,8 @@ int do_piece_move(struct game *gamept)
   retval = (*piece_functions[which_piece])(gamept);
 
   if (!retval) {
-    gamept->moves[gamept->curr_move].from = gamept->move_start_square;
-    gamept->moves[gamept->curr_move].to = gamept->move_end_square;
+    gamept->moves[gamept->curr_move].from = move_start_square;
+    gamept->moves[gamept->curr_move].to = move_end_square;
     return 0;  /* success */
   }
 
@@ -185,10 +185,10 @@ int rook_move2(
 
   retval = rook_move(
     gamept,
-    FILE_OF(gamept->move_start_square),
-    RANK_OF(gamept->move_start_square),
-    FILE_OF(gamept->move_end_square),
-    RANK_OF(gamept->move_end_square)
+    FILE_OF(move_start_square),
+    RANK_OF(move_start_square),
+    FILE_OF(move_end_square),
+    RANK_OF(move_end_square)
     );
 
   return retval;
@@ -232,10 +232,10 @@ int knight_move2(
 
   retval = knight_move(
     gamept,
-    FILE_OF(gamept->move_start_square),
-    RANK_OF(gamept->move_start_square),
-    FILE_OF(gamept->move_end_square),
-    RANK_OF(gamept->move_end_square)
+    FILE_OF(move_start_square),
+    RANK_OF(move_start_square),
+    FILE_OF(move_end_square),
+    RANK_OF(move_end_square)
     );
 
   return retval;
@@ -299,10 +299,10 @@ int bishop_move2(
 
   retval = bishop_move(
     gamept,
-    FILE_OF(gamept->move_start_square),
-    RANK_OF(gamept->move_start_square),
-    FILE_OF(gamept->move_end_square),
-    RANK_OF(gamept->move_end_square)
+    FILE_OF(move_start_square),
+    RANK_OF(move_start_square),
+    FILE_OF(move_end_square),
+    RANK_OF(move_end_square)
     );
 
   return retval;
@@ -333,10 +333,10 @@ int queen_move2(
 
   retval = queen_move(
     gamept,
-    FILE_OF(gamept->move_start_square),
-    RANK_OF(gamept->move_start_square),
-    FILE_OF(gamept->move_end_square),
-    RANK_OF(gamept->move_end_square)
+    FILE_OF(move_start_square),
+    RANK_OF(move_start_square),
+    FILE_OF(move_end_square),
+    RANK_OF(move_end_square)
     );
 
   return retval;
@@ -409,10 +409,10 @@ int king_move2(
 
   retval = king_move(
     gamept,
-    FILE_OF(gamept->move_start_square),
-    RANK_OF(gamept->move_start_square),
-    FILE_OF(gamept->move_end_square),
-    RANK_OF(gamept->move_end_square)
+    FILE_OF(move_start_square),
+    RANK_OF(move_start_square),
+    FILE_OF(move_end_square),
+    RANK_OF(move_end_square)
     );
 
   return retval;
