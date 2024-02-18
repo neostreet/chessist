@@ -11,6 +11,7 @@
 #include "chess.fun"
 #include "chess.mac"
 #include "chessist.h"
+#include "resource.h"
 
 static char appname[] = "Chessistant";
 #define ID_TOOLBAR         1
@@ -118,6 +119,8 @@ static TBBUTTON tbButtons[] = {
 
 static int bHome;
 
+static int special_move_info;
+
 // Forward declarations of functions included in this code module:
 
 BOOL InitApplication(HINSTANCE);
@@ -126,6 +129,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 char *trim_name(char *name);
 
 LRESULT CALLBACK About(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK Promotion(HWND, UINT, WPARAM, LPARAM);
 BOOL CenterWindow (HWND, HWND);
 void do_lbuttondown(HWND hWnd,int file,int rank);
 
@@ -1242,6 +1246,57 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 //
+//  FUNCTION: Promotion(HWND, unsigned, WORD, LONG)
+//
+//  PURPOSE:  Processes messages for "Promotion" dialog box
+//
+//  MESSAGES:
+//
+// WM_INITDIALOG - initialize dialog box
+// WM_COMMAND    - Input received
+//
+//
+LRESULT CALLBACK Promotion(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+   switch (message) {
+        case WM_INITDIALOG:
+         ShowWindow (hDlg, SW_HIDE);
+
+         CenterWindow (hDlg, GetWindow (hDlg, GW_OWNER));
+
+         ShowWindow (hDlg, SW_SHOW);
+
+         return (TRUE);
+
+      case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+            case IDC_QUEEN:
+                special_move_info = SPECIAL_MOVE_PROMOTION_QUEEN;
+                break;
+            case IDC_ROOK:
+                special_move_info = SPECIAL_MOVE_PROMOTION_ROOK;
+                break;
+            case IDC_BISHOP:
+                special_move_info = SPECIAL_MOVE_PROMOTION_BISHOP;
+                break;
+            case IDC_KNIGHT:
+                special_move_info = SPECIAL_MOVE_PROMOTION_KNIGHT;
+                break;
+            case IDOK:
+                EndDialog(hDlg, TRUE);
+                return (TRUE);
+            case IDCANCEL:
+                EndDialog(hDlg, FALSE);
+                return (FALSE);
+         }
+
+         break;
+   }
+
+    return FALSE;
+}
+
+//
 //   FUNCTION: CenterWindow(HWND, HWND)
 //
 //   PURPOSE: Centers one window over another.
@@ -1308,6 +1363,7 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
 {
   int n;
   int retval;
+  bool bPromotion;
   int invalid_squares[4];
   int num_invalid_squares;
 
@@ -1390,9 +1446,50 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     fprintf(debug_fptr,"do_lbuttondown:   attempting move: rank = %d,file = %d\n",rank,file);
   }
 
+  bPromotion = false;
+
   if ((move_start_square_piece == PAWN_ID) ||
       (move_start_square_piece == PAWN_ID * -1)) {
     retval = do_pawn_move(&curr_game);
+
+    if (!retval) {
+      // check if this was a pawn promotion
+
+      if (!((curr_game.curr_move) % 2)) {
+        // White
+
+        if (!curr_game.orientation) {
+          if (!rank)
+            bPromotion = true;
+        }
+        else {
+          if (rank == NUM_RANKS - 1)
+            bPromotion = true;
+        }
+      }
+      else {
+        // Black
+
+        if (!curr_game.orientation) {
+          if (rank == NUM_RANKS - 1)
+            bPromotion = true;
+        }
+        else {
+          if (!rank)
+            bPromotion = true;
+        }
+      }
+
+      if (bPromotion) {
+        special_move_info = 0;
+
+        if (!DialogBox(hInst,"PromotionBox",hWnd,(DLGPROC)Promotion))
+          retval = 1;
+        else {
+          curr_game.moves[curr_game.curr_move].special_move_info = special_move_info;
+        }
+      }
+    }
   }
   else
     retval = do_piece_move(&curr_game);
@@ -1408,6 +1505,7 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     highlight_file = -1;
 
     curr_game.curr_move++;
+    curr_game.moves[curr_game.curr_move].special_move_info = 0;
     curr_game.num_moves = curr_game.curr_move;
   }
 }
