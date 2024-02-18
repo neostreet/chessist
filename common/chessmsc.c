@@ -191,19 +191,48 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
 {
   bool bKingsideCastle;
   bool bQueensideCastle;
+  bool bBlack;
+  int from_piece;
+  int to_piece;
 
   update_board_calls++;
 
   if (dbg_update_board_call == update_board_calls)
     dbg = 0;
 
+  bBlack = (gamept->curr_move % 2);
+
+  from_piece = get_piece1(gamept,gamept->moves[gamept->curr_move].from);
+  to_piece = get_piece1(gamept,gamept->moves[gamept->curr_move].to);
+
+  if (from_piece * to_piece < 0)
+    gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_CAPTURE;
+
+  switch (gamept->moves[gamept->curr_move].special_move_info) {
+    case SPECIAL_MOVE_PROMOTION_QUEEN:
+      from_piece = (bBlack ? QUEEN_ID * -1 : QUEEN_ID);
+
+      break;
+    case SPECIAL_MOVE_PROMOTION_ROOK:
+      from_piece = (bBlack ? ROOK_ID * -1 : ROOK_ID);
+
+      break;
+    case SPECIAL_MOVE_PROMOTION_BISHOP:
+      from_piece = (bBlack ? BISHOP_ID * -1 : BISHOP_ID);
+
+      break;
+    case SPECIAL_MOVE_PROMOTION_KNIGHT:
+      from_piece = (bBlack ? KNIGHT_ID * -1 : KNIGHT_ID);
+
+      break;
+  }
+
   if (invalid_squares) {
     invalid_squares[(*num_invalid_squares)++] = gamept->moves[gamept->curr_move].from;
     invalid_squares[(*num_invalid_squares)++] = gamept->moves[gamept->curr_move].to;
   }
 
-  set_piece(gamept,gamept->moves[gamept->curr_move].to,
-    get_piece1(gamept,gamept->moves[gamept->curr_move].from));
+  set_piece(gamept,gamept->moves[gamept->curr_move].to,from_piece);
 
   set_piece(gamept,gamept->moves[gamept->curr_move].from,0);  /* vacate previous square */
 
