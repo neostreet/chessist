@@ -70,8 +70,6 @@ int read_binary_game(char *filename,struct game *gamept)
     return 2;
   }
 
-  populate_initial_board(gamept);
-
   bytes_to_read = gamept->num_moves * sizeof (struct move);
 
   if (bytes_to_read) {
