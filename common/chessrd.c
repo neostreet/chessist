@@ -84,7 +84,7 @@ int read_binary_game(char *filename,struct game *gamept)
   close(fhndl);
 
   set_initial_board(gamept);
-  position_game(gamept,gamept->num_moves);
+  position_game(gamept,gamept->curr_move);
 
   return 0;
 }
