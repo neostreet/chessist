@@ -8,7 +8,6 @@
 #define IDC_ROOK                        404
 #define IDC_BISHOP                      405
 #define IDC_KNIGHT                      407
-#define IDC_GARGANTUA                   408
 
 // Next default values for new objects
 // 
