@@ -797,21 +797,6 @@ static void toggle_board_size(HWND hWnd)
     chess_window_width,chess_window_height,TRUE);
 }
 
-static void position_game(int move)
-{
-  char position_file_name[80];
-
-  curr_game.curr_move = 0;
-  set_initial_board(&curr_game);
-
-  for ( ; curr_game.curr_move < move; curr_game.curr_move++) {
-    update_board(&curr_game,NULL,NULL);
-  }
-
-  // sprintf(position_file_name,"position_%d",curr_game.curr_move);
-  // fprint_bd(&curr_game,position_file_name);
-}
-
 void do_new(HWND hWnd,struct game *gamept)
 {
   char *cpt;
@@ -839,7 +824,7 @@ void prev_move(HWND hWnd)
   if (!curr_game.curr_move)
     return;
 
-  position_game(curr_game.curr_move - 1);
+  position_game(&curr_game,curr_game.curr_move - 1);
   invalidate_board(hWnd);
   redisplay_counts(hWnd,NULL);
 }
@@ -851,14 +836,14 @@ void next_move(HWND hWnd)
 
 void start_of_game(HWND hWnd)
 {
-  position_game(0);
+  position_game(&curr_game,0);
   invalidate_board(hWnd);
   redisplay_counts(hWnd,NULL);
 }
 
 void end_of_game(HWND hWnd)
 {
-  position_game(curr_game.num_moves);
+  position_game(&curr_game,curr_game.num_moves);
   invalidate_board(hWnd);
   redisplay_counts(hWnd,NULL);
 }
