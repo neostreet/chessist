@@ -3,6 +3,12 @@
 // Used by chessist.rc
 //
 #define IDC_COMPANY2                    401
+#define IDC_PROMOTION_GROUP             402
+#define IDC_QUEEN                       403
+#define IDC_ROOK                        404
+#define IDC_BISHOP                      405
+#define IDC_KNIGHT                      407
+#define IDC_GARGANTUA                   408
 
 // Next default values for new objects
 // 
