@@ -183,6 +183,15 @@ void set_initial_board(struct game *gamept)
     gamept->board[n] = initial_board[n];
 }
 
+void position_game(struct game *gamept,int move)
+{
+  set_initial_board(gamept);
+
+  for (gamept->curr_move = 0; gamept->curr_move < move; gamept->curr_move++) {
+    update_board(gamept,NULL,NULL);
+  }
+}
+
 static int update_board_calls;
 static int dbg_update_board_call;
 static int dbg;
