@@ -20,14 +20,17 @@
 #define QUEEN_ID      5
 #define KING_ID       6
 
-#define SPECIAL_MOVE_KINGSIDE_CASTLE  201
-#define SPECIAL_MOVE_QUEENSIDE_CASTLE 202
-#define SPECIAL_MOVE_CAPTURE          203
-#define SPECIAL_MOVE_EN_PASSANT       204
-#define SPECIAL_MOVE_PROMOTION_QUEEN  205
-#define SPECIAL_MOVE_PROMOTION_ROOK   206
-#define SPECIAL_MOVE_PROMOTION_KNIGHT 207
-#define SPECIAL_MOVE_PROMOTION_BISHOP 208
+#define SPECIAL_MOVE_NONE                      0x0000
+#define SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE   0x0001
+#define SPECIAL_MOVE_KINGSIDE_CASTLE           0x0002
+#define SPECIAL_MOVE_QUEENSIDE_CASTLE          0x0004
+#define SPECIAL_MOVE_CHECK                     0x0008
+#define SPECIAL_MOVE_CAPTURE                   0x0010
+#define SPECIAL_MOVE_EN_PASSANT_CAPTURE        0x0020
+#define SPECIAL_MOVE_PROMOTION_QUEEN           0x0040
+#define SPECIAL_MOVE_PROMOTION_ROOK            0x0080
+#define SPECIAL_MOVE_PROMOTION_KNIGHT          0x0100
+#define SPECIAL_MOVE_PROMOTION_BISHOP          0x0200
 
 #define WORDLEN 80
 #define MAX_MOVES 400
@@ -66,7 +69,6 @@ struct move {
 #define MAX_TITLE_LEN 128
 
 struct game {
-  char chessfilename[MAX_FILE_NAME_LEN];
   char title[MAX_TITLE_LEN];
   int orientation;
   int num_moves;
