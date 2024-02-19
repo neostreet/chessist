@@ -201,3 +201,8 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt)
 
   return end_of_file;
 }
+
+void copy_game(struct game *gamept_to,struct game *gamept_from)
+{
+  memcpy(gamept_to,gamept_from,sizeof (struct game));
+}
