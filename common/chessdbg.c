@@ -44,7 +44,7 @@ char get_decoded_piece(struct game *gamept)
 {
   int piece;
 
-  piece = get_piece1(gamept,
+  piece = get_piece1(gamept->board,
     gamept->moves[gamept->curr_move-1].to);
   return decode_piece(piece,FALSE);
 }
