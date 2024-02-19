@@ -556,9 +556,9 @@ void do_paint(HWND hWnd)
       }
 
       if (!curr_game.orientation)
-        piece = get_piece2(&curr_game,(NUM_RANKS - 1) - m,n);
+        piece = get_piece2(curr_game.board,(NUM_RANKS - 1) - m,n);
       else
-        piece = get_piece2(&curr_game,m,(NUM_FILES - 1) - n);
+        piece = get_piece2(curr_game.board,m,(NUM_FILES - 1) - n);
 
       if (debug_level == 2) {
         if (debug_fptr)
@@ -1373,27 +1373,27 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
   if (!curr_game.orientation) {
     if (highlight_rank == -1) {
       move_start_square = ((NUM_RANKS - 1) - rank) * NUM_FILES + file;
-      move_start_square_piece = get_piece1(&curr_game,move_start_square);
+      move_start_square_piece = get_piece1(curr_game.board,move_start_square);
 
       if (!move_start_square_piece)
         return;
     }
     else {
       move_end_square = ((NUM_RANKS - 1) - rank) * NUM_FILES + file;
-      move_end_square_piece = get_piece1(&curr_game,move_end_square);
+      move_end_square_piece = get_piece1(curr_game.board,move_end_square);
     }
   }
   else {
     if (highlight_rank == -1) {
       move_start_square = rank * NUM_FILES + (NUM_FILES - 1) - file;
-      move_start_square_piece = get_piece1(&curr_game,move_start_square);
+      move_start_square_piece = get_piece1(curr_game.board,move_start_square);
 
       if (!move_start_square_piece)
         return;
     }
     else {
       move_end_square = rank * NUM_FILES + (NUM_FILES - 1) - file;
-      move_end_square_piece = get_piece1(&curr_game,move_end_square);
+      move_end_square_piece = get_piece1(curr_game.board,move_end_square);
     }
   }
 
