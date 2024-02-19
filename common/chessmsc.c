@@ -307,11 +307,11 @@ int get_piece1(unsigned char *board,int board_offset)
   return piece_int;
 }
 
-int get_piece2(unsigned char *board,int row,int column)
+int get_piece2(unsigned char *board,int rank,int file)
 {
   int board_offset;
 
-  board_offset = row * NUM_RANKS + column;
+  board_offset = rank * NUM_FILES + file;
   return get_piece1(board,board_offset);
 }
 
@@ -336,10 +336,10 @@ void set_piece1(unsigned char *board,int board_offset,int piece)
   set_bits(BITS_PER_BOARD_SQUARE,board,bit_offset,piece);
 }
 
-void set_piece2(unsigned char *board,int row,int column,int piece)
+void set_piece2(unsigned char *board,int rank,int file,int piece)
 {
   int board_offset;
 
-  board_offset = row * NUM_FILES + column;
+  board_offset = rank * NUM_FILES + file;
   set_piece1(board,board_offset,piece);
 }
