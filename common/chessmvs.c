@@ -6,9 +6,12 @@
 #include "chess.mac"
 #include "chess.fun"
 
+static struct game scratch;
+
 int do_pawn_move(struct game *gamept)
 {
   bool bWhiteMove;
+  bool bBlack;
   int start_rank;
   int start_file;
   int end_rank;
@@ -82,6 +85,18 @@ int do_pawn_move(struct game *gamept)
       return 11; // failure
   }
 
+  // don't allow moves which would put the mover in check; use a scratch game
+  // to achieve this
+
+  copy_game(&scratch,gamept);
+  scratch.moves[scratch.curr_move].from = move_start_square;
+  scratch.moves[scratch.curr_move].to = move_end_square;
+  update_board(&scratch,NULL,NULL);
+  bBlack = scratch.curr_move & 0x1;
+
+  if (player_is_in_check(bBlack,scratch.board))
+    return 1;
+
   gamept->moves[gamept->curr_move].from = move_start_square;
   gamept->moves[gamept->curr_move].to = move_end_square;
 
@@ -97,8 +112,6 @@ int (*piece_functions[])(struct game *) = {
   queen_move2,
   king_move2
 };
-
-static struct game scratch;
 
 int do_piece_move(struct game *gamept)
 {
