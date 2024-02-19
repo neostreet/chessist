@@ -77,7 +77,7 @@ void fprint_game(struct game *gamept,char *filename)
        gamept->curr_move <= gamept->num_moves;
        gamept->curr_move++) {
 
-    sprintf_move(gamept,buf,20);
+    sprintf_move(gamept,buf,20,true);
     fprintf(fptr,fmt_str,buf);
 
     update_board(gamept,NULL,NULL);
@@ -98,7 +98,7 @@ void fprint_game2(struct game *gamept,FILE *fptr)
        gamept->curr_move <= gamept->num_moves;
        gamept->curr_move++) {
 
-    sprintf_move(gamept,buf,20);
+    sprintf_move(gamept,buf,20,true);
     fprintf(fptr,fmt_str,buf);
 
     update_board(gamept,NULL,NULL);
