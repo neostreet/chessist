@@ -801,7 +801,6 @@ void do_new(HWND hWnd,struct game *gamept)
 {
   char *cpt;
 
-  gamept->chessfilename[0] = 0;
   gamept->title[0] = 0;
 
   if ((cpt = getenv("DEBUG_ORIENTATION")) != NULL)
