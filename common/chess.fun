@@ -48,7 +48,7 @@ void fprint_moves2(struct game *gamept,FILE *fptr);
 
 void print_game(struct game *gamept);
 void fprintf_move(FILE *fptr,struct game *gamept);
-void sprintf_move(struct game *gamept,char *buf,int buf_len);
+void sprintf_move(struct game *gamept,char *buf,int buf_len,bool bInline);
 
 int square_attacks_square(unsigned char *board,int square1,int square2);
 int pawn_attacks_square(unsigned char *board,int square1,int color,int square2);
