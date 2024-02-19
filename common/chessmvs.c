@@ -98,10 +98,13 @@ int (*piece_functions[])(struct game *) = {
   king_move2
 };
 
+static struct game scratch;
+
 int do_piece_move(struct game *gamept)
 {
   int which_piece;
   int retval;
+  bool bBlack;
 
   which_piece = move_start_square_piece;
 
@@ -112,13 +115,24 @@ int do_piece_move(struct game *gamept)
 
   retval = (*piece_functions[which_piece])(gamept);
 
-  if (!retval) {
-    gamept->moves[gamept->curr_move].from = move_start_square;
-    gamept->moves[gamept->curr_move].to = move_end_square;
-    return 0;  /* success */
-  }
+  if (retval)
+    return 1;
 
-  return 1;
+  // don't allow moves which would put the mover in check; use a scratch game
+  // to achieve this
+
+  copy_game(&scratch,gamept);
+  scratch.moves[scratch.curr_move].from = move_start_square;
+  scratch.moves[scratch.curr_move].to = move_end_square;
+  update_board(&scratch,NULL,NULL);
+  bBlack = scratch.curr_move & 0x1;
+
+  if (player_is_in_check(bBlack,scratch.board))
+    return 1;
+
+  gamept->moves[gamept->curr_move].from = move_start_square;
+  gamept->moves[gamept->curr_move].to = move_end_square;
+  return 0;  /* success */
 }
 
 int get_to_position(char *word,int wordlen,int *to_filept,int *to_rankpt)
@@ -149,12 +163,12 @@ int rook_move(
   if (file1 == file2) {
     if (rank1 > rank2) {
       for (n = rank2 + 1; n < rank1; n++)
-        if (get_piece2(gamept,n,file1))
+        if (get_piece2(gamept->board,n,file1))
           return 1;  /* failure */
     }
     else
       for (n = rank1 + 1; n < rank2; n++)
-        if (get_piece2(gamept,n,file1))
+        if (get_piece2(gamept->board,n,file1))
           return 2;  /* failure */
 
     return 0;  /* success */
@@ -163,12 +177,12 @@ int rook_move(
   if (rank1 == rank2) {
     if (file1 > file2) {
       for (n = file2 + 1; n < file1; n++)
-        if (get_piece2(gamept,rank1,n))
+        if (get_piece2(gamept->board,rank1,n))
           return 1;  /* failure */
     }
     else
       for (n = file1 + 1; n < file2; n++)
-        if (get_piece2(gamept,rank1,n))
+        if (get_piece2(gamept->board,rank1,n))
           return 2;  /* failure */
 
     return 0;  /* success */
@@ -284,7 +298,7 @@ int bishop_move(
 
     rank1 += rank_dir;
 
-    if (get_piece2(gamept,rank1,file1))
+    if (get_piece2(gamept->board,rank1,file1))
       return 2;  /* failure */
   }
 
@@ -358,7 +372,7 @@ int king_move(
     // it's White's move
 
     // check for kingside castle
-    if ((file1 == 4) && (rank1 == 0) && (file2 == 6) && (rank2 == 0) && !get_piece1(gamept,5)) {
+    if ((file1 == 4) && (rank1 == 0) && (file2 == 6) && (rank2 == 0) && !get_piece1(gamept->board,5)) {
       gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
       return 0;
     }
