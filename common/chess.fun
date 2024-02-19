@@ -34,9 +34,9 @@ void set_initial_board(struct game *gamept);
 void position_game(struct game *gamept,int move);
 void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares);
 int get_piece1(unsigned char *board,int board_offset);
-int get_piece2(unsigned char *board,int row,int column);
+int get_piece2(unsigned char *board,int rank,int file);
 void set_piece1(unsigned char *board,int board_offset,int piece);
-void set_piece2(unsigned char *board,int row,int column,int piece);
+void set_piece2(unsigned char *board,int rank,int file,int piece);
 
 void print_bd(struct game *gamept);
 void fprint_game(struct game *gamept,char *filename);
