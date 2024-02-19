@@ -506,7 +506,7 @@ static void redisplay_counts(HWND hWnd,HDC hdc)
   rect.left = 0;
   rect.top = TOOLBAR_HEIGHT;
 
-  sprintf_move(&curr_game,buf,20);
+  sprintf_move(&curr_game,buf,20,true);
   TextOut(local_hdc,rect.left,rect.top,buf,lstrlen(buf));
 }
 
