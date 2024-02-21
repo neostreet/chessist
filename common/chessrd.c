@@ -206,3 +206,94 @@ void copy_game(struct game *gamept_to,struct game *gamept_from)
 {
   memcpy(gamept_to,gamept_from,sizeof (struct game));
 }
+
+void GetLine(FILE *fptr,char *line,int *line_len,int maxllen)
+{
+  int chara;
+  int local_line_len;
+
+  local_line_len = 0;
+
+  for ( ; ; ) {
+    chara = fgetc(fptr);
+
+    if (feof(fptr))
+      break;
+
+    if (chara == '\n')
+      break;
+
+    if (local_line_len < maxllen - 1)
+      line[local_line_len++] = (char)chara;
+  }
+
+  line[local_line_len] = 0;
+  *line_len = local_line_len;
+}
+
+#define MAX_LINE_LEN 256
+static char line[MAX_LINE_LEN];
+
+int populate_board_from_board_file(unsigned char *board,char *filename)
+{
+  int m;
+  int n;
+  FILE *fptr;
+  int line_len;
+  int line_no;
+  int chara;
+  int piece;
+
+  if ((fptr = fopen(filename,"r")) == NULL)
+    return 1;
+
+  line_no = 0;
+
+  for ( ; ; ) {
+    GetLine(fptr,line,&line_len,MAX_LINE_LEN);
+
+    if (feof(fptr))
+      break;
+
+    if (line_len != 15)
+      return 2;
+
+    for (n = 0; n < NUM_FILES; n++) {
+      chara = line[n*2];
+
+      if (chara == '.') {
+        piece = 0;
+        set_piece2(board,7 - line_no,n,piece);
+      }
+      else {
+        if (chara == 'p')
+          set_piece2(board,7 - line_no,n,PAWN_ID);
+        else if (chara == 'P')
+          set_piece2(board,7 - line_no,n,PAWN_ID * -1);
+        else if (chara == 'e')
+          set_piece2(board,7 - line_no,n,EMPTY_ID);
+        else {
+          for (m = 0; m < NUM_PIECE_TYPES; m++) {
+            if (chara == piece_ids[m]) {
+              piece = (m + 2) * -1;
+              break;
+            }
+            else if (chara == piece_ids[m] - 'A' + 'a') {
+              piece = (m + 2);
+              break;
+            }
+          }
+
+          if (m < NUM_PIECE_TYPES)
+            set_piece2(board,7 - line_no,n,piece);
+        }
+      }
+    }
+
+    line_no++;
+  }
+
+  fclose(fptr);
+
+  return 0;
+}
