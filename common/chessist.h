@@ -1,6 +1,6 @@
 #define IDM_NEW                100
 #define IDM_OPEN               101
-#define IDM_OPEN_BINARY_GAME   102
+#define IDM_READ_BOARD         102
 #define IDM_SAVE               103
 #define IDM_SAVEAS             104
 #define IDM_PRINT              105
