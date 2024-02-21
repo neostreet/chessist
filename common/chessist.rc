@@ -55,6 +55,7 @@ BEGIN
     BEGIN
         MENUITEM "&New",                        IDM_NEW
         MENUITEM "Open &game...",               IDM_OPEN
+        MENUITEM "Read &board...",              IDM_READ_BOARD
         MENUITEM "&Save",                       IDM_SAVE
         MENUITEM "Save &As...",                 IDM_SAVEAS
         MENUITEM SEPARATOR
