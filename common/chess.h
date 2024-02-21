@@ -19,6 +19,7 @@
 #define BISHOP_ID     4
 #define QUEEN_ID      5
 #define KING_ID       6
+#define EMPTY_ID      7
 
 #define SPECIAL_MOVE_NONE                      0x0000
 #define SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE   0x0001
