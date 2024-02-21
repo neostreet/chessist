@@ -11,6 +11,8 @@ int get_color(int);
 void put_square(struct game *gamept,int what,int where);
 void update_move_number(struct game *gamept);
 void copy_game(struct game *gamept_to,struct game *gamept_from);
+void GetLine(FILE *fptr,char *line,int *line_len,int maxllen);
+int populate_board_from_board_file(unsigned char *board,char *filename);
 
 int do_pawn_move(struct game *gamept);
 int get_piece_id_ix(char piece);
