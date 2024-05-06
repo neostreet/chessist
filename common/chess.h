@@ -74,8 +74,8 @@ struct game {
   int orientation;
   int num_moves;
   int curr_move;
-  struct move moves[MAX_MOVES];
   unsigned char board[CHARS_IN_BOARD];  /* 8 columns * 8 rows / 2 (nibbles per char) */
+  struct move moves[MAX_MOVES];
 };
 
 typedef char (*CHESS_FILE_LIST)[MAX_FILE_NAME_LEN];
