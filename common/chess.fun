@@ -1,9 +1,11 @@
 /*** chess function declarations ***/
 
+int read_game(char *filename,struct game *gamept,char *err_msg);
 int read_binary_game(char *filename,struct game *gamept);
+int read_game_and_display(FILE *fptr,struct game *gamept,char *err_msg);
 int write_binary_game(char *filename,struct game *gamept);
 char xlate_piece(char);
-int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt);
+int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,bool *bCheck,bool *bMate);
 int get_draw_input(struct game *gamept);
 int get_xstart(struct game *gamept,int board_offset);
 int get_ystart(struct game *gamept,int board_offset);
@@ -13,10 +15,19 @@ void update_move_number(struct game *gamept);
 void copy_game(struct game *gamept_to,struct game *gamept_from);
 void GetLine(FILE *fptr,char *line,int *line_len,int maxllen);
 int populate_board_from_board_file(unsigned char *board,char *filename);
+int populate_initial_board_from_board_file(char *filename);
+int populate_board_from_bin_board_file(unsigned char *board,char *filename);
+int populate_piece_counts_from_piece_count_file(int *piece_counts,char *filename);
+int populate_initial_board_from_bin_board_file(char *filename);
+int write_board_to_binfile(unsigned char *board,char *filename);
+int refresh_force_count(struct game *gamept);
 
-int do_pawn_move(struct game *gamept);
+int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct move *move_ptr);
+int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct move *move_ptr);
+int do_pawn_move2(struct game *gamept);
 int get_piece_id_ix(char piece);
-int do_piece_move(struct game *gamept);
+int do_piece_move(struct game *gamept,int direction,char *word,int wordlen,struct move *move_ptr);
+int do_piece_move2(struct game *gamept);
 int allow_user_moves(struct game *gamept);
 
 int rook_move(struct game *,int,int,int,int);
@@ -34,13 +45,30 @@ int get_to_position(char *word,int wordlen,int *to_filept,int *to_rankpt);
 
 void set_initial_board(struct game *gamept);
 void position_game(struct game *gamept,int move);
-void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares);
+void print_special_moves(struct game *gamept);
+void update_board(unsigned char *board,struct game *gamept,int *invalid_squares,int *num_invalid_squares);
 int get_piece1(unsigned char *board,int board_offset);
-int get_piece2(unsigned char *board,int rank,int file);
+int get_piece2(unsigned char *board,int row,int column);
 void set_piece1(unsigned char *board,int board_offset,int piece);
-void set_piece2(unsigned char *board,int rank,int file,int piece);
+void set_piece2(unsigned char *board,int row,int column,int piece);
+bool multiple_queens(unsigned char *board);
+bool opposite_colored_bishops(unsigned char *board);
+bool same_colored_bishops(unsigned char *board);
+bool two_bishops(unsigned char *board);
+bool opposite_side_castling(struct game *gamept);
+bool same_side_castling(struct game *gamept);
+bool less_than_2_castles(struct game *gamept);
+int get_enemy_king_file_and_rank(struct game *gamept,int *file_pt,int *rank_pt);
+void copy_board(unsigned char *from_board,unsigned char *to_board);
+int count_num_pieces(int color,struct game *gamept);
+void get_piece_counts(unsigned char *board,int *piece_counts);
+int piece_counts_match(int *piece_counts,int *match_piece_counts,bool bExactMatch);
+void print_piece_counts(int *piece_counts);
 
+int format_square(int square);
+void print_bd0(unsigned char *board,int orientation);
 void print_bd(struct game *gamept);
+void fprint_game_bin(struct game *gamept,char *filename);
 void fprint_game(struct game *gamept,char *filename);
 void fprint_game2(struct game *gamept,FILE *fptr);
 void fprint_bd(struct game *gamept,char *filename);
@@ -48,9 +76,12 @@ void fprint_bd2(struct game *gamept,FILE *fptr);
 void fprint_moves(struct game *gamept,char *filename);
 void fprint_moves2(struct game *gamept,FILE *fptr);
 
+int match_board(unsigned char *board1,unsigned char *board2,bool bExactMatch);
+
 void print_game(struct game *gamept);
 void fprintf_move(FILE *fptr,struct game *gamept);
 void sprintf_move(struct game *gamept,char *buf,int buf_len,bool bInline);
+void print_from_to(struct game *gamept);
 
 int square_attacks_square(unsigned char *board,int square1,int square2);
 int pawn_attacks_square(unsigned char *board,int square1,int color,int square2);
