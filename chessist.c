@@ -720,7 +720,7 @@ static void do_move(HWND hWnd)
   if (debug_level == 2) {
     if (debug_fptr) {
       fprintf(debug_fptr,"do_move\n");
-      fprint_bd2(&curr_game,debug_fptr);
+      fprint_bd2(curr_game.board,debug_fptr);
     }
   }
 
@@ -1114,7 +1114,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_PRINT_BOARD:
           if (debug_level == 2) {
             if (debug_fptr)
-              fprint_bd2(&curr_game,debug_fptr);
+              fprint_bd2(curr_game.board,debug_fptr);
           }
 
           break;
