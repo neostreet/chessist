@@ -712,7 +712,7 @@ static void do_move(HWND hWnd)
     return;
 
   num_invalid_squares = 0;
-  update_board(&curr_game,invalid_squares,&num_invalid_squares);
+  update_board(curr_game.board,&curr_game,invalid_squares,&num_invalid_squares);
 
   for (n = 0; n < num_invalid_squares; n++)
     invalidate_square(hWnd,invalid_squares[n]);
@@ -863,7 +863,7 @@ void do_read(HWND hWnd,LPSTR name,struct game *gamept)
   int retval;
   char buf[256];
 
-  retval = read_binary_game(name,gamept);
+  retval = read_game(name,gamept,err_msg);
 
   if (!retval) {
     bHaveGame = TRUE;
@@ -1478,7 +1478,7 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
 
   if ((move_start_square_piece == PAWN_ID) ||
       (move_start_square_piece == PAWN_ID * -1)) {
-    retval = do_pawn_move(&curr_game);
+    retval = do_pawn_move2(&curr_game);
 
     if (!retval) {
       // check if this was a pawn promotion
@@ -1520,11 +1520,11 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     }
   }
   else
-    retval = do_piece_move(&curr_game);
+    retval = do_piece_move2(&curr_game);
 
   if (!retval) {
     num_invalid_squares = 0;
-    update_board(&curr_game,invalid_squares,&num_invalid_squares);
+    update_board(curr_game.board,&curr_game,invalid_squares,&num_invalid_squares);
 
     for (n = 0; n < num_invalid_squares; n++)
       invalidate_square(hWnd,invalid_squares[n]);
