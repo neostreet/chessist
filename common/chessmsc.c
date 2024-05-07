@@ -167,7 +167,7 @@ void fprint_bd(struct game *gamept,char *filename)
   fclose(fptr);
 }
 
-void fprint_bd2(struct game *gamept,FILE *fptr)
+void fprint_bd2(unsigned char *board,FILE *fptr)
 {
   int m;
   int n;
@@ -175,7 +175,7 @@ void fprint_bd2(struct game *gamept,FILE *fptr)
 
   for (m = 0; m < NUM_RANKS; m++) {
     for (n = 0; n < NUM_FILES; n++) {
-      square = get_piece2(gamept->board,(NUM_RANKS - 1) - m,n);
+      square = get_piece2(board,(NUM_RANKS - 1) - m,n);
       fprintf(fptr,"%c ",format_square(square));
     }
 
