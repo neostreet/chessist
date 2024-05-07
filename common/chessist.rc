@@ -96,8 +96,8 @@ CAPTION "About Chessistant"
 FONT 8, "System"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,36,35,32,14,WS_GROUP
-    CTEXT           "Chessistant 5.0",IDC_COMPANY,6,6,100,8
-    CTEXT           "c 2023 Ambergris Software",IDC_COMPANY2,3,20,100,8
+    CTEXT           "Chessistant 6.0",IDC_COMPANY,6,6,100,8
+    CTEXT           "c 2024 Ambergris Software",IDC_COMPANY2,3,20,100,8
 END
 
 PROMOTIONBOX DIALOG DISCARDABLE  22, 17, 148, 190
