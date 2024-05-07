@@ -6,21 +6,58 @@
 #include "chess.glb"
 #include "chess.mac"
 
-extern char piece_ids[]; /* "RNBQK" */
-
 static char buf[20];
-char fmt_str[] = "%s\n";
 
-char decode_piece(int piece,int bShowBlack)
+bool kingside_castle(struct game *gamept)
 {
-  int bBlack;
+  if (!((gamept->curr_move) % 2)) {
+    // white
+
+    if ((gamept->moves[gamept->curr_move].from == 4) &&
+      (gamept->moves[gamept->curr_move].to == 6))
+      return true;
+  }
+  else {
+    // black
+
+    if ((gamept->moves[gamept->curr_move].from == 60) &&
+      (gamept->moves[gamept->curr_move].to == 62))
+      return true;
+  }
+
+  return false;
+}
+
+bool queenside_castle(struct game *gamept)
+{
+  if (!((gamept->curr_move) % 2)) {
+    // white
+
+    if ((gamept->moves[gamept->curr_move].from == 4) &&
+      (gamept->moves[gamept->curr_move].to == 2))
+      return true;
+  }
+  else {
+    // black
+
+    if ((gamept->moves[gamept->curr_move].from == 60) &&
+      (gamept->moves[gamept->curr_move].to == 58))
+      return true;
+  }
+
+  return false;
+}
+
+char decode_piece(int piece,bool bShowBlack)
+{
+  bool bBlack;
 
   if (piece < 0) {
-    bBlack = TRUE;
+    bBlack = true;
     piece *= -1;
   }
   else
-    bBlack = FALSE;
+    bBlack = false;
 
   if (!piece)
     return '.';
@@ -45,8 +82,8 @@ char get_decoded_piece(struct game *gamept)
   int piece;
 
   piece = get_piece1(gamept->board,
-    gamept->moves[gamept->curr_move-1].to);
-  return decode_piece(piece,FALSE);
+    gamept->moves[gamept->curr_move].from);
+  return decode_piece(piece,false);
 }
 
 char get_from_file(struct game *gamept)
@@ -81,7 +118,7 @@ void print_game(struct game *gamept)
     if (gamept->curr_move % 2)
       putchar(0x0a);
 
-    update_board(gamept,NULL,NULL);
+    update_board(gamept->board,gamept,NULL,NULL);
   }
 
   if (gamept->num_moves % 2)
@@ -93,9 +130,10 @@ void fprintf_move(FILE *fptr,struct game *gamept)
   if (gamept->curr_move == gamept->num_moves)
     return;
 
-  fprintf(fptr,"%d %d\n",
+  fprintf(fptr,"%d %d %d\n",
     gamept->moves[gamept->curr_move].from,
-    gamept->moves[gamept->curr_move].to);
+    gamept->moves[gamept->curr_move].to,
+    gamept->moves[gamept->curr_move].special_move_info);
 }
 
 void sprintf_move(struct game *gamept,char *buf,int buf_len,bool bInline)
@@ -124,11 +162,11 @@ void sprintf_move(struct game *gamept,char *buf,int buf_len,bool bInline)
     put_count += 5;
   }
 
-  if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_KINGSIDE_CASTLE) {
+  if (kingside_castle(gamept)) {
     sprintf(&buf[put_count],"O-O");
     put_count += 3;
   }
-  else if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_QUEENSIDE_CASTLE) {
+  else if (queenside_castle(gamept)) {
     sprintf(&buf[put_count],"O-O-O");
     put_count += 5;
   }
@@ -167,4 +205,16 @@ void sprintf_move(struct game *gamept,char *buf,int buf_len,bool bInline)
   }
 
   buf[put_count] = 0;
+}
+
+void print_from_to(struct game *gamept)
+{
+  printf(fmt_str,gamept->title);
+
+  set_initial_board(gamept);
+
+  for (gamept->curr_move = 0; gamept->curr_move < gamept->num_moves; gamept->curr_move++) {
+    printf("%2d %2d\n",gamept->moves[gamept->curr_move].from,gamept->moves[gamept->curr_move].to);
+    print_special_moves(gamept);
+  }
 }
