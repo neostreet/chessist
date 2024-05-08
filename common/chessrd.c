@@ -232,7 +232,7 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
       gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_MATE;
     }
 
-    update_board(gamept->board,gamept,NULL,NULL);
+    update_board(gamept,NULL,NULL);
 
     gamept->curr_move++;
   }
@@ -405,13 +405,15 @@ static int update_board_calls;
 static int dbg_update_board_call;
 static int dbg;
 
-void update_board(unsigned char *board,struct game *gamept,int *invalid_squares,int *num_invalid_squares)
+void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares)
 {
-  bool bKingsideCastle;
-  bool bQueensideCastle;
   bool bBlack;
   int from_piece;
   int to_piece;
+  bool bKingsideCastle = false;
+  bool bQueensideCastle = false;
+  bool bEnPassantCapture = false;
+  int square_to_clear;
 
   update_board_calls++;
 
@@ -420,90 +422,107 @@ void update_board(unsigned char *board,struct game *gamept,int *invalid_squares,
 
   bBlack = (gamept->curr_move % 2);
 
-  from_piece = get_piece1(board,gamept->moves[gamept->curr_move].from);
-  to_piece = get_piece1(board,gamept->moves[gamept->curr_move].to);
+  from_piece = get_piece1(gamept->board,gamept->moves[gamept->curr_move].from);
+  to_piece = get_piece1(gamept->board,gamept->moves[gamept->curr_move].to);
 
   if (from_piece * to_piece < 0)
     gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_CAPTURE;
 
-  switch (gamept->moves[gamept->curr_move].special_move_info) {
-    case SPECIAL_MOVE_PROMOTION_QUEEN:
-      from_piece = (bBlack ? QUEEN_ID * -1 : QUEEN_ID);
-
-      break;
-    case SPECIAL_MOVE_PROMOTION_ROOK:
-      from_piece = (bBlack ? ROOK_ID * -1 : ROOK_ID);
-
-      break;
-    case SPECIAL_MOVE_PROMOTION_BISHOP:
-      from_piece = (bBlack ? BISHOP_ID * -1 : BISHOP_ID);
-
-      break;
-    case SPECIAL_MOVE_PROMOTION_KNIGHT:
-      from_piece = (bBlack ? KNIGHT_ID * -1 : KNIGHT_ID);
-
-      break;
+  if (debug_fptr) {
+    fprintf(debug_fptr,"update_board: curr_move = %d, special_move_info = %x\n",gamept->curr_move,gamept->moves[gamept->curr_move].special_move_info);
   }
 
+  if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_KINGSIDE_CASTLE)
+    bKingsideCastle = true;
+  else if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_QUEENSIDE_CASTLE)
+    bQueensideCastle = true;
+  else if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_EN_PASSANT_CAPTURE)
+    bEnPassantCapture = true;
+  else if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_PROMOTION_QUEEN)
+    from_piece = (bBlack ? QUEEN_ID * -1 : QUEEN_ID);
+  else if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_PROMOTION_ROOK)
+    from_piece = (bBlack ? ROOK_ID * -1 : ROOK_ID);
+  else if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_PROMOTION_BISHOP)
+    from_piece = (bBlack ? BISHOP_ID * -1 : BISHOP_ID);
+  else if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_PROMOTION_KNIGHT)
+    from_piece = (bBlack ? KNIGHT_ID * -1 : KNIGHT_ID);
+
   if (invalid_squares) {
+    *num_invalid_squares = 0;
     invalid_squares[(*num_invalid_squares)++] = gamept->moves[gamept->curr_move].from;
     invalid_squares[(*num_invalid_squares)++] = gamept->moves[gamept->curr_move].to;
   }
 
-  set_piece1(board,gamept->moves[gamept->curr_move].to,from_piece);
+  set_piece1(gamept->board,gamept->moves[gamept->curr_move].to,from_piece);
 
-  set_piece1(board,gamept->moves[gamept->curr_move].from,0);  /* vacate previous square */
-
-  bKingsideCastle = (gamept->moves[gamept->curr_move].special_move_info == SPECIAL_MOVE_KINGSIDE_CASTLE);
-  bQueensideCastle = (gamept->moves[gamept->curr_move].special_move_info == SPECIAL_MOVE_QUEENSIDE_CASTLE);
+  set_piece1(gamept->board,gamept->moves[gamept->curr_move].from,0);  /* vacate previous square */
 
   if (bKingsideCastle) {
     if (!(gamept->curr_move % 2)) {
       // it's White's move
-      set_piece1(board,5,
-        get_piece1(board,7));
-      set_piece1(board,7,0);
+      set_piece1(gamept->board,6,ROOK_ID);
 
-      if (invalid_squares) {
-        invalid_squares[(*num_invalid_squares)++] = 5;
-        invalid_squares[(*num_invalid_squares)++] = 7;
-      }
+      if (invalid_squares)
+        invalid_squares[(*num_invalid_squares)++] = 6;
+
+      set_piece1(gamept->board,8,0);
+
+      if (invalid_squares)
+        invalid_squares[(*num_invalid_squares)++] = 8;
     }
     else {
       // it's Blacks's move
-      set_piece1(board,61,
-        get_piece1(board,63));
-      set_piece1(board,63,0);
+      set_piece1(gamept->board,76,ROOK_ID * -1);
 
-      if (invalid_squares) {
-        invalid_squares[(*num_invalid_squares)++] = 61;
-        invalid_squares[(*num_invalid_squares)++] = 63;
-      }
+      if (invalid_squares)
+        invalid_squares[(*num_invalid_squares)++] = 76;
+
+      set_piece1(gamept->board,78,0);
+
+      if (invalid_squares)
+        invalid_squares[(*num_invalid_squares)++] = 78;
     }
   }
   else if (bQueensideCastle) {
     if (!(gamept->curr_move % 2)) {
       // it's White's move
-      set_piece1(board,3,
-        get_piece1(board,0));
-      set_piece1(board,0,0);
+      set_piece1(gamept->board,4,ROOK_ID);
 
-      if (invalid_squares) {
-        invalid_squares[(*num_invalid_squares)++] = 3;
-        invalid_squares[(*num_invalid_squares)++] = 0;
-      }
+      if (invalid_squares)
+        invalid_squares[(*num_invalid_squares)++] = 4;
+
+      set_piece1(gamept->board,1,0);
+
+      if (invalid_squares)
+        invalid_squares[(*num_invalid_squares)++] = 1;
     }
     else {
       // it's Blacks's move
-      set_piece1(board,59,
-        get_piece1(board,56));
-      set_piece1(board,56,0);
+      set_piece1(gamept->board,74,ROOK_ID * -1);
 
-      if (invalid_squares) {
-        invalid_squares[(*num_invalid_squares)++] = 59;
-        invalid_squares[(*num_invalid_squares)++] = 56;
-      }
+      if (invalid_squares)
+        invalid_squares[(*num_invalid_squares)++] = 74;
+
+      set_piece1(gamept->board,71,0);
+
+      if (invalid_squares)
+        invalid_squares[(*num_invalid_squares)++] = 71;
     }
+  }
+  else if (bEnPassantCapture) {
+    if (!(gamept->curr_move % 2)) {
+      // it's White's move
+      square_to_clear = gamept->moves[gamept->curr_move].to - NUM_FILES;
+    }
+    else {
+      // it's Blacks's move
+      square_to_clear = gamept->moves[gamept->curr_move].to + NUM_FILES;
+    }
+
+    set_piece1(gamept->board,square_to_clear,0);
+
+    if (invalid_squares)
+      invalid_squares[(*num_invalid_squares)++] = square_to_clear;
   }
 }
 
