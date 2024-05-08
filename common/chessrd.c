@@ -524,6 +524,9 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
     if (invalid_squares)
       invalid_squares[(*num_invalid_squares)++] = square_to_clear;
   }
+
+  if (debug_fptr)
+    fprint_bd2(gamept->board,debug_fptr);
 }
 
 int get_piece1(unsigned char *board,int board_offset)
