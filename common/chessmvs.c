@@ -94,6 +94,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
   int capture_file;
   int piece;
   int which_piece;
+  bool bBlack;
 
   if (debug_fptr)
     fprintf(debug_fptr,"do_pawn_move: curr_move = %d, word = %s\n",gamept->curr_move,word);
@@ -265,7 +266,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
           }
         }
 
-        return 0;
+        goto check_for_illegal_move;
       }
     }
 
@@ -280,7 +281,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
             move_ptr->to = POS_OF(2,capture_file);
             move_ptr->special_move_info |=
               SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
-            return 0;
+            goto check_for_illegal_move;
           }
         }
       }
@@ -293,7 +294,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
             move_ptr->to = POS_OF(5,capture_file);
             move_ptr->special_move_info |=
               SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
-            return 0;
+            goto check_for_illegal_move;
           }
         }
       }
@@ -303,6 +304,22 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
   }
 
   return 14;
+
+check_for_illegal_move:
+
+  // don't allow moves which would put the mover in check; use a scratch game
+  // to achieve this
+
+  copy_game(&scratch,gamept);
+  scratch.moves[scratch.curr_move].from = move_ptr->from;
+  scratch.moves[scratch.curr_move].to = move_ptr->to;
+  update_board(&scratch,NULL,NULL);
+  bBlack = scratch.curr_move & 0x1;
+
+  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
+    return 15;
+
+  return 0;
 }
 
 int do_pawn_move2(struct game *gamept)
