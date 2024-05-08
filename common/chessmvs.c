@@ -276,7 +276,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
             move_ptr->from = POS_OF(3,file);
             move_ptr->to = POS_OF(2,capture_file);
             move_ptr->special_move_info |=
-              SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT;
+              SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
             return 0;
           }
         }
@@ -289,7 +289,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
             move_ptr->from = POS_OF(4,file);
             move_ptr->to = POS_OF(5,capture_file);
             move_ptr->special_move_info |=
-              SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT;
+              SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
             return 0;
           }
         }
@@ -312,6 +312,7 @@ int do_pawn_move2(struct game *gamept)
   int end_file;
   int rank_diff;
   int file_diff;
+  int retval;
 
   bWhiteMove = (move_start_square_piece > 0);
 
@@ -375,8 +376,23 @@ int do_pawn_move2(struct game *gamept)
     if (rank_diff != 1)
       return 10; // failure
 
-    if (!move_end_square_piece)
-      return 11; // failure
+    if (!move_end_square_piece) {
+      // check for en passant capture
+      if (bWhiteMove && (start_rank == 4) &&
+        (get_piece2(gamept->board,4,end_file) == PAWN_ID * -1) &&
+        (gamept->moves[gamept->curr_move-1].special_move_info == SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
+
+        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_EN_PASSANT_CAPTURE;
+      }
+      else if (!bWhiteMove && (start_rank == 3) &&
+        (get_piece2(gamept->board,3,end_file) == PAWN_ID) &&
+        (gamept->moves[gamept->curr_move-1].special_move_info == SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
+
+        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_EN_PASSANT_CAPTURE;
+      }
+      else
+        return 11; // failure
+    }
   }
 
   // don't allow moves which would put the mover in check; use a scratch game
@@ -385,16 +401,20 @@ int do_pawn_move2(struct game *gamept)
   copy_game(&scratch,gamept);
   scratch.moves[scratch.curr_move].from = move_start_square;
   scratch.moves[scratch.curr_move].to = move_end_square;
-  update_board(scratch.board,&scratch,NULL,NULL);
+  update_board(&scratch,NULL,NULL);
   bBlack = scratch.curr_move & 0x1;
 
   if (player_is_in_check(bBlack,scratch.board))
-    return 1;
+    return 12;
 
   gamept->moves[gamept->curr_move].from = move_start_square;
   gamept->moves[gamept->curr_move].to = move_end_square;
+  retval = 0;
 
-  return 0; // success
+  if (rank_diff > 1)
+    gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE;
+
+  return retval; // success
 }
 
 int get_piece_id_ix(char piece)
@@ -500,14 +520,14 @@ int do_piece_move(struct game *gamept,int direction,char *word,int wordlen,struc
           move_ptr->from = POS_OF(curr_rank,curr_file);
           move_ptr->to = POS_OF(to_rank,to_file);
 
-          // don't allow the move if it would put the mover in check
+          // don't allow moves which would put the mover in check; use a scratch game
+          // to achieve this
 
-          copy_board(gamept->board,board);
-          bBlack = gamept->curr_move & 0x1;
-          update_board(board,gamept,NULL,NULL);
-
-          if (gamept->curr_move == dbg_move)
-            dbg = 1;
+          copy_game(&scratch,gamept);
+          scratch.moves[scratch.curr_move].from = move_ptr->from;
+          scratch.moves[scratch.curr_move].to = move_ptr->to;
+          update_board(&scratch,NULL,NULL);
+          bBlack = scratch.curr_move & 0x1;
 
           if (!player_is_in_check(bBlack,board))
             return 0;  /* success */
@@ -543,7 +563,7 @@ int do_piece_move2(struct game *gamept)
   copy_game(&scratch,gamept);
   scratch.moves[scratch.curr_move].from = move_start_square;
   scratch.moves[scratch.curr_move].to = move_end_square;
-  update_board(scratch.board,&scratch,NULL,NULL);
+  update_board(&scratch,NULL,NULL);
   bBlack = scratch.curr_move & 0x1;
 
   if (player_is_in_check(bBlack,scratch.board))
