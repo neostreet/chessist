@@ -221,27 +221,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   // Initialize global strings
   lstrcpy (szAppName, appname);
 
-  for (n = 0; lpCmdLine[n]; n++) {
-    if (lpCmdLine[n] != ' ') {
-      if (lpCmdLine[n] == '-') {
-        if ((lpCmdLine[n+1] = 'h') &&
-            (lpCmdLine[n+2] = 'o') &&
-            (lpCmdLine[n+3] = 'm') &&
-            (lpCmdLine[n+4] = 'e'))
-          bHome = TRUE;
-
-        for ( ; lpCmdLine[n]; n++) {
-          if (lpCmdLine[n] == ' ')
-            break;
-        }
-      }
-      else
-        break;
-    }
-  }
-
   // save name of chess game
-  lstrcpy(szFile,&lpCmdLine[n]);
+  lstrcpy(szFile,lpCmdLine);
 
   if (szFile[0])
     wsprintf(szTitle,"%s - %s",szAppName,
@@ -863,6 +844,9 @@ void do_read(HWND hWnd,LPSTR name,struct game *gamept)
   int retval;
   char buf[256];
 
+  if (debug_fptr)
+    fprintf(debug_fptr,"%s\n","do_read(): top of function");
+
   retval = read_game(name,gamept,err_msg);
 
   if (!retval) {
@@ -1011,8 +995,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
       if (szFile[0])
         do_read(hWnd,szFile,&curr_game);
-      else
+      else {
+        if (debug_fptr)
+          fprintf(debug_fptr,"%s\n","calling do_new() instead of do_read(), since szFile[0] is NULL");
+
         do_new(hWnd,&curr_game);
+      }
 
       highlight_rank = -1;
       highlight_file = -1;
