@@ -693,7 +693,7 @@ static void do_move(HWND hWnd)
     return;
 
   num_invalid_squares = 0;
-  update_board(curr_game.board,&curr_game,invalid_squares,&num_invalid_squares);
+  update_board(&curr_game,invalid_squares,&num_invalid_squares);
 
   for (n = 0; n < num_invalid_squares; n++)
     invalidate_square(hWnd,invalid_squares[n]);
@@ -1512,7 +1512,7 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
 
   if (!retval) {
     num_invalid_squares = 0;
-    update_board(curr_game.board,&curr_game,invalid_squares,&num_invalid_squares);
+    update_board(&curr_game,invalid_squares,&num_invalid_squares);
 
     for (n = 0; n < num_invalid_squares; n++)
       invalidate_square(hWnd,invalid_squares[n]);
