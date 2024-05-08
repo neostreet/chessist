@@ -95,6 +95,9 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
   int piece;
   int which_piece;
 
+  if (debug_fptr)
+    fprintf(debug_fptr,"do_pawn_move: curr_move = %d, word = %s\n",gamept->curr_move,word);
+
   /*printf("%s\n",word);/*for now*/
   file = word[0] - 'a';
 
@@ -404,7 +407,7 @@ int do_pawn_move2(struct game *gamept)
   update_board(&scratch,NULL,NULL);
   bBlack = scratch.curr_move & 0x1;
 
-  if (player_is_in_check(bBlack,scratch.board))
+  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
     return 12;
 
   gamept->moves[gamept->curr_move].from = move_start_square;
@@ -461,9 +464,11 @@ int do_piece_move(struct game *gamept,int direction,char *word,int wordlen,struc
   int to_rank;
   int to_piece;
   int retval;
-  unsigned char board[CHARS_IN_BOARD];
   bool bBlack;
   int dbg;
+
+  if (debug_fptr)
+    fprintf(debug_fptr,"do_piece_move: curr_move = %d, word = %s\n",gamept->curr_move,word);
 
   if (wordlen == 4) {
     where = word[1];
@@ -529,7 +534,7 @@ int do_piece_move(struct game *gamept,int direction,char *word,int wordlen,struc
           update_board(&scratch,NULL,NULL);
           bBlack = scratch.curr_move & 0x1;
 
-          if (!player_is_in_check(bBlack,board))
+          if (!player_is_in_check(bBlack,scratch.board,scratch.curr_move))
             return 0;  /* success */
         }
       }
@@ -566,7 +571,7 @@ int do_piece_move2(struct game *gamept)
   update_board(&scratch,NULL,NULL);
   bBlack = scratch.curr_move & 0x1;
 
-  if (player_is_in_check(bBlack,scratch.board))
+  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
     return 1;
 
   gamept->moves[gamept->curr_move].from = move_start_square;
