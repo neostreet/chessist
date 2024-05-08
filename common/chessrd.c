@@ -460,53 +460,53 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
   if (bKingsideCastle) {
     if (!(gamept->curr_move % 2)) {
       // it's White's move
-      set_piece1(gamept->board,6,ROOK_ID);
+      set_piece1(gamept->board,5,ROOK_ID);
 
       if (invalid_squares)
-        invalid_squares[(*num_invalid_squares)++] = 6;
+        invalid_squares[(*num_invalid_squares)++] = 5;
 
-      set_piece1(gamept->board,8,0);
+      set_piece1(gamept->board,7,0);
 
       if (invalid_squares)
-        invalid_squares[(*num_invalid_squares)++] = 8;
+        invalid_squares[(*num_invalid_squares)++] = 7;
     }
     else {
       // it's Blacks's move
-      set_piece1(gamept->board,76,ROOK_ID * -1);
+      set_piece1(gamept->board,61,ROOK_ID * -1);
 
       if (invalid_squares)
-        invalid_squares[(*num_invalid_squares)++] = 76;
+        invalid_squares[(*num_invalid_squares)++] = 61;
 
-      set_piece1(gamept->board,78,0);
+      set_piece1(gamept->board,63,0);
 
       if (invalid_squares)
-        invalid_squares[(*num_invalid_squares)++] = 78;
+        invalid_squares[(*num_invalid_squares)++] = 63;
     }
   }
   else if (bQueensideCastle) {
     if (!(gamept->curr_move % 2)) {
       // it's White's move
-      set_piece1(gamept->board,4,ROOK_ID);
+      set_piece1(gamept->board,3,ROOK_ID);
 
       if (invalid_squares)
-        invalid_squares[(*num_invalid_squares)++] = 4;
+        invalid_squares[(*num_invalid_squares)++] = 3;
 
-      set_piece1(gamept->board,1,0);
+      set_piece1(gamept->board,0,0);
 
       if (invalid_squares)
-        invalid_squares[(*num_invalid_squares)++] = 1;
+        invalid_squares[(*num_invalid_squares)++] = 0;
     }
     else {
       // it's Blacks's move
-      set_piece1(gamept->board,74,ROOK_ID * -1);
+      set_piece1(gamept->board,59,ROOK_ID * -1);
 
       if (invalid_squares)
-        invalid_squares[(*num_invalid_squares)++] = 74;
+        invalid_squares[(*num_invalid_squares)++] = 59;
 
-      set_piece1(gamept->board,71,0);
+      set_piece1(gamept->board,56,0);
 
       if (invalid_squares)
-        invalid_squares[(*num_invalid_squares)++] = 71;
+        invalid_squares[(*num_invalid_squares)++] = 56;
     }
   }
   else if (bEnPassantCapture) {
