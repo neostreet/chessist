@@ -92,7 +92,7 @@ struct move {
 #define ANNOTATION_X (8 * XLEN + 2 + FONT_WIDTH)
 #define ANNOTATION_Y 5
 
-#define MAX_FILE_NAME_LEN 128
+#define MAX_FILE_NAME_LEN 32
 #define MAX_TITLE_LEN 128
 
 struct game {
