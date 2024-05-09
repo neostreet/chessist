@@ -119,6 +119,12 @@ static HWND hWndToolBar;
 static char szAppName[100];  // Name of the app
 static char szTitle[100];    // The title bar text
 
+static int bHaveListFile;
+static int num_files_in_list;
+static int curr_chess_file;
+
+static CHESS_FILE_LIST chess_file_list;
+
 static int bHaveGame;
 static struct game curr_game;
 
@@ -128,8 +134,6 @@ static TBBUTTON tbButtons[] = {
     { 2, IDM_SAVE,                     TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 };
 
-static int bHome;
-
 static int special_move_info;
 
 // Forward declarations of functions included in this code module:
@@ -138,6 +142,9 @@ BOOL InitApplication(HINSTANCE);
 BOOL InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 char *trim_name(char *name);
+
+int is_list_file(LPSTR file_name);
+int read_list_file(LPSTR file_name,CHESS_FILE_LIST *cfl_ptr,int *num_files);
 
 LRESULT CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK Promotion(HWND, UINT, WPARAM, LPARAM);
@@ -601,7 +608,7 @@ void do_paint(HWND hWnd)
       bSelectedFont = TRUE;
     }
 
-    TextOut(hdc,rect.left,rect.top,curr_game.title,lstrlen(curr_game.title));
+    // TextOut(hdc,rect.left,rect.top,curr_game.title,lstrlen(curr_game.title));
   }
 
   rect.top = TOOLBAR_HEIGHT + 16;
@@ -993,8 +1000,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
           16,16,                  // width & height of the bitmaps
           sizeof(TBBUTTON));      // structure size
 
-      if (szFile[0])
-        do_read(hWnd,szFile,&curr_game);
+      // read the game passed on the command line, if there is one
+      if (szFile[0]) {
+        bHaveName = FALSE;
+        retval = is_list_file(szFile);
+
+        if (retval) {
+          if (!read_list_file(szFile,
+            &chess_file_list,&num_files_in_list)) {
+            name = chess_file_list[curr_chess_file];
+            bHaveName = TRUE;
+          }
+        }
+        else {
+          name = szFile;
+          bHaveName = TRUE;
+        }
+
+        if (bHaveName)
+          do_read(hWnd,name,&curr_game);
+        else
+          do_new(hWnd,&curr_game);
+      }
       else {
         if (debug_fptr)
           fprintf(debug_fptr,"%s\n","calling do_new() instead of do_read(), since szFile[0] is NULL");
@@ -1027,6 +1054,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case VK_F3:
           toggle_board_size(hWnd);
+
+          break;
+
+        case VK_F6:
+        case VK_F7:
+          if (bHaveListFile) {
+            if (wParam == VK_F6) {
+              curr_chess_file++;
+
+              if (curr_chess_file == num_files_in_list)
+                curr_chess_file = 0;
+            }
+            else {
+              curr_chess_file--;
+
+              if (curr_chess_file < 0)
+                curr_chess_file = num_files_in_list - 1;
+            }
+
+            retval = read_game(chess_file_list[curr_chess_file],
+              &curr_game,err_msg);
+
+            if (!retval) {
+              bHaveGame = TRUE;
+
+              wsprintf(szTitle,"%s - %s",szAppName,
+                trim_name(chess_file_list[curr_chess_file]));
+              SetWindowText(hWnd,szTitle);
+              highlight_rank = -1;
+              highlight_file = -1;
+              InvalidateRect(hWnd,NULL,TRUE);
+            }
+            else {
+              hdc = GetDC(hWnd);
+              rect.left = 0;
+              rect.top = 0;
+              rect.right = chess_window_width;
+              rect.bottom = 16;
+              wsprintf(buf,read_game_failure,
+                chess_file_list[curr_chess_file],retval,curr_game.curr_move);
+              TextOut(hdc,rect.left,rect.top,buf,lstrlen(buf));
+            }
+          }
 
           break;
 
@@ -1224,6 +1294,93 @@ char *trim_name(char *name)
   n++;
 
   return &name[n];
+}
+
+int is_list_file(LPSTR file_name)
+{
+  int n;
+  int len;
+
+  len = lstrlen(file_name);
+
+  for (n = len - 1; (n >= 0); n--) {
+    if (file_name[n] == '.')
+      break;
+  }
+
+  if (n < 0)
+    return FALSE;
+
+  n++;
+
+  if (!strcmp(&file_name[n],"lst"))
+    return TRUE;
+
+  return FALSE;
+}
+
+int read_list_file(LPSTR file_name,CHESS_FILE_LIST *cfl_ptr,int *num_files)
+{
+  int m;
+  int n;
+  FILE *fptr;
+  int chara;
+  char *cpt;
+
+  if (chess_file_list != NULL) {
+    free(chess_file_list);
+    chess_file_list = NULL;
+  }
+
+  if ((fptr = fopen(file_name,"r")) == NULL)
+    return 1;
+
+  num_files_in_list = 0;
+
+  for ( ; ; ) {
+    chara = fgetc(fptr);
+
+    if (feof(fptr))
+      break;
+
+    if (chara == 0x0a)
+      num_files_in_list++;
+  }
+
+  fseek(fptr,0,SEEK_SET);
+
+  chess_file_list = (CHESS_FILE_LIST)malloc(MAX_FILE_NAME_LEN *
+    num_files_in_list);
+
+  if (chess_file_list == NULL)
+    return 2;
+
+  n = 0;
+  m = 0;
+  cpt = (char *)chess_file_list[n];
+
+  for ( ; ; ) {
+    chara = fgetc(fptr);
+
+    if (feof(fptr))
+      break;
+
+    if (chara == 0x0a) {
+      cpt[m] = 0;
+      m = 0;
+      n++;
+      cpt = (char *)chess_file_list[n];
+    }
+    else
+      cpt[m++] = chara;
+  }
+
+  fclose(fptr);
+
+  bHaveListFile = TRUE;
+  curr_chess_file = 0;
+
+  return 0;
 }
 
 //
