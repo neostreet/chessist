@@ -1,16 +1,17 @@
 #define IDM_NEW                100
 #define IDM_OPEN               101
-#define IDM_READ_BOARD         102
-#define IDM_SAVE               103
-#define IDM_SAVEAS             104
-#define IDM_PRINT              105
-#define IDM_PRINTSETUP         106
-#define IDM_EXIT               107
+#define IDM_OPEN_BINARY_GAME   102
+#define IDM_READ_BOARD         103
+#define IDM_SAVE               104
+#define IDM_SAVEAS             105
+#define IDM_PRINT              106
+#define IDM_PRINTSETUP         107
+#define IDM_EXIT               108
 
-#define IDI_CHESSIST           108
-#define IDI_SMALL              109
+#define IDI_CHESSIST           109
+#define IDI_SMALL              110
 
-#define IDB_TOOLBAR            110
+#define IDB_TOOLBAR            111
 
 #define IDM_SET_LAST_MOVE      200
 #define IDM_PRINT_BOARD        201
