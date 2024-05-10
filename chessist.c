@@ -846,7 +846,7 @@ void end_of_game(HWND hWnd)
   redisplay_counts(hWnd,NULL);
 }
 
-void do_read(HWND hWnd,LPSTR name,struct game *gamept)
+void do_read(HWND hWnd,LPSTR name,struct game *gamept,bool bBinary)
 {
   int retval;
   char buf[256];
@@ -854,7 +854,10 @@ void do_read(HWND hWnd,LPSTR name,struct game *gamept)
   if (debug_fptr)
     fprintf(debug_fptr,"%s\n","do_read(): top of function");
 
-  retval = read_game(name,gamept,err_msg);
+  if (!bBinary)
+    retval = read_game(name,gamept,err_msg);
+  else
+    retval = read_binary_game(name,gamept);
 
   if (!retval) {
     bHaveGame = TRUE;
@@ -1018,7 +1021,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
         if (bHaveName)
-          do_read(hWnd,name,&curr_game);
+          do_read(hWnd,name,&curr_game,false);
         else
           do_new(hWnd,&curr_game);
       }
@@ -1140,7 +1143,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           if (GetOpenFileName(&OpenFileName)) {
             name = OpenFileName.lpstrFile;
-            do_read(hWnd,name,&curr_game);
+            do_read(hWnd,name,&curr_game,false);
+          }
+
+          break;
+
+        case IDM_OPEN_BINARY_GAME:
+	  // Call the common dialog function.
+          bHaveGame = FALSE;
+
+          if (GetOpenFileName(&OpenFileName)) {
+            name = OpenFileName.lpstrFile;
+            do_read(hWnd,name,&curr_game,true);
           }
 
           break;
