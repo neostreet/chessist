@@ -183,6 +183,45 @@ void fprint_bd2(unsigned char *board,FILE *fptr)
   }
 }
 
+void print_moves(struct game *gamept)
+{
+  int m;
+  int n;
+  int and_val;
+  int hit;
+  int dbg_move;
+  int dbg;
+
+  dbg_move = -1;
+
+  for (n = 0; n < gamept->num_moves; n++) {
+    if (n == dbg_move)
+      dbg = 1;
+
+    printf("%3d %2d %2d",n,gamept->moves[n].from,gamept->moves[n].to);
+
+    and_val = 0x1;
+    hit = 0;
+
+    for (m = 0; m < num_special_moves; m++) {
+      if (gamept->moves[n].special_move_info & and_val) {
+        hit = 1;
+        putchar(' ' );
+        printf("%s",special_moves[m]);
+      }
+
+      and_val <<= 1;
+    }
+
+    if (!hit)
+      printf(" SPECIAL_MOVE_NONE");
+
+    putchar(0x0a);
+  }
+
+  dbg = 1; // see if you get here
+}
+
 void fprint_moves(struct game *gamept,char *filename)
 {
   int n;
@@ -192,7 +231,7 @@ void fprint_moves(struct game *gamept,char *filename)
     return;
 
   for (n = 0; n < gamept->num_moves; n++) {
-    fprintf(fptr,"%d %d\n",gamept->moves[n].from,gamept->moves[n].to);
+    fprintf(fptr,"%d %d %d %x\n",n,gamept->moves[n].from,gamept->moves[n].to,gamept->moves[n].special_move_info);
   }
 
   fclose(fptr);
@@ -203,7 +242,7 @@ void fprint_moves2(struct game *gamept,FILE *fptr)
   int n;
 
   for (n = 0; n < gamept->num_moves; n++) {
-    fprintf(fptr,"%d %d\n",gamept->moves[n].from,gamept->moves[n].to);
+    fprintf(fptr,"%d %d %d %x\n",n,gamept->moves[n].from,gamept->moves[n].to,gamept->moves[n].special_move_info);
   }
 }
 
@@ -231,6 +270,8 @@ void print_special_moves(struct game *gamept)
 
   if (hit)
     putchar(0x0a);
+  else
+    printf("SPECIAL_MOVE_NONE\n");
 }
 
 int match_board(unsigned char *board1,unsigned char *board2,bool bExactMatch)
