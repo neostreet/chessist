@@ -44,6 +44,7 @@ int king_move2(struct game *);
 int get_to_position(char *word,int wordlen,int *to_filept,int *to_rankpt);
 
 void set_initial_board(struct game *gamept);
+void initialize_piece_info(struct game *gamept);
 void position_game(struct game *gamept,int move);
 void print_special_moves(struct game *gamept);
 void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares);
