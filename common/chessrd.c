@@ -113,6 +113,8 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
   bool bCheck;
   bool bMate;
 
+  bzero(gamept,sizeof (struct game));
+
   gamept->curr_move = -1;
 
   if ((fptr = fopen(filename,"r")) == NULL)
