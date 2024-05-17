@@ -574,6 +574,9 @@ void do_paint(HWND hWnd)
         else
           bigbmp_row = 0;
 
+        if (debug_fptr)
+          fprintf(debug_fptr,"  bigbmp_column = %d, bigbmp_row = %d\n",bigbmp_column,bigbmp_row);
+
         BitBlt(hdc,rect.left,rect.top,
           width_in_pixels,height_in_pixels,
           hdc_compatible[bBig],
