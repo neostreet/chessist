@@ -19,6 +19,8 @@
 #define NUM_PIECE_TYPES_0 6
 #define EMPTY_ID          7
 
+#define NUM_PIECES_PER_PLAYER 16
+
 #define FORCE_VALUE_QUEEN  9
 #define FORCE_VALUE_ROOK   5
 #define FORCE_VALUE_KNIGHT 3
@@ -79,6 +81,12 @@ struct move {
   int special_move_info;
 };
 
+struct piece_info {
+  char piece_ix;
+  char piece_id;
+  char current_board_position;
+};
+
 #define BITS_PER_BOARD_SQUARE 4
 
 #define FONT_HEIGHT 12
@@ -102,6 +110,8 @@ struct game {
   int curr_move;
   struct move moves[MAX_MOVES];
   unsigned char board[CHARS_IN_BOARD];  /* 8 columns * 8 rows / 2 (nibbles per char) */
+  struct piece_info white_pieces[NUM_PIECES_PER_PLAYER];
+  struct piece_info black_pieces[NUM_PIECES_PER_PLAYER];
 };
 
 typedef char (*CHESS_FILE_LIST)[MAX_FILE_NAME_LEN];
