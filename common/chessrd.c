@@ -132,6 +132,8 @@ void set_initial_board(struct game *gamept)
 
   for (n = 0; n < CHARS_IN_BOARD; n++)
     gamept->board[n] = initial_board[n];
+
+  initialize_piece_info(gamept);
 }
 
 void initialize_piece_info(struct game *gamept)
@@ -288,6 +290,7 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
     }
 
     update_board(gamept,NULL,NULL);
+    update_piece_info(gamept);
 
     gamept->curr_move++;
   }
@@ -586,6 +589,78 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
 
   if (debug_fptr)
     fprint_bd2(gamept->board,debug_fptr);
+}
+
+void update_piece_info(struct game *gamept)
+{
+  int n;
+  char from;
+  int to;
+
+  from = gamept->moves[gamept->curr_move].from;
+  to = gamept->moves[gamept->curr_move].to;
+
+  if (!(gamept->curr_move % 2)) {
+    // it's White's move
+
+    for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+      if (gamept->white_pieces[n].current_board_position == from)
+        break;
+    }
+
+    if (n == NUM_PIECES_PER_PLAYER)
+      return; // should never happen
+
+    gamept->white_pieces[n].current_board_position = to;
+
+    for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+      if (gamept->black_pieces[n].current_board_position == to)
+        break;
+    }
+
+    if (n < NUM_PIECES_PER_PLAYER)
+      gamept->black_pieces[n].current_board_position = -1;
+  }
+  else {
+    // it's Blacks's move
+
+    for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+      if (gamept->black_pieces[n].current_board_position == from)
+        break;
+    }
+
+    if (n == NUM_PIECES_PER_PLAYER)
+      return; // should never happen
+
+    gamept->black_pieces[n].current_board_position = to;
+
+    for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+      if (gamept->white_pieces[n].current_board_position == to)
+        break;
+    }
+
+    if (n < NUM_PIECES_PER_PLAYER)
+      gamept->white_pieces[n].current_board_position = -1;
+  }
+}
+
+void fprint_piece_info(struct game *gamept,FILE *fptr)
+{
+  int n;
+
+  fprintf(fptr,"White:\n");
+
+  for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+    fprintf(fptr,"  %d %d %d\n",gamept->white_pieces[n].piece_ix,gamept->white_pieces[n].piece_id,
+      gamept->white_pieces[n].current_board_position);
+  }
+
+  fprintf(fptr,"Black:\n");
+
+  for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+    fprintf(fptr,"  %d %d %d\n",gamept->black_pieces[n].piece_ix,gamept->black_pieces[n].piece_id,
+      gamept->black_pieces[n].current_board_position);
+  }
 }
 
 int get_piece1(unsigned char *board,int board_offset)
