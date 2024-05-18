@@ -17,16 +17,17 @@
 #define IDM_PRINT_BOARD        201
 #define IDM_PRINT_GAME         202
 #define IDM_PRINT_MOVES        203
+#define IDM_PRINT_PIECE_INFO   204
 
-#define IDM_TOGGLE_ORIENTATION 204
-#define IDM_TOGGLE_BOARD_SIZE  205
+#define IDM_TOGGLE_ORIENTATION 205
+#define IDM_TOGGLE_BOARD_SIZE  206
 
-#define IDM_PREV_MOVE          206
-#define IDM_NEXT_MOVE          207
-#define IDM_START_OF_GAME      208
-#define IDM_END_OF_GAME        209
+#define IDM_PREV_MOVE          207
+#define IDM_NEXT_MOVE          208
+#define IDM_START_OF_GAME      209
+#define IDM_END_OF_GAME        210
 
-#define IDM_ABOUT              210
+#define IDM_ABOUT              211
 
 #define IDC_STATIC -1
 
