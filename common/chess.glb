@@ -25,6 +25,15 @@ GLOBAL int do_castle_successes;
 
 #ifdef MAKE_GLOBALS_HERE
 char piece_ids[] = "RNBQK";
+char *piece_names[] = {
+  "PAWN",
+  "ROOK",
+  "KNIGHT",
+  "BISHOP",
+  "QUEEN",
+  "KING"
+};
+
 char fmt_str[] = "%s\n";
 char *special_moves[] = {
   "SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE",
@@ -42,6 +51,7 @@ char *special_moves[] = {
 int num_special_moves = (sizeof special_moves / sizeof (char *));
 #else
 extern char piece_ids[];
+extern char *piece_names[];
 extern char fmt_str[];
 extern char *special_moves[];
 extern int num_special_moves;
