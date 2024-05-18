@@ -260,12 +260,18 @@ int king_attacks_square(unsigned char *board,int square1,int square2)
   return false;
 }
 
+static int debug_move = -1;
+
 bool player_is_in_check(bool bBlack,unsigned char *board,int curr_move)
 {
   int n;
   int movers_king;
   int movers_king_square;
   int piece;
+  int debug;
+
+  if (curr_move == debug_move)
+    debug = 1;
 
   if (debug_fptr)
     fprintf(debug_fptr,"player_is_in_check: bBlack = %d, curr_move = %d\n",bBlack,curr_move);
