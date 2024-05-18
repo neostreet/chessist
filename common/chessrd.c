@@ -685,6 +685,39 @@ void fprint_piece_info(struct game *gamept,FILE *fptr)
   }
 }
 
+void populate_board_from_piece_info(struct game *gamept,unsigned char *board)
+{
+  int n;
+  unsigned int bit_offset;
+
+  for (n = 0; n < CHARS_IN_BOARD; n++)
+    board[n] = 0;
+
+  for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+    if (gamept->white_pieces[n].current_board_position != -1) {
+      bit_offset = gamept->white_pieces[n].current_board_position * BITS_PER_BOARD_SQUARE;
+      set_bits(BITS_PER_BOARD_SQUARE,board,bit_offset,gamept->white_pieces[n].piece_id);
+    }
+
+    if (gamept->black_pieces[n].current_board_position != -1) {
+      bit_offset = gamept->black_pieces[n].current_board_position * BITS_PER_BOARD_SQUARE;
+      set_bits(BITS_PER_BOARD_SQUARE,board,bit_offset,gamept->black_pieces[n].piece_id);
+    }
+  }
+}
+
+int compare_boards(unsigned char *board1,unsigned char *board2)
+{
+  int n;
+
+  for (n = 0; n < CHARS_IN_BOARD; n++) {
+    if (board1[n] != board2[n])
+      return 0;
+  }
+
+  return 1;
+}
+
 int get_piece1(unsigned char *board,int board_offset)
 {
   unsigned int bit_offset;
