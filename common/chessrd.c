@@ -651,15 +651,37 @@ void fprint_piece_info(struct game *gamept,FILE *fptr)
   fprintf(fptr,"White:\n");
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-    fprintf(fptr,"  %d %d %d\n",gamept->white_pieces[n].piece_ix,gamept->white_pieces[n].piece_id,
-      gamept->white_pieces[n].current_board_position);
+    if (gamept->white_pieces[n].current_board_position == -1) {
+      fprintf(fptr,"  %d %s %d\n",
+        gamept->white_pieces[n].piece_ix,
+        piece_names[gamept->white_pieces[n].piece_id - 1],
+        gamept->white_pieces[n].current_board_position);
+    }
+    else {
+      fprintf(fptr,"  %d %s %c%c\n",
+        gamept->white_pieces[n].piece_ix,
+        piece_names[gamept->white_pieces[n].piece_id - 1],
+        'a' + FILE_OF(gamept->white_pieces[n].current_board_position),
+        '1' + RANK_OF(gamept->white_pieces[n].current_board_position));
+    }
   }
 
   fprintf(fptr,"Black:\n");
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-    fprintf(fptr,"  %d %d %d\n",gamept->black_pieces[n].piece_ix,gamept->black_pieces[n].piece_id,
-      gamept->black_pieces[n].current_board_position);
+    if (gamept->black_pieces[n].current_board_position == -1) {
+      fprintf(fptr,"  %d %s %d\n",
+        gamept->black_pieces[n].piece_ix,
+        piece_names[(gamept->black_pieces[n].piece_id * -1) - 1],
+        gamept->black_pieces[n].current_board_position);
+    }
+    else {
+      fprintf(fptr,"  %d %s %c%c\n",
+        gamept->black_pieces[n].piece_ix,
+        piece_names[(gamept->black_pieces[n].piece_id * -1) - 1],
+        'a' + FILE_OF(gamept->black_pieces[n].current_board_position),
+        '1' + RANK_OF(gamept->black_pieces[n].current_board_position));
+    }
   }
 }
 
