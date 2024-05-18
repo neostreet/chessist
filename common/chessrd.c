@@ -595,52 +595,72 @@ void update_piece_info(struct game *gamept)
 {
   int n;
   char from;
-  int to;
+  char to;
+  int special_move_info;
 
   from = gamept->moves[gamept->curr_move].from;
   to = gamept->moves[gamept->curr_move].to;
+  special_move_info = gamept->moves[gamept->curr_move].special_move_info;
 
   if (!(gamept->curr_move % 2)) {
     // it's White's move
-
-    for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-      if (gamept->white_pieces[n].current_board_position == from)
-        break;
+    if (special_move_info == SPECIAL_MOVE_KINGSIDE_CASTLE) {
+      gamept->white_pieces[4].current_board_position = 6;
+      gamept->white_pieces[7].current_board_position = 5;
     }
-
-    if (n == NUM_PIECES_PER_PLAYER)
-      return; // should never happen
-
-    gamept->white_pieces[n].current_board_position = to;
-
-    for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-      if (gamept->black_pieces[n].current_board_position == to)
-        break;
+    else if (special_move_info == SPECIAL_MOVE_QUEENSIDE_CASTLE) {
+      gamept->white_pieces[4].current_board_position = 2;
+      gamept->white_pieces[0].current_board_position = 3;
     }
+    else {
+      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+        if (gamept->white_pieces[n].current_board_position == from)
+          break;
+      }
 
-    if (n < NUM_PIECES_PER_PLAYER)
-      gamept->black_pieces[n].current_board_position = -1;
+      if (n == NUM_PIECES_PER_PLAYER)
+        return; // should never happen
+
+      gamept->white_pieces[n].current_board_position = to;
+
+      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+        if (gamept->black_pieces[n].current_board_position == to)
+          break;
+      }
+
+      if (n < NUM_PIECES_PER_PLAYER)
+        gamept->black_pieces[n].current_board_position = -1;
+    }
   }
   else {
     // it's Blacks's move
-
-    for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-      if (gamept->black_pieces[n].current_board_position == from)
-        break;
+    if (special_move_info == SPECIAL_MOVE_KINGSIDE_CASTLE) {
+      gamept->black_pieces[12].current_board_position = 62;
+      gamept->black_pieces[15].current_board_position = 61;
     }
-
-    if (n == NUM_PIECES_PER_PLAYER)
-      return; // should never happen
-
-    gamept->black_pieces[n].current_board_position = to;
-
-    for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-      if (gamept->white_pieces[n].current_board_position == to)
-        break;
+    else if (special_move_info == SPECIAL_MOVE_QUEENSIDE_CASTLE) {
+      gamept->black_pieces[12].current_board_position = 58;
+      gamept->black_pieces[8].current_board_position = 59;
     }
+    else {
+      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+        if (gamept->black_pieces[n].current_board_position == from)
+          break;
+      }
 
-    if (n < NUM_PIECES_PER_PLAYER)
-      gamept->white_pieces[n].current_board_position = -1;
+      if (n == NUM_PIECES_PER_PLAYER)
+        return; // should never happen
+
+      gamept->black_pieces[n].current_board_position = to;
+
+      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+        if (gamept->white_pieces[n].current_board_position == to)
+          break;
+      }
+
+      if (n < NUM_PIECES_PER_PLAYER)
+        gamept->white_pieces[n].current_board_position = -1;
+    }
   }
 }
 
