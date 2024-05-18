@@ -206,7 +206,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
       }
     }
 
-    return 0;
+    goto check_for_illegal_move;
   }
 
   /* pawn capture */
