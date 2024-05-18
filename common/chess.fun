@@ -50,6 +50,8 @@ void print_special_moves(struct game *gamept);
 void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares);
 void update_piece_info(struct game *gamept);
 void fprint_piece_info(struct game *gamept,FILE *fptr);
+void populate_board_from_piece_info(struct game *gamept,unsigned char *board);
+int compare_boards(unsigned char *board1,unsigned char *board2);
 int get_piece1(unsigned char *board,int board_offset);
 int get_piece2(unsigned char *board,int row,int column);
 void set_piece1(unsigned char *board,int board_offset,int piece);
