@@ -1210,6 +1210,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           break;
 
+        case IDM_PRINT_PIECE_INFO:
+          if (debug_fptr)
+            fprint_piece_info(&curr_game,debug_fptr);
+
+          break;
+
         case IDM_TOGGLE_ORIENTATION:
           toggle_orientation(hWnd);
 
