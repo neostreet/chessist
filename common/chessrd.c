@@ -591,12 +591,18 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
     fprint_bd2(gamept->board,debug_fptr);
 }
 
+static int debug_move = -1;
+
 void update_piece_info(struct game *gamept)
 {
   int n;
   char from;
   char to;
   int special_move_info;
+  int debug;
+
+  if (gamept->curr_move == debug_move)
+    debug = 1;
 
   from = gamept->moves[gamept->curr_move].from;
   to = gamept->moves[gamept->curr_move].to;
@@ -642,7 +648,8 @@ void update_piece_info(struct game *gamept)
 
         gamept->black_pieces[n].current_board_position = -1;
       }
-      else if (special_move_info & SPECIAL_MOVE_CAPTURE) {
+
+      if ((special_move_info & SPECIAL_MOVE_CAPTURE) && !(special_move_info & SPECIAL_MOVE_EN_PASSANT_CAPTURE)) {
         for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
           if (gamept->black_pieces[n].current_board_position == to)
             break;
@@ -695,7 +702,8 @@ void update_piece_info(struct game *gamept)
 
         gamept->white_pieces[n].current_board_position = -1;
       }
-      else if (special_move_info & SPECIAL_MOVE_CAPTURE) {
+
+      if ((special_move_info & SPECIAL_MOVE_CAPTURE) && !(special_move_info & SPECIAL_MOVE_EN_PASSANT_CAPTURE)) {
         for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
           if (gamept->white_pieces[n].current_board_position == to)
             break;
