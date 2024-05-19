@@ -631,14 +631,28 @@ void update_piece_info(struct game *gamept)
         gamept->white_pieces[n].piece_id = KNIGHT_ID;
       else if (special_move_info & SPECIAL_MOVE_PROMOTION_BISHOP)
         gamept->white_pieces[n].piece_id = BISHOP_ID;
+      else if (special_move_info & SPECIAL_MOVE_EN_PASSANT_CAPTURE) {
+        for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+          if (gamept->black_pieces[n].current_board_position == to - NUM_FILES)
+            break;
+        }
 
-      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-        if (gamept->black_pieces[n].current_board_position == to)
-          break;
-      }
+        if (n == NUM_PIECES_PER_PLAYER)
+          return; // should never happen
 
-      if (n < NUM_PIECES_PER_PLAYER)
         gamept->black_pieces[n].current_board_position = -1;
+      }
+      else if (special_move_info & SPECIAL_MOVE_CAPTURE) {
+        for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+          if (gamept->black_pieces[n].current_board_position == to)
+            break;
+        }
+
+        if (n == NUM_PIECES_PER_PLAYER)
+          return; // should never happen
+
+        gamept->black_pieces[n].current_board_position = -1;
+      }
     }
   }
   else {
@@ -670,14 +684,28 @@ void update_piece_info(struct game *gamept)
         gamept->black_pieces[n].piece_id = KNIGHT_ID* -1;
       else if (special_move_info & SPECIAL_MOVE_PROMOTION_BISHOP)
         gamept->black_pieces[n].piece_id = BISHOP_ID* -1;
+      else if (special_move_info & SPECIAL_MOVE_EN_PASSANT_CAPTURE) {
+        for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+          if (gamept->white_pieces[n].current_board_position == to + NUM_FILES)
+            break;
+        }
 
-      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-        if (gamept->white_pieces[n].current_board_position == to)
-          break;
-      }
+        if (n == NUM_PIECES_PER_PLAYER)
+          return; // should never happen
 
-      if (n < NUM_PIECES_PER_PLAYER)
         gamept->white_pieces[n].current_board_position = -1;
+      }
+      else if (special_move_info & SPECIAL_MOVE_CAPTURE) {
+        for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+          if (gamept->white_pieces[n].current_board_position == to)
+            break;
+        }
+
+        if (n == NUM_PIECES_PER_PLAYER)
+          return; // should never happen
+
+        gamept->white_pieces[n].current_board_position = -1;
+      }
     }
   }
 }
