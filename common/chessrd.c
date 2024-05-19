@@ -623,6 +623,15 @@ void update_piece_info(struct game *gamept)
 
       gamept->white_pieces[n].current_board_position = to;
 
+      if (special_move_info & SPECIAL_MOVE_PROMOTION_QUEEN)
+        gamept->white_pieces[n].piece_id = QUEEN_ID;
+      else if (special_move_info & SPECIAL_MOVE_PROMOTION_ROOK)
+        gamept->white_pieces[n].piece_id = ROOK_ID;
+      else if (special_move_info & SPECIAL_MOVE_PROMOTION_KNIGHT)
+        gamept->white_pieces[n].piece_id = KNIGHT_ID;
+      else if (special_move_info & SPECIAL_MOVE_PROMOTION_BISHOP)
+        gamept->white_pieces[n].piece_id = BISHOP_ID;
+
       for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
         if (gamept->black_pieces[n].current_board_position == to)
           break;
@@ -652,6 +661,15 @@ void update_piece_info(struct game *gamept)
         return; // should never happen
 
       gamept->black_pieces[n].current_board_position = to;
+
+      if (special_move_info & SPECIAL_MOVE_PROMOTION_QUEEN)
+        gamept->black_pieces[n].piece_id = QUEEN_ID* -1;
+      else if (special_move_info & SPECIAL_MOVE_PROMOTION_ROOK)
+        gamept->black_pieces[n].piece_id = ROOK_ID* -1;
+      else if (special_move_info & SPECIAL_MOVE_PROMOTION_KNIGHT)
+        gamept->black_pieces[n].piece_id = KNIGHT_ID* -1;
+      else if (special_move_info & SPECIAL_MOVE_PROMOTION_BISHOP)
+        gamept->black_pieces[n].piece_id = BISHOP_ID* -1;
 
       for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
         if (gamept->white_pieces[n].current_board_position == to)
