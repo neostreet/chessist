@@ -41,6 +41,7 @@ int queen_move2(struct game *);
 int king_move(struct game *,int,int,int,int);
 int king_move2(struct game *);
 
+void get_legal_moves(struct game *gamept,struct move *legal_moves,int *legal_moves_count);
 void legal_pawn_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
 void legal_rook_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
 void legal_knight_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
