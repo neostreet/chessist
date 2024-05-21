@@ -57,6 +57,6 @@ extern char *piece_names[];
 extern char fmt_str[];
 extern char *special_moves[];
 extern int num_special_moves;
-extern struct move *legal_moves;
+extern struct move legal_moves[];
 extern int legal_moves_count;
 #endif
