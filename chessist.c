@@ -704,6 +704,7 @@ static void do_move(HWND hWnd)
 
   num_invalid_squares = 0;
   update_board(&curr_game,invalid_squares,&num_invalid_squares);
+  update_piece_info(&curr_game);
 
   for (n = 0; n < num_invalid_squares; n++)
     invalidate_square(hWnd,invalid_squares[n]);
@@ -1217,7 +1218,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
           break;
 
         case IDM_MAKE_A_MOVE:
-          make_a_move(&curr_game);
+          // must not be in the middle of replaying the moves from the game
+          if (curr_game.curr_move == curr_game.num_moves) {
+            if (make_a_move(&curr_game))
+              do_move(hWnd);
+          }
 
           break;
 
@@ -1698,6 +1703,7 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
   if (!retval) {
     num_invalid_squares = 0;
     update_board(&curr_game,invalid_squares,&num_invalid_squares);
+    update_piece_info(&curr_game);
 
     for (n = 0; n < num_invalid_squares; n++)
       invalidate_square(hWnd,invalid_squares[n]);
