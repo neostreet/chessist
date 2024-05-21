@@ -22,6 +22,7 @@ GLOBAL int move_end_square_piece;
 
 GLOBAL int do_castle_failures;
 GLOBAL int do_castle_successes;
+GLOBAL int seed;
 
 #ifdef MAKE_GLOBALS_HERE
 char piece_ids[] = "RNBQK";
