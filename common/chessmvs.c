@@ -925,12 +925,9 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
   int rank;
   int file;
 
-  printf("legal_pawn_moves()\n"); // for now
-
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
-  printf("square = %d, rank = %d, file = %d\n",square,rank,file);
 }
 
 void legal_rook_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count)
@@ -939,12 +936,9 @@ void legal_rook_moves(struct game *gamept,char current_board_position,struct mov
   int rank;
   int file;
 
-  printf("legal_rook_moves()\n"); // for now
-
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
-  printf("square = %d, rank = %d, file = %d\n",square,rank,file);
 }
 
 struct knight_move_offset {
@@ -978,7 +972,6 @@ void legal_knight_moves(struct game *gamept,char current_board_position,struct m
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
-  printf("square = %d, rank = %d, file = %d\n",square,rank,file);
 
   for (n = 0; n < NUM_OFFSETS; n++) {
     work_rank = rank + offsets[n].rank_offset;
@@ -1023,12 +1016,9 @@ void legal_bishop_moves(struct game *gamept,char current_board_position,struct m
   int rank;
   int file;
 
-  printf("legal_bishop_moves()\n"); // for now
-
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
-  printf("square = %d, rank = %d, file = %d\n",square,rank,file);
 }
 
 void legal_queen_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count)
@@ -1037,12 +1027,9 @@ void legal_queen_moves(struct game *gamept,char current_board_position,struct mo
   int rank;
   int file;
 
-  printf("legal_queen_moves()\n"); // for now
-
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
-  printf("square = %d, rank = %d, file = %d\n",square,rank,file);
 }
 
 void legal_king_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count)
@@ -1051,10 +1038,14 @@ void legal_king_moves(struct game *gamept,char current_board_position,struct mov
   int rank;
   int file;
 
-  printf("legal_king_moves()\n"); // for now
-
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
-  printf("square = %d, rank = %d, file = %d\n",square,rank,file);
+}
+
+void make_a_move(struct game *gamept)
+{
+  legal_moves_count =  0;
+
+  get_legal_moves(gamept,&legal_moves[0],&legal_moves_count);
 }
