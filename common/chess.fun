@@ -48,6 +48,7 @@ void legal_knight_moves(struct game *gamept,char current_board_position,struct m
 void legal_bishop_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
 void legal_queen_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
 void legal_king_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
+void make_a_move(struct game *gamept);
 
 int get_to_position(char *word,int wordlen,int *to_filept,int *to_rankpt);
 
