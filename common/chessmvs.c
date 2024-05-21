@@ -861,6 +861,64 @@ int king_move2(
   return retval;
 }
 
+void get_legal_moves(struct game *gamept,struct move *legal_moves,int *legal_moves_count)
+{
+  int n;
+  bool bWhiteToMove;
+  struct piece_info *info_pt;
+  unsigned char board[CHARS_IN_BOARD];
+  char piece_id;
+
+  bWhiteToMove = !(gamept->num_moves % 2);
+
+  if (bWhiteToMove)
+    info_pt = gamept->white_pieces;
+  else
+    info_pt = gamept->black_pieces;
+
+  print_piece_info2(info_pt); // for now
+  putchar(0x0a);
+  populate_board_from_piece_info(gamept,board);
+  print_bd0(board,gamept->orientation);
+
+  for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+    if (info_pt[n].current_board_position == -1)
+      continue;
+
+    piece_id = info_pt[n].piece_id;
+
+    if (piece_id < 0)
+      piece_id *= -1;
+
+    switch (piece_id) {
+      case PAWN_ID:
+        legal_pawn_moves(gamept,info_pt[n].current_board_position,legal_moves,legal_moves_count);
+
+        break;
+      case ROOK_ID:
+        legal_rook_moves(gamept,info_pt[n].current_board_position,legal_moves,legal_moves_count);
+
+        break;
+      case KNIGHT_ID:
+        legal_knight_moves(gamept,info_pt[n].current_board_position,legal_moves,legal_moves_count);
+
+        break;
+      case BISHOP_ID:
+        legal_bishop_moves(gamept,info_pt[n].current_board_position,legal_moves,legal_moves_count);
+
+        break;
+      case QUEEN_ID:
+        legal_queen_moves(gamept,info_pt[n].current_board_position,legal_moves,legal_moves_count);
+
+        break;
+      case KING_ID:
+        legal_king_moves(gamept,info_pt[n].current_board_position,legal_moves,legal_moves_count);
+
+        break;
+    }
+  }
+}
+
 void legal_pawn_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count)
 {
   int square;
