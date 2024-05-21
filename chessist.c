@@ -5,6 +5,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <memory.h>
+#include <time.h>
 #include "chess.h"
 #define MAKE_GLOBALS_HERE
 #include "chess.glb"
@@ -169,6 +170,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   int n;
   MSG msg;
   char *cpt;
+  time_t now;
+
+  time(&now);
+  seed = (int)now;
+  srand(seed);
 
   bBig = TRUE;
 
@@ -183,6 +189,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   if (cpt != NULL) {
     debug_level = atoi(cpt);
     debug_fptr = fopen("chessist.dbg","w");
+
+    if (debug_fptr)
+      fprintf(debug_fptr,"WinMain: seed = %d\n",seed);
   }
   else {
     debug_level = 0;
@@ -1124,6 +1133,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case VK_DOWN:
           next_move(hWnd);
+
+        case VK_F8:
+          // must not be in the middle of replaying the moves from the game
+          if (curr_game.curr_move == curr_game.num_moves) {
+            if (make_a_move(&curr_game))
+              do_move(hWnd);
+          }
 
           break;
       }
