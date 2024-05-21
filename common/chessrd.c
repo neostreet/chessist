@@ -467,6 +467,7 @@ static int dbg;
 
 void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares)
 {
+  int n;
   bool bBlack;
   int from_piece;
   int to_piece;
@@ -489,7 +490,8 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
     gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_CAPTURE;
 
   if (debug_fptr) {
-    fprintf(debug_fptr,"update_board: curr_move = %d, special_move_info = %x\n",gamept->curr_move,gamept->moves[gamept->curr_move].special_move_info);
+    fprintf(debug_fptr,"update_board (%d): curr_move = %d, special_move_info = %x\n",
+      update_board_calls,gamept->curr_move,gamept->moves[gamept->curr_move].special_move_info);
   }
 
   if (gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_KINGSIDE_CASTLE)
@@ -585,8 +587,16 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
       invalid_squares[(*num_invalid_squares)++] = square_to_clear;
   }
 
-  if (debug_fptr)
+  if (debug_fptr) {
+    if (invalid_squares) {
+      for (n = 0; n < *num_invalid_squares; n++) {
+        fprintf(debug_fptr,"update_board (%d): invalid_squares[%d] = %d\n",
+          update_board_calls,n,invalid_squares[n]);
+      }
+    }
+
     fprint_bd2(gamept->board,debug_fptr);
+  }
 }
 
 static int debug_move = -1;
