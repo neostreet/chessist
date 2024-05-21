@@ -876,10 +876,7 @@ void get_legal_moves(struct game *gamept,struct move *legal_moves,int *legal_mov
   else
     info_pt = gamept->black_pieces;
 
-  print_piece_info2(info_pt); // for now
-  putchar(0x0a);
   populate_board_from_piece_info(gamept,board);
-  print_bd0(board,gamept->orientation);
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
     if (info_pt[n].current_board_position == -1)
@@ -1043,9 +1040,23 @@ void legal_king_moves(struct game *gamept,char current_board_position,struct mov
   file = FILE_OF(current_board_position);
 }
 
-void make_a_move(struct game *gamept)
+int make_a_move(struct game *gamept)
 {
   legal_moves_count =  0;
 
   get_legal_moves(gamept,&legal_moves[0],&legal_moves_count);
+  // if there are any legal moves, pick the first one for now
+
+  if (legal_moves_count) {
+    gamept->moves[gamept->curr_move].from = legal_moves[0].from;
+    gamept->moves[gamept->curr_move].to = legal_moves[0].to;
+    gamept->moves[gamept->curr_move].special_move_info = 0;
+
+    // now increment the number of moves in the game
+    gamept->num_moves++;
+
+    return 1;
+  }
+
+  return 0;
 }
