@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "chess.h"
@@ -1043,13 +1044,20 @@ void legal_king_moves(struct game *gamept,char current_board_position,struct mov
 int make_a_move(struct game *gamept)
 {
   legal_moves_count =  0;
+  int work;
 
   get_legal_moves(gamept,&legal_moves[0],&legal_moves_count);
-  // if there are any legal moves, pick the first one for now
 
   if (legal_moves_count) {
-    gamept->moves[gamept->curr_move].from = legal_moves[0].from;
-    gamept->moves[gamept->curr_move].to = legal_moves[0].to;
+    // get a random legal move
+    work = rand();
+    work %= legal_moves_count;
+
+    if (debug_fptr)
+      fprintf(debug_fptr,"make_a_move: legal_moves_count = %d, work = %d\n",legal_moves_count,work);
+
+    gamept->moves[gamept->curr_move].from = legal_moves[work].from;
+    gamept->moves[gamept->curr_move].to = legal_moves[work].to;
     gamept->moves[gamept->curr_move].special_move_info = 0;
 
     // now increment the number of moves in the game
