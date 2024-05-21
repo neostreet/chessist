@@ -41,6 +41,13 @@ int queen_move2(struct game *);
 int king_move(struct game *,int,int,int,int);
 int king_move2(struct game *);
 
+void legal_pawn_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
+void legal_rook_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
+void legal_knight_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
+void legal_bishop_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
+void legal_queen_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
+void legal_king_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count);
+
 int get_to_position(char *word,int wordlen,int *to_filept,int *to_rankpt);
 
 void set_initial_board(struct game *gamept);
@@ -50,6 +57,8 @@ void print_special_moves(struct game *gamept);
 void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares);
 void update_piece_info(struct game *gamept);
 void fprint_piece_info(struct game *gamept,FILE *fptr);
+void print_piece_info(struct game *gamept);
+void print_piece_info2(struct piece_info *info_pt);
 void populate_board_from_piece_info(struct game *gamept,unsigned char *board);
 int compare_boards(unsigned char *board1,unsigned char *board2);
 int get_piece1(unsigned char *board,int board_offset);
