@@ -49,10 +49,14 @@ char *special_moves[] = {
   "SPECIAL_MOVE_MATE"
 };
 int num_special_moves = (sizeof special_moves / sizeof (char *));
+struct move legal_moves[MAX_LEGAL_MOVES];
+int legal_moves_count;
 #else
 extern char piece_ids[];
 extern char *piece_names[];
 extern char fmt_str[];
 extern char *special_moves[];
 extern int num_special_moves;
+extern struct move *legal_moves;
+extern int legal_moves_count;
 #endif
