@@ -534,5 +534,6 @@ void position_game(struct game *gamept,int move)
 
   for (gamept->curr_move = 0; gamept->curr_move < move; gamept->curr_move++) {
     update_board(gamept,NULL,NULL);
+    update_piece_info(gamept);
   }
 }
