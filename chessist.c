@@ -171,10 +171,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   MSG msg;
   char *cpt;
   time_t now;
-
-  time(&now);
-  seed = (int)now;
-  srand(seed);
+  int cmd_len;
 
   bBig = TRUE;
 
@@ -189,9 +186,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   if (cpt != NULL) {
     debug_level = atoi(cpt);
     debug_fptr = fopen("chessist.dbg","w");
-
-    if (debug_fptr)
-      fprintf(debug_fptr,"WinMain: seed = %d\n",seed);
   }
   else {
     debug_level = 0;
@@ -237,8 +231,40 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   // Initialize global strings
   lstrcpy (szAppName, appname);
 
-  // save name of chess game
-  lstrcpy(szFile,lpCmdLine);
+  // read seed if it's there
+  if (!strncmp(lpCmdLine,"seed",4)) {
+    sscanf(&lpCmdLine[4],"%d",&seed);
+
+    // save name of chess game, if one is specified after the seed
+
+    cmd_len = strlen(lpCmdLine);
+
+    for (n = 0; n < cmd_len; n++) {
+      if (lpCmdLine[n] == ' ') {
+        if (n < cmd_len - 1)
+          lstrcpy(szFile,&lpCmdLine[n+1]);
+        else
+          szFile[0] = 0;
+
+        break;
+      }
+    }
+
+    if (n == cmd_len)
+      szFile[0] = 0;
+  }
+  else {
+    time(&now);
+    seed = (int)now;
+
+    // save name of chess game
+    lstrcpy(szFile,lpCmdLine);
+  }
+
+  if (debug_fptr)
+    fprintf(debug_fptr,"WinMain: seed = %d\n",seed);
+
+  srand(seed);
 
   if (szFile[0])
     wsprintf(szTitle,"%s - %s",szAppName,
