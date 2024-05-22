@@ -95,7 +95,6 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
   int capture_file;
   int piece;
   int which_piece;
-  bool bBlack;
 
   if (debug_fptr)
     fprintf(debug_fptr,"do_pawn_move: curr_move = %d, word = %s\n",gamept->curr_move,word);
@@ -308,16 +307,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
 
 check_for_illegal_move:
 
-  // don't allow moves which would put the mover in check; use a scratch game
-  // to achieve this
-
-  copy_game(&scratch,gamept);
-  scratch.moves[scratch.curr_move].from = move_ptr->from;
-  scratch.moves[scratch.curr_move].to = move_ptr->to;
-  update_board(&scratch,NULL,NULL);
-  bBlack = scratch.curr_move & 0x1;
-
-  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
+  if (!move_is_legal(gamept,move_ptr->from,move_ptr->to))
     return 15;
 
   return 0;
@@ -326,7 +316,6 @@ check_for_illegal_move:
 int do_pawn_move2(struct game *gamept)
 {
   bool bWhiteMove;
-  bool bBlack;
   int start_rank;
   int start_file;
   int end_rank;
@@ -416,16 +405,7 @@ int do_pawn_move2(struct game *gamept)
     }
   }
 
-  // don't allow moves which would put the mover in check; use a scratch game
-  // to achieve this
-
-  copy_game(&scratch,gamept);
-  scratch.moves[scratch.curr_move].from = move_start_square;
-  scratch.moves[scratch.curr_move].to = move_end_square;
-  update_board(&scratch,NULL,NULL);
-  bBlack = scratch.curr_move & 0x1;
-
-  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
+  if (!move_is_legal(gamept,move_start_square,move_end_square))
     return 12;
 
   gamept->moves[gamept->curr_move].from = move_start_square;
@@ -482,7 +462,6 @@ int do_piece_move(struct game *gamept,int direction,char *word,int wordlen,struc
   int to_rank;
   int to_piece;
   int retval;
-  bool bBlack;
   int dbg;
 
   if (debug_fptr)
@@ -543,16 +522,7 @@ int do_piece_move(struct game *gamept,int direction,char *word,int wordlen,struc
           move_ptr->from = POS_OF(curr_rank,curr_file);
           move_ptr->to = POS_OF(to_rank,to_file);
 
-          // don't allow moves which would put the mover in check; use a scratch game
-          // to achieve this
-
-          copy_game(&scratch,gamept);
-          scratch.moves[scratch.curr_move].from = move_ptr->from;
-          scratch.moves[scratch.curr_move].to = move_ptr->to;
-          update_board(&scratch,NULL,NULL);
-          bBlack = scratch.curr_move & 0x1;
-
-          if (!player_is_in_check(bBlack,scratch.board,scratch.curr_move))
+          if (move_is_legal(gamept,move_ptr->from,move_ptr->to))
             return 0;  /* success */
         }
       }
@@ -566,7 +536,6 @@ int do_piece_move2(struct game *gamept)
 {
   int which_piece;
   int retval;
-  bool bBlack;
 
   which_piece = move_start_square_piece;
 
@@ -580,16 +549,7 @@ int do_piece_move2(struct game *gamept)
   if (retval)
     return 1;
 
-  // don't allow moves which would put the mover in check; use a scratch game
-  // to achieve this
-
-  copy_game(&scratch,gamept);
-  scratch.moves[scratch.curr_move].from = move_start_square;
-  scratch.moves[scratch.curr_move].to = move_end_square;
-  update_board(&scratch,NULL,NULL);
-  bBlack = scratch.curr_move & 0x1;
-
-  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
+  if (!move_is_legal(gamept,move_start_square,move_end_square))
     return 1;
 
   gamept->moves[gamept->curr_move].from = move_start_square;
@@ -862,6 +822,26 @@ int king_move2(
   return retval;
 }
 
+bool move_is_legal(struct game *gamept,char from,char to)
+{
+  // don't allow moves which would put the mover in check; use a scratch game
+  // to achieve this
+
+  bool bBlack;
+
+  bBlack = gamept->curr_move & 0x1;
+  copy_game(&scratch,gamept);
+  scratch.moves[scratch.curr_move].from = from;
+  scratch.moves[scratch.curr_move].to = to;
+  scratch.moves[scratch.curr_move].special_move_info = 0;
+  update_board(&scratch,NULL,NULL);
+
+  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
+    return false;
+
+  return true;
+}
+
 void get_legal_moves(struct game *gamept,struct move *legal_moves,int *legal_moves_count)
 {
   int n;
@@ -958,15 +938,7 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
     if (square2)
       continue;
 
-    // don't allow moves which would put the mover in check; use a scratch game
-    // to achieve this
-
-    copy_game(&scratch,gamept);
-    scratch.moves[scratch.curr_move].from = current_board_position;
-    scratch.moves[scratch.curr_move].to = POS_OF(work_rank,work_file);
-    update_board(&scratch,NULL,NULL);
-
-    if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
+    if (!move_is_legal(gamept,current_board_position,POS_OF(work_rank,work_file)))
       continue;
 
     if (*legal_moves_count < MAX_LEGAL_MOVES) {
@@ -1010,7 +982,6 @@ void legal_knight_moves(struct game *gamept,char current_board_position,struct m
   int work_rank;
   int work_file;
   int square2;
-  bool bBlack;
 
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
@@ -1032,16 +1003,7 @@ void legal_knight_moves(struct game *gamept,char current_board_position,struct m
     if ((square * square2) > 0)
       continue;
 
-    // don't allow moves which would put the mover in check; use a scratch game
-    // to achieve this
-
-    copy_game(&scratch,gamept);
-    scratch.moves[scratch.curr_move].from = current_board_position;
-    scratch.moves[scratch.curr_move].to = POS_OF(work_rank,work_file);
-    update_board(&scratch,NULL,NULL);
-    bBlack = scratch.curr_move & 0x1;
-
-    if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
+    if (!move_is_legal(gamept,current_board_position,POS_OF(work_rank,work_file)))
       continue;
 
     if (*legal_moves_count < MAX_LEGAL_MOVES) {
