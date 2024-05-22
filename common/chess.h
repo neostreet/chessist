@@ -114,4 +114,9 @@ struct game {
   struct piece_info black_pieces[NUM_PIECES_PER_PLAYER];
 };
 
+struct move_offset {
+  char rank_offset;
+  char file_offset;
+};
+
 typedef char (*CHESS_FILE_LIST)[MAX_FILE_NAME_LEN];
