@@ -919,7 +919,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   HDC hdc;
   RECT rect;
   char buf[80];
-  int do_nothing;
 
   switch (message) {
     case WM_CREATE:
@@ -1119,7 +1118,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case VK_HOME:
           start_of_game(hWnd);
- d
+
           break;
 
         case VK_END:
@@ -1127,7 +1126,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           break;
 
-d        case VK_UP:
+        case VK_UP:
           prev_move(hWnd);
 
           break;
@@ -1242,11 +1241,6 @@ d        case VK_UP:
             if (make_a_move(&curr_game))
               do_move(hWnd);
           }
-
-          break;
-
-        case IDM_DO_NOTHING:
-          do_nothing = 1;
 
           break;
 
