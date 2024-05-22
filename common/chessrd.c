@@ -608,6 +608,7 @@ void update_piece_info(struct game *gamept)
   char to;
   int special_move_info;
   int debug;
+  unsigned char board[CHARS_IN_BOARD];
 
   if (gamept->curr_move == debug_move)
     debug = 1;
@@ -723,6 +724,13 @@ void update_piece_info(struct game *gamept)
         gamept->white_pieces[n].current_board_position = -1;
       }
     }
+  }
+
+  if (debug_fptr) {
+    fprintf(debug_fptr,"update_piece_info: curr_move = %d, num_moves = %d\n",gamept->curr_move,gamept->num_moves);
+    fprint_piece_info(gamept,debug_fptr);
+    populate_board_from_piece_info(gamept,board);
+    fprint_bd2(board,debug_fptr);
   }
 }
 
