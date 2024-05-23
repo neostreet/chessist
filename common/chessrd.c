@@ -287,7 +287,7 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
       gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_MATE;
     }
 
-    update_board(gamept,NULL,NULL);
+    update_board(gamept,NULL,NULL,false);
     update_piece_info(gamept);
 
     gamept->curr_move++;
@@ -465,7 +465,7 @@ static int update_board_calls;
 static int dbg_update_board_call;
 static int dbg;
 
-void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares)
+void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares,bool bScratch)
 {
   int n;
   bool bBlack;
@@ -595,7 +595,8 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
       }
     }
 
-    fprint_bd2(gamept->board,debug_fptr);
+    if (!bScratch)
+      fprint_bd2(gamept->board,debug_fptr);
   }
 }
 
