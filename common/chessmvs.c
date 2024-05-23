@@ -834,7 +834,7 @@ bool move_is_legal(struct game *gamept,char from,char to)
   scratch.moves[scratch.curr_move].from = from;
   scratch.moves[scratch.curr_move].to = to;
   scratch.moves[scratch.curr_move].special_move_info = 0;
-  update_board(&scratch,NULL,NULL);
+  update_board(&scratch,NULL,NULL,true);
 
   if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
     return false;
@@ -912,11 +912,13 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
   int work_file;
   int square2;
   bool bBlack;
+  int num_legal_moves;
 
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
   bBlack = gamept->curr_move & 0x1;
+  num_legal_moves = 0;
 
   for (n = 0; n < NUM_PAWN_OFFSETS; n++) {
     if (!bBlack)
@@ -941,6 +943,8 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
     if (!move_is_legal(gamept,current_board_position,POS_OF(work_rank,work_file)))
       continue;
 
+    num_legal_moves++;
+
     if (*legal_moves_count < MAX_LEGAL_MOVES) {
       legal_moves[*legal_moves_count].from = current_board_position;
       legal_moves[*legal_moves_count].to = POS_OF(work_rank,work_file);
@@ -948,17 +952,77 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
       (*legal_moves_count)++;
     }
   }
+
+  if (debug_fptr) {
+    fprintf(debug_fptr,"legal_pawn_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
+      gamept->curr_move,current_board_position,num_legal_moves);
+  }
 }
+
+struct move_offset rook_offsets[] = {
+  1,   0,
+  0,   1,
+  -1,  0,
+  0,  -1
+};
+#define NUM_ROOK_OFFSETS (sizeof rook_offsets / sizeof(struct move_offset))
 
 void legal_rook_moves(struct game *gamept,char current_board_position,struct move *legal_moves,int *legal_moves_count)
 {
+  int m;
+  int n;
   int square;
   int rank;
   int file;
+  int work_rank;
+  int work_file;
+  int square2;
+  int num_legal_moves;
 
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
+  num_legal_moves = 0;
+
+  for (n = 0; n < NUM_ROOK_OFFSETS; n++) {
+    for (m = 0; m < NUM_RANKS - 1; m++) {
+      work_rank = rank + (rook_offsets[n].rank_offset * (m + 1));
+      work_file = file + (rook_offsets[n].file_offset * (m + 1));
+
+      if ((work_rank < 0) || (work_rank >= NUM_RANKS))
+        break;
+
+      if ((work_file < 0) || (work_file >= NUM_FILES))
+        break;
+
+      square2 = get_piece2(gamept->board,work_rank,work_file);
+
+      // can't capture a piece of the same color
+      if ((square * square2) > 0)
+        break;
+
+      if (move_is_legal(gamept,current_board_position,POS_OF(work_rank,work_file))) {
+        num_legal_moves++;
+
+        if (*legal_moves_count < MAX_LEGAL_MOVES) {
+          legal_moves[*legal_moves_count].from = current_board_position;
+          legal_moves[*legal_moves_count].to = POS_OF(work_rank,work_file);
+          legal_moves[*legal_moves_count].special_move_info = 0;
+          (*legal_moves_count)++;
+        }
+      }
+
+      if (square2)
+        break;
+      else
+        continue;
+    }
+  }
+
+  if (debug_fptr) {
+    fprintf(debug_fptr,"legal_rook_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
+      gamept->curr_move,current_board_position,num_legal_moves);
+  }
 }
 
 struct move_offset knight_offsets[] = {
@@ -982,10 +1046,12 @@ void legal_knight_moves(struct game *gamept,char current_board_position,struct m
   int work_rank;
   int work_file;
   int square2;
+  int num_legal_moves;
 
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
+  num_legal_moves = 0;
 
   for (n = 0; n < NUM_KNIGHT_OFFSETS; n++) {
     work_rank = rank + knight_offsets[n].rank_offset;
@@ -1006,12 +1072,19 @@ void legal_knight_moves(struct game *gamept,char current_board_position,struct m
     if (!move_is_legal(gamept,current_board_position,POS_OF(work_rank,work_file)))
       continue;
 
+    num_legal_moves++;
+
     if (*legal_moves_count < MAX_LEGAL_MOVES) {
       legal_moves[*legal_moves_count].from = current_board_position;
       legal_moves[*legal_moves_count].to = POS_OF(work_rank,work_file);
       legal_moves[*legal_moves_count].special_move_info = 0;
       (*legal_moves_count)++;
     }
+  }
+
+  if (debug_fptr) {
+    fprintf(debug_fptr,"legal_knight_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
+      gamept->curr_move,current_board_position,num_legal_moves);
   }
 }
 
@@ -1020,6 +1093,9 @@ void legal_bishop_moves(struct game *gamept,char current_board_position,struct m
   int square;
   int rank;
   int file;
+
+  if (debug_fptr)
+    fprintf(debug_fptr,"legal_bishop_moves: current_board_position = %d\n",current_board_position);
 
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
@@ -1032,6 +1108,9 @@ void legal_queen_moves(struct game *gamept,char current_board_position,struct mo
   int rank;
   int file;
 
+  if (debug_fptr)
+    fprintf(debug_fptr,"legal_queen_moves: current_board_position = %d\n",current_board_position);
+
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
@@ -1043,6 +1122,9 @@ void legal_king_moves(struct game *gamept,char current_board_position,struct mov
   int rank;
   int file;
 
+  if (debug_fptr)
+    fprintf(debug_fptr,"legal_king_moves: current_board_position = %d\n",current_board_position);
+
   square = get_piece1(gamept->board,current_board_position);
   rank = RANK_OF(current_board_position);
   file = FILE_OF(current_board_position);
@@ -1052,6 +1134,12 @@ int make_a_move(struct game *gamept)
 {
   legal_moves_count =  0;
   int work;
+
+  if (debug_fptr) {
+    fprintf(debug_fptr,"make_a_move: about to call get_legal_moves, curr_move = %d, num_moves = %d\n",
+      gamept->curr_move,gamept->num_moves);
+    fprint_bd2(gamept->board,debug_fptr);
+  }
 
   get_legal_moves(gamept,&legal_moves[0],&legal_moves_count);
 
