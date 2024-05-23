@@ -1323,9 +1323,13 @@ int make_a_move(struct game *gamept)
   get_legal_moves(gamept,&legal_moves[0],&legal_moves_count);
 
   if (legal_moves_count) {
-    // get a random legal move
-    work = rand();
-    work %= legal_moves_count;
+    if (legal_moves_count == 1)
+      work = 0;
+    else {
+      // get a random legal move
+      work = rand();
+      work %= legal_moves_count;
+    }
 
     if (debug_fptr) {
       fprintf(debug_fptr,"make_a_move: curr_move = %d, num_moves = %d, legal_moves_count = %d, work = %d\n",
