@@ -80,6 +80,7 @@ BEGIN
         MENUITEM "Print &moves",                IDM_PRINT_MOVES
         MENUITEM "Print &piece info",           IDM_PRINT_PIECE_INFO
         MENUITEM "Ma&ke a move",                IDM_MAKE_A_MOVE
+        MENUITEM "Play vs. make-a-move",        IDM_PLAY_VS_MAKE_A_MOVE
     END
     POPUP "&Help"
     BEGIN
