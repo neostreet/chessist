@@ -16,6 +16,11 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
   int rank;
   int special_move_info;
 
+  if (debug_fptr) {
+    fprintf(debug_fptr,"do_castle: piece_info:\n");
+    fprint_piece_info(gamept,debug_fptr);
+  }
+
   if (direction == 1)  /* if white's move: */
     rank = 0;
   else
@@ -27,17 +32,27 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     return 1;
   }
 
+  /* make sure the king hasn't previously moved */
+  if (direction == 1) {
+    if (gamept->white_pieces[4].move_count)
+      return 2;
+  }
+  else {
+    if (gamept->black_pieces[12].move_count)
+      return 3;
+  }
+
   if (wordlen == 3) {  /* kingside castle */
     /* make sure there is a rook in the corner: */
     if (get_piece2(gamept->board,rank,7) != 2 * direction) {
       do_castle_failures++;
-      return 2;
+      return 4;
     }
 
     /* make sure there are empty squares between king and rook: */
     if (get_piece2(gamept->board,rank,5) || get_piece2(gamept->board,rank,6)) {
       do_castle_failures++;
-      return 3;
+      return 5;
     }
 
     if (direction == 1) {  /* if white's move: */
@@ -55,13 +70,13 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     /* make sure there is a rook in the corner: */
     if (get_piece2(gamept->board,rank,0) != 2 * direction) {
       do_castle_failures++;
-      return 4;
+      return 6;
     }
 
     /* make sure there are empty squares between king and rook: */
     if (get_piece2(gamept->board,rank,1) || get_piece2(gamept->board,rank,2) || get_piece2(gamept->board,rank,3)) {
       do_castle_failures++;
-      return 5;
+      return 7;
     }
 
     if (direction == 1) {  /* if white's move: */
@@ -77,7 +92,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
   }
   else {
     do_castle_failures++;
-    return 6;
+    return 8;
   }
 
   move_ptr->special_move_info = special_move_info;
@@ -793,6 +808,11 @@ int king_move(
   int should_be_empty3;
   int should_be_rook;
 
+  if (debug_fptr) {
+    fprintf(debug_fptr,"king_move: piece_info:\n");
+    fprint_piece_info(gamept,debug_fptr);
+  }
+
   // first, check if this is a castling move
   if (!(gamept->curr_move % 2)) {
     // it's White's move
@@ -804,8 +824,11 @@ int king_move(
       should_be_rook = get_piece1(gamept->board,7);
 
       if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID)) {
-        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
-        return 0;
+        // make sure the neither the king nor the rook has previously moved */
+        if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[7].move_count) {
+          gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
+          return 0;
+        }
       }
     }
 
@@ -817,8 +840,11 @@ int king_move(
       should_be_rook = get_piece1(gamept->board,0);
 
       if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID)) {
-        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
-        return 0;
+        // make sure the neither the king nor the rook has previously moved */
+        if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[0].move_count) {
+          gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
+          return 0;
+        }
       }
     }
   }
@@ -832,8 +858,11 @@ int king_move(
       should_be_rook = get_piece1(gamept->board,63);
 
       if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID * -1)) {
-        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
-        return 0;
+        // make sure the neither the king nor the rook has previously moved */
+        if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[15].move_count) {
+          gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
+          return 0;
+        }
       }
     }
 
@@ -845,8 +874,11 @@ int king_move(
       should_be_rook = get_piece1(gamept->board,56);
 
       if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID * -1)) {
-        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
-        return 0;
+        // make sure the neither the king nor the rook has previously moved */
+        if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[8].move_count) {
+          gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
+          return 0;
+        }
       }
     }
   }
