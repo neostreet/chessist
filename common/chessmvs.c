@@ -1025,6 +1025,45 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
   bBlack = gamept->curr_move & 0x1;
   num_legal_moves_before = *legal_moves_count;
 
+  // first, see if there's a legal two square pawn advance
+
+  if (!bBlack) {
+    if (rank == 1) {
+      if (!get_piece2(gamept->board,2,file) && !get_piece2(gamept->board,3,file)) {
+        to = POS_OF(3,file);
+
+        if (move_is_legal(gamept,current_board_position,to)) {
+          if (*legal_moves_count < MAX_LEGAL_MOVES) {
+            legal_moves[*legal_moves_count].from = current_board_position;
+            legal_moves[*legal_moves_count].to = to;
+            legal_moves[*legal_moves_count].special_move_info = 0;
+
+            (*legal_moves_count)++;
+          }
+        }
+      }
+    }
+  }
+  else {
+    if (rank == 6) {
+      if (!get_piece2(gamept->board,5,file) && !get_piece2(gamept->board,4,file)) {
+        to = POS_OF(4,file);
+
+        if (move_is_legal(gamept,current_board_position,to)) {
+          if (*legal_moves_count < MAX_LEGAL_MOVES) {
+            legal_moves[*legal_moves_count].from = current_board_position;
+            legal_moves[*legal_moves_count].to = to;
+            legal_moves[*legal_moves_count].special_move_info = 0;
+
+            (*legal_moves_count)++;
+          }
+        }
+      }
+    }
+  }
+
+  // now check for a one square pawn advance
+
   for (n = 0; n < NUM_PAWN_OFFSETS; n++) {
     if (!bBlack)
       work_rank = rank + pawn_offsets[n].rank_offset;
