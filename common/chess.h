@@ -85,6 +85,7 @@ struct move {
 struct piece_info {
   char piece_id;
   char current_board_position;
+  char move_count;
 };
 
 #define BITS_PER_BOARD_SQUARE 4
