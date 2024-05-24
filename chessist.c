@@ -136,6 +136,7 @@ static TBBUTTON tbButtons[] = {
 };
 
 static int special_move_info;
+static boolean bPlayingVsMakeAMove;
 
 // Forward declarations of functions included in this code module:
 
@@ -1270,6 +1271,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           break;
 
+        case IDM_PLAY_VS_MAKE_A_MOVE:
+          if (!bPlayingVsMakeAMove)
+            bPlayingVsMakeAMove = true;
+          else
+            bPlayingVsMakeAMove = false;
+
+          break;
+
         case IDM_TOGGLE_ORIENTATION:
           toggle_orientation(hWnd);
 
@@ -1758,5 +1767,10 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     curr_game.curr_move++;
     curr_game.moves[curr_game.curr_move].special_move_info = 0;
     curr_game.num_moves = curr_game.curr_move;
+
+    if (bPlayingVsMakeAMove) {
+      if (make_a_move(&curr_game))
+        do_move(hWnd);
+    }
   }
 }
