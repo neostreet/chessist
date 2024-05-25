@@ -1121,29 +1121,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 curr_chess_file = num_files_in_list - 1;
             }
 
-            retval = read_game(chess_file_list[curr_chess_file],
-              &curr_game,err_msg);
-
-            if (!retval) {
-              bHaveGame = TRUE;
-
-              wsprintf(szTitle,"%s - %s",szAppName,
-                trim_name(chess_file_list[curr_chess_file]));
-              SetWindowText(hWnd,szTitle);
-              highlight_rank = -1;
-              highlight_file = -1;
-              InvalidateRect(hWnd,NULL,TRUE);
-            }
-            else {
-              hdc = GetDC(hWnd);
-              rect.left = 0;
-              rect.top = 0;
-              rect.right = chess_window_width;
-              rect.bottom = 16;
-              wsprintf(buf,read_game_failure,
-                chess_file_list[curr_chess_file],retval,curr_game.curr_move);
-              TextOut(hdc,rect.left,rect.top,buf,lstrlen(buf));
-            }
+            do_read(hWnd,chess_file_list[curr_chess_file],&curr_game,bBinaryFormat);
           }
 
           break;
