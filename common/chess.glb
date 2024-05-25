@@ -24,6 +24,7 @@ GLOBAL int do_castle_failures;
 GLOBAL int do_castle_successes;
 GLOBAL int seed;
 GLOBAL bool bBinaryFormat;
+GLOBAL bool bAutoSaveAndAdvance;
 
 #ifdef MAKE_GLOBALS_HERE
 char piece_ids[] = "RNBQK";
