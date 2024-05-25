@@ -1129,6 +1129,44 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
     }
   }
 
+  // now check for captures
+
+  if (!bBlack)
+    work_rank = rank + 1;
+  else
+    work_rank = rank - 1;
+
+  if ((work_rank >= 0) && (work_rank < NUM_RANKS)) {
+    for (n = 0; n < 2; n++) {
+      if (!n)
+        work_file = file - 1;
+      else
+        work_file = file + 1;
+
+      if ((work_file < 0) || (work_file >= NUM_FILES))
+        continue;
+
+      square2 = get_piece2(gamept->board,work_rank,work_file);
+
+      // pawn can only capture an enemy piece
+      if (square * square2 >= 0)
+        continue;
+
+      to = POS_OF(work_rank,work_file);
+
+      if (!move_is_legal(gamept,current_board_position,to))
+        continue;
+
+      if (*legal_moves_count < MAX_LEGAL_MOVES) {
+        legal_moves[*legal_moves_count].from = current_board_position;
+        legal_moves[*legal_moves_count].to = to;
+        legal_moves[*legal_moves_count].special_move_info = SPECIAL_MOVE_CAPTURE;
+
+        (*legal_moves_count)++;
+      }
+    }
+  }
+
   if (debug_fptr) {
     num_legal_moves = *legal_moves_count - num_legal_moves_before;
     fprintf(debug_fptr,"legal_pawn_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
