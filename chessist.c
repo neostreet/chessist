@@ -198,6 +198,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   else
     bBinaryFormat = false;
 
+  if (getenv("AUTO_SAVE"))
+    bAutoSave = true;
+  else
+    bAutoSave = false;
+
   if ((cpt = getenv("TOP_MARGIN")) != NULL)
     top_margin = atoi(cpt);
   else
@@ -1108,6 +1113,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case VK_F6:
         case VK_F7:
           if (bHaveListFile) {
+            if (bAutoSave) {
+              // toggle the orientation, and save
+              curr_game.orientation ^= 1;
+              write_binary_game(chess_file_list[curr_chess_file],&curr_game);
+            }
+
             if (wParam == VK_F6) {
               curr_chess_file++;
 
