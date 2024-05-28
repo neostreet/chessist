@@ -241,8 +241,13 @@ void fprint_moves2(struct game *gamept,FILE *fptr)
 {
   int n;
 
+  fprintf(fptr,"fprint_moves2:\n");
+
   for (n = 0; n < gamept->num_moves; n++) {
-    fprintf(fptr,"%d %d %d %x\n",n,gamept->moves[n].from,gamept->moves[n].to,gamept->moves[n].special_move_info);
+    fprintf(fptr,"%d %d %x\n",
+      gamept->moves[n].from,
+      gamept->moves[n].to,
+      gamept->moves[n].special_move_info);
   }
 }
 
