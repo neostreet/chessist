@@ -938,9 +938,6 @@ bool move_is_legal(struct game *gamept,char from,char to)
 
   bBlack = gamept->curr_move & 0x1;
   copy_game(&scratch,gamept);
-  scratch.moves[scratch.curr_move].from = from;
-  scratch.moves[scratch.curr_move].to = to;
-  scratch.moves[scratch.curr_move].special_move_info = 0;
   update_board(&scratch,NULL,NULL,true);
 
   if (debug_fptr && (gamept->curr_move == dbg_move)) {
