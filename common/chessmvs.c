@@ -322,7 +322,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
 
 check_for_illegal_move:
 
-  if (!move_is_legal(gamept,move_ptr->from,move_ptr->to)) {
+  if (!move_is_legal(gamept)) {
     if (debug_fptr) {
       fprintf(debug_fptr,"do_pawn_move: about to return 15, curr_move = %d\n",
         gamept->curr_move);
@@ -427,7 +427,7 @@ int do_pawn_move2(struct game *gamept)
     }
   }
 
-  if (!move_is_legal(gamept,move_start_square,move_end_square))
+  if (!move_is_legal(gamept))
     return 12;
 
   gamept->moves[gamept->curr_move].from = move_start_square;
@@ -544,7 +544,7 @@ int do_piece_move(struct game *gamept,int direction,char *word,int wordlen,struc
           move_ptr->from = POS_OF(curr_rank,curr_file);
           move_ptr->to = POS_OF(to_rank,to_file);
 
-          if (move_is_legal(gamept,move_ptr->from,move_ptr->to))
+          if (move_is_legal(gamept))
             return 0;  /* success */
         }
       }
@@ -571,7 +571,7 @@ int do_piece_move2(struct game *gamept)
   if (retval)
     return 1;
 
-  if (!move_is_legal(gamept,move_start_square,move_end_square))
+  if (!move_is_legal(gamept))
     return 1;
 
   gamept->moves[gamept->curr_move].from = move_start_square;
@@ -923,7 +923,7 @@ int king_move2(
   return retval;
 }
 
-bool move_is_legal(struct game *gamept,char from,char to)
+bool move_is_legal(struct game *gamept)
 {
   // don't allow moves which would put the mover in check; use a scratch game
   // to achieve this
@@ -1055,7 +1055,7 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
       if (!get_piece2(gamept->board,2,file) && !get_piece2(gamept->board,3,file)) {
         to = POS_OF(3,file);
 
-        if (move_is_legal(gamept,current_board_position,to)) {
+        if (move_is_legal(gamept)) {
           if (*legal_moves_count < MAX_LEGAL_MOVES) {
             legal_moves[*legal_moves_count].from = current_board_position;
             legal_moves[*legal_moves_count].to = to;
@@ -1072,7 +1072,7 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
       if (!get_piece2(gamept->board,5,file) && !get_piece2(gamept->board,4,file)) {
         to = POS_OF(4,file);
 
-        if (move_is_legal(gamept,current_board_position,to)) {
+        if (move_is_legal(gamept)) {
           if (*legal_moves_count < MAX_LEGAL_MOVES) {
             legal_moves[*legal_moves_count].from = current_board_position;
             legal_moves[*legal_moves_count].to = to;
@@ -1109,7 +1109,7 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
 
     to = POS_OF(work_rank,work_file);
 
-    if (!move_is_legal(gamept,current_board_position,to))
+    if (!move_is_legal(gamept))
       continue;
 
     if (!bBlack) {
@@ -1177,7 +1177,7 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
 
       to = POS_OF(work_rank,work_file);
 
-      if (!move_is_legal(gamept,current_board_position,to))
+      if (!move_is_legal(gamept))
         continue;
 
       if (*legal_moves_count < MAX_LEGAL_MOVES) {
@@ -1243,7 +1243,7 @@ void legal_rook_moves(struct game *gamept,char current_board_position,struct mov
 
       to = POS_OF(work_rank,work_file);
 
-      if (move_is_legal(gamept,current_board_position,to)) {
+      if (move_is_legal(gamept)) {
         if (*legal_moves_count < MAX_LEGAL_MOVES) {
           legal_moves[*legal_moves_count].from = current_board_position;
           legal_moves[*legal_moves_count].to = to;
@@ -1314,7 +1314,7 @@ void legal_knight_moves(struct game *gamept,char current_board_position,struct m
 
     to = POS_OF(work_rank,work_file);
 
-    if (!move_is_legal(gamept,current_board_position,to))
+    if (!move_is_legal(gamept))
       continue;
 
     if (*legal_moves_count < MAX_LEGAL_MOVES) {
@@ -1378,7 +1378,7 @@ void legal_bishop_moves(struct game *gamept,char current_board_position,struct m
 
       to = POS_OF(work_rank,work_file);
 
-      if (move_is_legal(gamept,current_board_position,to)) {
+      if (move_is_legal(gamept)) {
         if (*legal_moves_count < MAX_LEGAL_MOVES) {
           legal_moves[*legal_moves_count].from = current_board_position;
           legal_moves[*legal_moves_count].to = to;
@@ -1466,7 +1466,7 @@ void legal_king_moves(struct game *gamept,char current_board_position,struct mov
 
     to = POS_OF(work_rank,work_file);
 
-    if (!move_is_legal(gamept,current_board_position,to))
+    if (!move_is_legal(gamept))
       continue;
 
     if (*legal_moves_count < MAX_LEGAL_MOVES) {
