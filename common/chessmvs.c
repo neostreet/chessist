@@ -930,12 +930,24 @@ bool move_is_legal(struct game *gamept,char from,char to)
 
   bool bBlack;
 
+  if (debug_fptr && (gamept->curr_move == dbg_move)) {
+    fprintf(debug_fptr,"move_is_legal: curr_move = %d, special_move_info = %x, before update_board\n",
+      gamept->curr_move,gamept->moves[gamept->curr_move].special_move_info);
+    fprint_bd2(gamept->board,debug_fptr);
+  }
+
   bBlack = gamept->curr_move & 0x1;
   copy_game(&scratch,gamept);
   scratch.moves[scratch.curr_move].from = from;
   scratch.moves[scratch.curr_move].to = to;
   scratch.moves[scratch.curr_move].special_move_info = 0;
   update_board(&scratch,NULL,NULL,true);
+
+  if (debug_fptr && (gamept->curr_move == dbg_move)) {
+    fprintf(debug_fptr,"move_is_legal: curr_move = %d, special_move_info = %x, after update_board\n",
+      gamept->curr_move,gamept->moves[gamept->curr_move].special_move_info);
+    fprint_bd2(scratch.board,debug_fptr);
+  }
 
   if (player_is_in_check(bBlack,scratch.board,scratch.curr_move)) {
     if (debug_fptr) {
