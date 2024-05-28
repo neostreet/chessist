@@ -322,8 +322,15 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
 
 check_for_illegal_move:
 
-  if (!move_is_legal(gamept,move_ptr->from,move_ptr->to))
+  if (!move_is_legal(gamept,move_ptr->from,move_ptr->to)) {
+    if (debug_fptr) {
+      fprintf(debug_fptr,"do_pawn_move: about to return 15, curr_move = %d\n",
+        gamept->curr_move);
+      fprint_bd2(gamept->board,debug_fptr);
+    }
+
     return 15;
+  }
 
   return 0;
 }
@@ -930,8 +937,15 @@ bool move_is_legal(struct game *gamept,char from,char to)
   scratch.moves[scratch.curr_move].special_move_info = 0;
   update_board(&scratch,NULL,NULL,true);
 
-  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move))
+  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move)) {
+    if (debug_fptr) {
+      fprintf(debug_fptr,"move_is_legal: about to return false, curr_move = %d\n",
+        scratch.curr_move);
+      fprint_bd2(scratch.board,debug_fptr);
+    }
+
     return false;
+  }
 
   return true;
 }
