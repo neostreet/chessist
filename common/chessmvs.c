@@ -7,8 +7,6 @@
 #include "chess.mac"
 #include "chess.fun"
 
-using namespace std;
-
 static struct game scratch;
 
 int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct move *move_ptr)
