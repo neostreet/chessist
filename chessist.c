@@ -84,8 +84,8 @@ static int initial_y_pos;
 static int chess_window_width;
 static int chess_window_height;
 
-#define WINDOW_EXTRA_WIDTH   8
-#define WINDOW_EXTRA_HEIGHT 56
+#define WINDOW_EXTRA_WIDTH  16
+#define WINDOW_EXTRA_HEIGHT 61
 
 static int window_extra_width;
 static int window_extra_height;
