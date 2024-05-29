@@ -927,6 +927,7 @@ bool move_is_legal(struct game *gamept,char from,char to)
   // to achieve this
 
   bool bBlack;
+  int dbg;
 
   if (debug_fptr && (gamept->curr_move == dbg_move)) {
     fprintf(debug_fptr,"move_is_legal: curr_move = %d, special_move_info = %x, before update_board\n",
@@ -936,6 +937,10 @@ bool move_is_legal(struct game *gamept,char from,char to)
 
   bBlack = gamept->curr_move & 0x1;
   copy_game(&scratch,gamept);
+
+  if ((scratch.moves[scratch.curr_move].from != from) || (scratch.moves[scratch.curr_move].to != to))
+    dbg = 1;
+
   scratch.moves[scratch.curr_move].from = from;
   scratch.moves[scratch.curr_move].to = to;
   update_board(&scratch,NULL,NULL,true);
