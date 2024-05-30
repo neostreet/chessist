@@ -478,10 +478,13 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
   bool bEnPassantCapture = false;
   int square_to_clear;
 
+  if (gamept->curr_move == dbg_move)
+    dbg = 1;
+
   update_board_calls++;
 
   if (dbg_update_board_call == update_board_calls)
-    dbg = 0;
+    dbg = 1;
 
   bBlack = (gamept->curr_move % 2);
 
@@ -602,8 +605,6 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
   }
 }
 
-static int debug_move = -1;
-
 void update_piece_info(struct game *gamept)
 {
   int n;
@@ -613,8 +614,8 @@ void update_piece_info(struct game *gamept)
   int debug;
   unsigned char board[CHARS_IN_BOARD];
 
-  if (gamept->curr_move == debug_move)
-    debug = 1;
+  if (gamept->curr_move == dbg_move)
+    dbg = 1;
 
   from = gamept->moves[gamept->curr_move].from;
   to = gamept->moves[gamept->curr_move].to;
