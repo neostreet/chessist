@@ -1765,8 +1765,17 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
 
     bBlack = curr_game.curr_move & 0x1;
 
-    if (player_is_in_check(bBlack,curr_game.board,curr_game.curr_move))
+    if (player_is_in_check(bBlack,curr_game.board,curr_game.curr_move)) {
       curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
+
+      // now determine if this is a checkmate
+
+      legal_moves_count = 0;
+      get_legal_moves(&curr_game,&legal_moves[0],&legal_moves_count);
+
+      if (!legal_moves_count)
+        curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_MATE;
+    }
 
     if (bPlayingVsMakeAMove) {
       if (make_a_move(&curr_game))
