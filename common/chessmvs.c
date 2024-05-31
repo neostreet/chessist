@@ -412,13 +412,13 @@ int do_pawn_move2(struct game *gamept)
         (get_piece2(gamept->board,4,end_file) == PAWN_ID * -1) &&
         (gamept->moves[gamept->curr_move-1].special_move_info == SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
 
-        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_EN_PASSANT_CAPTURE;
+        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
       }
       else if (!bWhiteMove && (start_rank == 3) &&
         (get_piece2(gamept->board,3,end_file) == PAWN_ID) &&
         (gamept->moves[gamept->curr_move-1].special_move_info == SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
 
-        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_EN_PASSANT_CAPTURE;
+        gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
       }
       else
         return 11; // failure
