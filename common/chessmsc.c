@@ -37,16 +37,16 @@ void print_bd0(unsigned char *board,int orientation)
   int n;
   int square;
 
-  for (m = 0; m < 8; m++) {
-    for (n = 0; n < 8; n++) {
+  for (m = 0; m < NUM_RANKS; m++) {
+    for (n = 0; n < NUM_FILES; n++) {
       if (!orientation)
-        square = get_piece2(board,7 - m,n);
+        square = get_piece2(board,(NUM_RANKS - 1) - m,n);
       else
-        square = get_piece2(board,m,7 - n);
+        square = get_piece2(board,m,(NUM_FILES - 1) - n);
 
       printf("%c",format_square(square));
 
-      if (n < 7)
+      if (n < (NUM_FILES - 1))
         putchar(' ');
     }
 
