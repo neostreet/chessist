@@ -929,6 +929,9 @@ bool move_is_legal(struct game *gamept,char from,char to)
   bool bBlack;
   int dbg;
 
+  if (bAssumeMoveIsLegal) // this is only used for debugging
+    return true;
+
   if (debug_fptr && (gamept->curr_move == dbg_move)) {
     fprintf(debug_fptr,"move_is_legal: curr_move = %d, special_move_info = %x, before update_board\n",
       gamept->curr_move,gamept->moves[gamept->curr_move].special_move_info);
