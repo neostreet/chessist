@@ -203,6 +203,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   else
     bAutoSave = false;
 
+  if (getenv("ASSUME_MOVE_IS_LEGAL"))
+    bAssumeMoveIsLegal = true;
+  else
+    bAssumeMoveIsLegal = false;
+
   if ((cpt = getenv("TOP_MARGIN")) != NULL)
     top_margin = atoi(cpt);
   else
