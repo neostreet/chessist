@@ -1152,12 +1152,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           break;
 
-        case VK_UP:
+        case VK_LEFT:
           prev_move(hWnd);
 
           break;
 
-        case VK_DOWN:
+        case VK_RIGHT:
           next_move(hWnd);
 
           break;
