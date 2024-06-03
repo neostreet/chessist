@@ -326,11 +326,13 @@ int read_binary_game(char *filename,struct game *gamept)
 
   bytes_to_read = gamept->num_moves * sizeof (struct move);
 
-  bytes_read = read(fhndl,(char *)gamept->moves,bytes_to_read);
+  if (bytes_to_read) {
+    bytes_read = read(fhndl,(char *)gamept->moves,bytes_to_read);
 
-  if (bytes_read != bytes_to_read) {
-    close(fhndl);
-    return 3;
+    if (bytes_read != bytes_to_read) {
+      close(fhndl);
+      return 3;
+    }
   }
 
   close(fhndl);
