@@ -30,6 +30,9 @@ char couldnt_open[] = "couldn't open %s\n";
 static char read_game_failure[] =
   "read_game() of %s failed: %d, curr_move = %d";
 
+static char read_binary_game_failure[] =
+  "read_binary_game() of %s failed: %d, curr_move = %d";
+
 static int bChangesMade;
 
 static char *chess_piece_bitmap_names[] = {
@@ -193,10 +196,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     debug_fptr = NULL;
   }
 
-  if (getenv("BINARY_FORMAT"))
+  // if (getenv("BINARY_FORMAT"))
     bBinaryFormat = true;
-  else
-    bBinaryFormat = false;
+  // else
+  //   bBinaryFormat = false;
 
   if (getenv("AUTO_SAVE"))
     bAutoSave = true;
@@ -925,8 +928,15 @@ void do_read(HWND hWnd,LPSTR name,struct game *gamept,bool bBinaryFormat)
     InvalidateRect(hWnd,NULL,TRUE);
   }
   else {
-    wsprintf(buf,read_game_failure,
-      name,retval,gamept->curr_move);
+    if (!bBinaryFormat) {
+      wsprintf(buf,read_game_failure,
+        name,retval,gamept->curr_move);
+    }
+    else {
+      wsprintf(buf,read_binary_game_failure,
+        name,retval,gamept->curr_move);
+    }
+
     MessageBox(hWnd,buf,NULL,MB_OK);
   }
 }
@@ -1770,16 +1780,20 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
 
     bBlack = curr_game.curr_move & 0x1;
 
+    legal_moves_count = 0;
+    get_legal_moves(&curr_game,&legal_moves[0],&legal_moves_count);
+
     if (player_is_in_check(bBlack,curr_game.board,curr_game.curr_move)) {
       curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
 
       // now determine if this is a checkmate
 
-      legal_moves_count = 0;
-      get_legal_moves(&curr_game,&legal_moves[0],&legal_moves_count);
-
       if (!legal_moves_count)
         curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_MATE;
+    }
+    else {
+      if (!legal_moves_count)
+        curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_STALEMATE;
     }
 
     if (bPlayingVsMakeAMove) {
