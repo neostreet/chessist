@@ -50,7 +50,8 @@ char *special_moves[] = {
   "SPECIAL_MOVE_PROMOTION_ROOK",
   "SPECIAL_MOVE_PROMOTION_KNIGHT",
   "SPECIAL_MOVE_PROMOTION_BISHOP",
-  "SPECIAL_MOVE_MATE"
+  "SPECIAL_MOVE_MATE",
+  "SPECIAL_MOVE_STALEMATE"
 };
 int num_special_moves = (sizeof special_moves / sizeof (char *));
 struct move legal_moves[MAX_LEGAL_MOVES];
