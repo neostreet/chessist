@@ -140,6 +140,7 @@ static TBBUTTON tbButtons[] = {
 
 static int special_move_info;
 static boolean bPlayingVsMakeAMove;
+static int move_number;
 
 // Forward declarations of functions included in this code module:
 
@@ -153,6 +154,7 @@ int read_list_file(LPSTR file_name,CHESS_FILE_LIST *cfl_ptr,int *num_files);
 
 LRESULT CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK Promotion(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK MoveNumber(HWND, UINT, WPARAM, LPARAM);
 BOOL CenterWindow (HWND, HWND);
 void do_lbuttondown(HWND hWnd,int file,int rank);
 
@@ -1288,6 +1290,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           break;
 
+        case IDM_GO_TO_MOVE_NUMBER:
+           if (DialogBox(hInst,"MoveNumberBox",hWnd,(DLGPROC)MoveNumber)) {
+             if (move_number < 0)
+               move_number = 0;
+             else if (move_number > curr_game.num_moves)
+               move_number = curr_game.num_moves;
+
+             position_game(&curr_game,move_number);
+             invalidate_board(hWnd);
+           }
+
+           break;
+
+
         case IDM_TOGGLE_ORIENTATION:
           toggle_orientation(hWnd);
 
@@ -1527,7 +1543,7 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 LRESULT CALLBACK Promotion(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
    switch (message) {
-        case WM_INITDIALOG:
+      case WM_INITDIALOG:
          ShowWindow (hDlg, SW_HIDE);
 
          CenterWindow (hDlg, GetWindow (hDlg, GW_OWNER));
@@ -1560,6 +1576,53 @@ LRESULT CALLBACK Promotion(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 
          break;
    }
+
+    return FALSE;
+}
+
+#define MAX_MOVE_NUMBER_LEN 3
+static char move_number_buf[MAX_MOVE_NUMBER_LEN+1];
+
+//
+//  FUNCTION: MoveNumber(HWND, unsigned, WORD, LONG)
+//
+//  PURPOSE:  Processes messages for "MoveNumber" dialog box
+//
+//  MESSAGES:
+//
+// WM_INITDIALOG - initialize dialog box
+// WM_COMMAND    - Input received
+//
+//
+LRESULT CALLBACK MoveNumber(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+   switch (message) {
+      case WM_INITDIALOG:
+         ShowWindow (hDlg, SW_HIDE);
+
+         CenterWindow (hDlg, GetWindow (hDlg, GW_OWNER));
+
+         ShowWindow (hDlg, SW_SHOW);
+
+         return (TRUE);
+
+      case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+            case IDOK:
+                if (GetDlgItemText(hDlg,IDC_MOVE_NUMBER,move_number_buf,MAX_MOVE_NUMBER_LEN)) {
+                    sscanf(move_number_buf,"%d",&move_number);
+                }
+
+                EndDialog(hDlg, TRUE);
+                return (TRUE);
+            case IDCANCEL:
+                EndDialog(hDlg, FALSE);
+                return (FALSE);
+         }
+
+         break;
+   }
+
 
     return FALSE;
 }
