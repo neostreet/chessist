@@ -74,6 +74,7 @@ BEGIN
     BEGIN
         MENUITEM "Go to &start of game (Home)", IDM_START_OF_GAME
         MENUITEM "Go to &end of game (End)",    IDM_END_OF_GAME
+        MENUITEM "Go to move number",           IDM_GO_TO_MOVE_NUMBER
         MENUITEM "Set &last move",              IDM_SET_LAST_MOVE
         MENUITEM "Print &board",                IDM_PRINT_BOARD
         MENUITEM "Print &game",                 IDM_PRINT_GAME
@@ -116,6 +117,16 @@ BEGIN
     AUTORADIOBUTTON "Knight",IDC_KNIGHT,20,90,100,30
     DEFPUSHBUTTON   "OK",IDOK,36,161,32,14,WS_GROUP
     PUSHBUTTON      "Cancel",IDCANCEL,76,161,32,14,WS_GROUP
+END
+
+MOVENUMBERBOX DIALOG DISCARDABLE  22, 17, 148, 50
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "Enter move number"
+FONT 8, "System"
+BEGIN
+    EDITTEXT        IDC_MOVE_NUMBER,20,2,100,14
+    DEFPUSHBUTTON   "OK",IDOK,36,25,32,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,76,25,32,14,WS_GROUP
 END
 
 
