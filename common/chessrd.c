@@ -281,12 +281,14 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
     if (got_error)
       break;
 
-    if (bCheck) {
-      gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_CHECK;
-    }
+    if (!bSkipChecks) {
+      if (bCheck) {
+        gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_CHECK;
+      }
 
-    if (bMate) {
-      gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_MATE;
+      if (bMate) {
+        gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_MATE;
+      }
     }
 
     update_board(gamept,NULL,NULL,false);
