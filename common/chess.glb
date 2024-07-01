@@ -26,6 +26,7 @@ GLOBAL int seed;
 GLOBAL bool bBinaryFormat;
 GLOBAL bool bAutoSave;
 GLOBAL bool bAssumeMoveIsLegal;
+GLOBAL bool bSkipChecks;
 
 #ifdef MAKE_GLOBALS_HERE
 char piece_ids[] = "RNBQK";
