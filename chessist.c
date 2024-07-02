@@ -628,9 +628,10 @@ void do_paint(HWND hWnd)
         if ((m == highlight_rank) && (n == highlight_file))
           bigbmp_row = 2;
         else {
-          if ((curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_MATE) ||
-              (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_STALEMATE))
+          if (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_MATE)
             bigbmp_row = 1;
+          else if (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_STALEMATE)
+            bigbmp_row = 3;
           else
             bigbmp_row = 0;
         }
