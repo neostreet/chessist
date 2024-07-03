@@ -133,8 +133,8 @@ static int bHaveGame;
 static struct game curr_game;
 
 static TBBUTTON tbButtons[] = {
-    { 0, IDM_NEW,                      TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-    { 1, IDM_OPEN,                     TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 0, IDM_NEXT_GAME,                TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+    { 1, IDM_PREV_GAME,                TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
     { 2, IDM_SAVE,                     TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 };
 
@@ -198,10 +198,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     debug_fptr = NULL;
   }
 
-  if (getenv("BINARY_FORMAT"))
+  //if (getenv("BINARY_FORMAT"))
     bBinaryFormat = true;
-  else
-    bBinaryFormat = false;
+  //else
+  //  bBinaryFormat = false;
 
   if (getenv("AUTO_SAVE"))
     bAutoSave = true;
@@ -1360,6 +1360,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             bHaveName = TRUE;
             lstrcpy(szFile,szWriteFileName);
             write_binary_game(szFile,&curr_game);
+          }
+
+          break;
+
+        case IDM_PREV_GAME:
+        case IDM_NEXT_GAME:
+          if (bHaveListFile) {
+            if (wmId == IDM_NEXT_GAME) {
+              curr_chess_file++;
+
+              if (curr_chess_file == num_files_in_list)
+                curr_chess_file = 0;
+            }
+            else {
+              curr_chess_file--;
+
+              if (curr_chess_file < 0)
+                curr_chess_file = num_files_in_list - 1;
+            }
+
+            do_read(hWnd,chess_file_list[curr_chess_file],&curr_game,bBinaryFormat);
           }
 
           break;
