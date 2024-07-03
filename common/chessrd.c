@@ -165,8 +165,7 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
   int dbg;
   int retval;
   int got_error;
-  bool bCheck;
-  bool bMate;
+  bool bBlack;
 
   bzero(gamept,sizeof (struct game));
 
@@ -178,7 +177,7 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
   fscanf(fptr,"%d",&gamept->orientation);  /* get board orientation */
                                    /* 0 = standard, 1 = black on bottom */
 
-  end_of_file = get_word(fptr,word,WORDLEN,&wordlen,&bCheck,&bMate);
+  end_of_file = get_word(fptr,word,WORDLEN,&wordlen);
   bHaveFirstWord = true;
 
   set_initial_board(gamept);
@@ -192,7 +191,7 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
 
   for ( ; ; ) {
     if (word_no || !bHaveFirstWord)
-      end_of_file = get_word(fptr,word,WORDLEN,&wordlen,&bCheck,&bMate);
+      end_of_file = get_word(fptr,word,WORDLEN,&wordlen);
 
     if (end_of_file)
       break;
@@ -281,28 +280,34 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
     if (got_error)
       break;
 
-    if (!bSkipChecks) {
-      if (bCheck) {
-        gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_CHECK;
-      }
-
-      if (bMate) {
-        gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_MATE;
-      }
-    }
-
     update_board(gamept,NULL,NULL,false);
     update_piece_info(gamept);
 
     gamept->curr_move++;
-  }
+    gamept->moves[gamept->curr_move].special_move_info = 0;
+    gamept->num_moves = gamept->curr_move;
 
-  gamept->num_moves = gamept->curr_move;
+    bBlack = gamept->curr_move & 0x1;
+
+    if (player_is_in_check(bBlack,gamept->board,gamept->curr_move))
+      gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
+  }
 
   fclose(fptr);
 
   if (got_error)
     return 3;
+
+  legal_moves_count = 0;
+  get_legal_moves(gamept,&legal_moves[0],&legal_moves_count);
+
+  if (!legal_moves_count) {
+    // determine if this is a checkmate or a stalemate
+    if (gamept->moves[gamept->curr_move-1].special_move_info & SPECIAL_MOVE_CHECK)
+      gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_MATE;
+    else
+      gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_STALEMATE;
+  }
 
   return 0;
 }
@@ -378,14 +383,8 @@ int write_binary_game(char *filename,struct game *gamept)
   return 0;
 }
 
-int ignore_character(int chara,bool *bCheck,bool *bMate)
+int ignore_character(int chara)
 {
-  if ((chara == '+') || (chara == '#'))
-    *bCheck = true;
-
-  if (chara == '#')
-    *bMate = true;
-
   if ((chara == 0x0d) ||
     (chara == '(') ||
     (chara == ')') ||
@@ -398,7 +397,7 @@ int ignore_character(int chara,bool *bCheck,bool *bMate)
   return false;
 }
 
-int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,bool *bCheck,bool *bMate)
+int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt)
 {
   int chara;
   int started;
@@ -410,8 +409,6 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,bool *bCheck,bool *
   started = 0;
   comment = 0;
   end_of_file = 0;
-  *bCheck = false;
-  *bMate = false;
 
   for ( ; ; ) {
     chara = fgetc(fptr);
@@ -424,7 +421,7 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,bool *bCheck,bool *
     }
 
     // ignore carriage returns and other characters
-    if (ignore_character(chara,bCheck,bMate))
+    if (ignore_character(chara))
       continue;
 
     /* end of line ? */
