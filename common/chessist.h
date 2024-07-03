@@ -32,6 +32,9 @@
 
 #define IDM_ABOUT              214
 
+#define IDM_PREV_GAME          215
+#define IDM_NEXT_GAME          216
+
 #define IDC_STATIC -1
 
 #define DLG_VERFIRST        400
