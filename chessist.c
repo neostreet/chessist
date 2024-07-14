@@ -1731,6 +1731,10 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
   int invalid_squares[4];
   int num_invalid_squares;
   bool bBlack;
+  int dbg;
+
+  if (curr_game.curr_move == dbg_move)
+    dbg = 1;
 
   if (debug_fptr != NULL) {
     fprintf(debug_fptr,"do_lbuttondown: rank = %d, file = %d\n",rank,file);
