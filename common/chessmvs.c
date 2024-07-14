@@ -987,6 +987,7 @@ void get_legal_moves(struct game *gamept,struct move *legal_moves,int *legal_mov
   unsigned char board[CHARS_IN_BOARD];
   char piece_id;
 
+  bInGetLegalMoves = true;
   bWhiteToMove = !(gamept->num_moves % 2);
 
   if (bWhiteToMove)
@@ -1032,6 +1033,8 @@ void get_legal_moves(struct game *gamept,struct move *legal_moves,int *legal_mov
         break;
     }
   }
+
+  bInGetLegalMoves = false;
 }
 
 struct move_offset pawn_offsets[] = {
