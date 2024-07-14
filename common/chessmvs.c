@@ -576,8 +576,10 @@ int do_piece_move2(struct game *gamept)
   if (retval)
     return 1;
 
-  if (!move_is_legal(gamept,move_start_square,move_end_square))
+  if (!move_is_legal(gamept,move_start_square,move_end_square)) {
+    gamept->moves[gamept->curr_move].special_move_info = 0;
     return 1;
+  }
 
   gamept->moves[gamept->curr_move].from = move_start_square;
   gamept->moves[gamept->curr_move].to = move_end_square;
@@ -935,6 +937,9 @@ bool move_is_legal(struct game *gamept,char from,char to)
 
   bool bBlack;
   int dbg;
+
+  if (!bInGetLegalMoves)
+    dbg = 1;
 
   if (bAssumeMoveIsLegal) // this is only used for debugging
     return true;
