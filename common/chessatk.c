@@ -262,16 +262,47 @@ int king_attacks_square(unsigned char *board,int square1,int square2)
 
 static int debug_move = -1;
 
+bool any_opponent_piece_attacks_square(int square,bool bBlack,unsigned char *board,int curr_move)
+{
+  int n;
+  int piece;
+
+  for (n = 0; n < NUM_BOARD_SQUARES; n++) {
+    piece = get_piece1(board,n);
+
+    if (!piece)
+      continue;
+
+    if (bBlack) {
+      if (piece < 0)
+        continue;
+    }
+    else {
+      if (piece > 0)
+        continue;
+    }
+
+    if (square_attacks_square(board,n,square)) {
+      if (debug_fptr)
+        fprint_bd2(board,debug_fptr);
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
 bool player_is_in_check(bool bBlack,unsigned char *board,int curr_move)
 {
   int n;
   int movers_king;
   int movers_king_square;
   int piece;
-  int debug;
+  int dbg;
 
   if (curr_move == debug_move)
-    debug = 1;
+    dbg = 1;
 
   if (debug_fptr)
     fprintf(debug_fptr,"player_is_in_check: bBlack = %d, curr_move = %d\n",bBlack,curr_move);
@@ -298,29 +329,8 @@ bool player_is_in_check(bool bBlack,unsigned char *board,int curr_move)
     return false; // should never happen
 
   // now determine if any of the opponent's pieces attack the mover's king
-
-  for (n = 0; n < NUM_BOARD_SQUARES; n++) {
-    piece = get_piece1(board,n);
-
-    if (!piece)
-      continue;
-
-    if (bBlack) {
-      if (piece < 0)
-        continue;
-    }
-    else {
-      if (piece > 0)
-        continue;
-    }
-
-    if (square_attacks_square(board,n,movers_king_square)) {
-      if (debug_fptr)
-        fprint_bd2(board,debug_fptr);
-
-      return true;
-    }
-  }
+  if (any_opponent_piece_attacks_square(movers_king_square,bBlack,board,curr_move))
+    return true;
 
   return false;
 }
