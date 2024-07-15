@@ -11,7 +11,9 @@ static struct game scratch;
 
 int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct move *move_ptr)
 {
+  int n;
   int rank;
+  int squares_to_check[2];
   int special_move_info;
 
   if (debug_fptr) {
@@ -53,6 +55,17 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
       return 5;
     }
 
+    /* make sure the empty squares are not attacked */
+    squares_to_check[0] = POS_OF(rank,5);
+    squares_to_check[1] = POS_OF(rank,6);
+
+    for (n = 0; n < 2; n++) {
+      if (any_opponent_piece_attacks_square(squares_to_check[n],(direction != 1),gamept->board,gamept->curr_move)) {
+        do_castle_failures++;
+        return 6;
+      }
+    }
+
     if (direction == 1) {  /* if white's move: */
       move_ptr->from = 4;
       move_ptr->to = 6;
@@ -68,13 +81,24 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     /* make sure there is a rook in the corner: */
     if (get_piece2(gamept->board,rank,0) != 2 * direction) {
       do_castle_failures++;
-      return 6;
+      return 7;
     }
 
     /* make sure there are empty squares between king and rook: */
     if (get_piece2(gamept->board,rank,1) || get_piece2(gamept->board,rank,2) || get_piece2(gamept->board,rank,3)) {
       do_castle_failures++;
-      return 7;
+      return 8;
+    }
+
+    /* make sure the empty squares are not attacked */
+    squares_to_check[0] = POS_OF(rank,2);
+    squares_to_check[1] = POS_OF(rank,3);
+
+    for (n = 0; n < 2; n++) {
+      if (any_opponent_piece_attacks_square(squares_to_check[n],(direction != 1),gamept->board,gamept->curr_move)) {
+        do_castle_failures++;
+        return 9;
+      }
     }
 
     if (direction == 1) {  /* if white's move: */
@@ -90,7 +114,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
   }
   else {
     do_castle_failures++;
-    return 8;
+    return 10;
   }
 
   move_ptr->special_move_info = special_move_info;
@@ -938,8 +962,12 @@ bool move_is_legal(struct game *gamept,char from,char to)
   bool bBlack;
   int dbg;
 
-  if (!bInGetLegalMoves)
-    dbg = 1;
+  if (!bInGetLegalMoves) {
+    if (gamept->curr_move == dbg_move)
+      dbg = 1;
+    else
+      dbg = 2;
+  }
 
   if (bAssumeMoveIsLegal) // this is only used for debugging
     return true;
