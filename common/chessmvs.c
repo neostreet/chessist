@@ -860,31 +860,43 @@ int king_move(
 
     // check for kingside castle
     if ((file1 == 4) && (rank1 == 0) && (file2 == 6) && (rank2 == 0)) {
-      should_be_empty1 = get_piece1(gamept->board,5);
-      should_be_empty2 = get_piece1(gamept->board,6);
-      should_be_rook = get_piece1(gamept->board,7);
+      // don't allow castling if the player is in check
+      if (gamept->moves[gamept->curr_move-1].special_move_info & SPECIAL_MOVE_CHECK) {
+        ;
+      }
+      else {
+        should_be_empty1 = get_piece1(gamept->board,5);
+        should_be_empty2 = get_piece1(gamept->board,6);
+        should_be_rook = get_piece1(gamept->board,7);
 
-      if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID)) {
-        // make sure the neither the king nor the rook has previously moved */
-        if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[7].move_count) {
-          gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
-          return 0;
+        if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID)) {
+          // make sure the neither the king nor the rook has previously moved */
+          if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[7].move_count) {
+            gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
+            return 0;
+          }
         }
       }
     }
 
     // check for queenside castle
     if ((file1 == 4) && (rank1 == 0) && (file2 == 2) && (rank2 == 0)) {
-      should_be_empty1 = get_piece1(gamept->board,1);
-      should_be_empty2 = get_piece1(gamept->board,2);
-      should_be_empty3 = get_piece1(gamept->board,3);
-      should_be_rook = get_piece1(gamept->board,0);
+      // don't allow castling if the player is in check
+      if (gamept->moves[gamept->curr_move-1].special_move_info & SPECIAL_MOVE_CHECK) {
+        ;
+      }
+      else {
+        should_be_empty1 = get_piece1(gamept->board,1);
+        should_be_empty2 = get_piece1(gamept->board,2);
+        should_be_empty3 = get_piece1(gamept->board,3);
+        should_be_rook = get_piece1(gamept->board,0);
 
-      if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID)) {
-        // make sure the neither the king nor the rook has previously moved */
-        if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[0].move_count) {
-          gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
-          return 0;
+        if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID)) {
+          // make sure the neither the king nor the rook has previously moved */
+          if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[0].move_count) {
+            gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
+            return 0;
+          }
         }
       }
     }
@@ -894,31 +906,43 @@ int king_move(
 
     // check for kingside castle
     if ((file1 == 4) && (rank1 == 7) && (file2 == 6) && (rank2 == 7)) {
-      should_be_empty1 = get_piece1(gamept->board,61);
-      should_be_empty2 = get_piece1(gamept->board,62);
-      should_be_rook = get_piece1(gamept->board,63);
+      // don't allow castling if the player is in check
+      if (gamept->moves[gamept->curr_move-1].special_move_info & SPECIAL_MOVE_CHECK) {
+        ;
+      }
+      else {
+        should_be_empty1 = get_piece1(gamept->board,61);
+        should_be_empty2 = get_piece1(gamept->board,62);
+        should_be_rook = get_piece1(gamept->board,63);
 
-      if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID * -1)) {
-        // make sure the neither the king nor the rook has previously moved */
-        if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[15].move_count) {
-          gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
-          return 0;
+        if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID * -1)) {
+          // make sure the neither the king nor the rook has previously moved */
+          if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[15].move_count) {
+            gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
+            return 0;
+          }
         }
       }
     }
 
     // check for queenside castle
     if ((file1 == 4) && (rank1 == 7) && (file2 == 2) && (rank2 == 7)) {
-      should_be_empty1 = get_piece1(gamept->board,57);
-      should_be_empty2 = get_piece1(gamept->board,58);
-      should_be_empty3 = get_piece1(gamept->board,59);
-      should_be_rook = get_piece1(gamept->board,56);
+      // don't allow castling if the player is in check
+      if (gamept->moves[gamept->curr_move-1].special_move_info & SPECIAL_MOVE_CHECK) {
+        ;
+      }
+      else {
+        should_be_empty1 = get_piece1(gamept->board,57);
+        should_be_empty2 = get_piece1(gamept->board,58);
+        should_be_empty3 = get_piece1(gamept->board,59);
+        should_be_rook = get_piece1(gamept->board,56);
 
-      if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID * -1)) {
-        // make sure the neither the king nor the rook has previously moved */
-        if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[8].move_count) {
-          gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
-          return 0;
+        if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID * -1)) {
+          // make sure the neither the king nor the rook has previously moved */
+          if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[8].move_count) {
+            gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
+            return 0;
+          }
         }
       }
     }
