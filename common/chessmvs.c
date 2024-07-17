@@ -742,6 +742,7 @@ int bishop_move(
   int dist2;
   int file_dir;
   int rank_dir;
+  int piece;
 
   dist1 = (file1 - file2);
 
@@ -773,7 +774,9 @@ int bishop_move(
 
     rank1 += rank_dir;
 
-    if (get_piece2(gamept->board,rank1,file1))
+    piece = get_piece2(gamept->board,rank1,file1);
+
+    if (piece)
       return 2;  /* failure */
   }
 
