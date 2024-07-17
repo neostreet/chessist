@@ -842,12 +842,14 @@ int king_move(
   int rank2
 )
 {
+  int n;
   int dist1;
   int dist2;
   int should_be_empty1;
   int should_be_empty2;
   int should_be_empty3;
   int should_be_rook;
+  int squares_to_check[2];
 
   if (debug_fptr) {
     fprintf(debug_fptr,"king_move: piece_info:\n");
@@ -865,15 +867,29 @@ int king_move(
         ;
       }
       else {
-        should_be_empty1 = get_piece1(gamept->board,5);
-        should_be_empty2 = get_piece1(gamept->board,6);
-        should_be_rook = get_piece1(gamept->board,7);
+        // don't allow castling if the king moves over or onto a controlled square
+        squares_to_check[0] = 5;
+        squares_to_check[1] = 6;
 
-        if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID)) {
-          // make sure the neither the king nor the rook has previously moved */
-          if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[7].move_count) {
-            gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
-            return 0;
+        for (n = 0; n < 2; n++) {
+          if (any_opponent_piece_attacks_square(squares_to_check[n],false,gamept->board,gamept->curr_move))
+            break;
+        }
+
+        if (n < 2) {
+          ;
+        }
+        else {
+          should_be_empty1 = get_piece1(gamept->board,5);
+          should_be_empty2 = get_piece1(gamept->board,6);
+          should_be_rook = get_piece1(gamept->board,7);
+
+          if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID)) {
+            // make sure the neither the king nor the rook has previously moved */
+            if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[7].move_count) {
+              gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
+              return 0;
+            }
           }
         }
       }
@@ -886,16 +902,30 @@ int king_move(
         ;
       }
       else {
-        should_be_empty1 = get_piece1(gamept->board,1);
-        should_be_empty2 = get_piece1(gamept->board,2);
-        should_be_empty3 = get_piece1(gamept->board,3);
-        should_be_rook = get_piece1(gamept->board,0);
+        // don't allow castling if the king moves over or onto a controlled square
+        squares_to_check[0] = 2;
+        squares_to_check[1] = 3;
 
-        if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID)) {
-          // make sure the neither the king nor the rook has previously moved */
-          if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[0].move_count) {
-            gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
-            return 0;
+        for (n = 0; n < 2; n++) {
+          if (any_opponent_piece_attacks_square(squares_to_check[n],false,gamept->board,gamept->curr_move))
+            break;
+        }
+
+        if (n < 2) {
+          ;
+        }
+        else {
+          should_be_empty1 = get_piece1(gamept->board,1);
+          should_be_empty2 = get_piece1(gamept->board,2);
+          should_be_empty3 = get_piece1(gamept->board,3);
+          should_be_rook = get_piece1(gamept->board,0);
+
+          if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID)) {
+            // make sure the neither the king nor the rook has previously moved */
+            if (!gamept->white_pieces[4].move_count && !gamept->white_pieces[0].move_count) {
+              gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
+              return 0;
+            }
           }
         }
       }
@@ -911,15 +941,29 @@ int king_move(
         ;
       }
       else {
-        should_be_empty1 = get_piece1(gamept->board,61);
-        should_be_empty2 = get_piece1(gamept->board,62);
-        should_be_rook = get_piece1(gamept->board,63);
+        // don't allow castling if the king moves over or onto a controlled square
+        squares_to_check[0] = 61;
+        squares_to_check[1] = 62;
 
-        if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID * -1)) {
-          // make sure the neither the king nor the rook has previously moved */
-          if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[15].move_count) {
-            gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
-            return 0;
+        for (n = 0; n < 2; n++) {
+          if (any_opponent_piece_attacks_square(squares_to_check[n],true,gamept->board,gamept->curr_move))
+            break;
+        }
+
+        if (n < 2) {
+          ;
+        }
+        else {
+          should_be_empty1 = get_piece1(gamept->board,61);
+          should_be_empty2 = get_piece1(gamept->board,62);
+          should_be_rook = get_piece1(gamept->board,63);
+
+          if (!should_be_empty1 && !should_be_empty2 && (should_be_rook == ROOK_ID * -1)) {
+            // make sure the neither the king nor the rook has previously moved */
+            if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[15].move_count) {
+              gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_KINGSIDE_CASTLE;
+              return 0;
+            }
           }
         }
       }
@@ -932,16 +976,30 @@ int king_move(
         ;
       }
       else {
-        should_be_empty1 = get_piece1(gamept->board,57);
-        should_be_empty2 = get_piece1(gamept->board,58);
-        should_be_empty3 = get_piece1(gamept->board,59);
-        should_be_rook = get_piece1(gamept->board,56);
+        // don't allow castling if the king moves over or onto a controlled square
+        squares_to_check[0] = 58;
+        squares_to_check[1] = 59;
 
-        if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID * -1)) {
-          // make sure the neither the king nor the rook has previously moved */
-          if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[8].move_count) {
-            gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
-            return 0;
+        for (n = 0; n < 2; n++) {
+          if (any_opponent_piece_attacks_square(squares_to_check[n],true,gamept->board,gamept->curr_move))
+            break;
+        }
+
+        if (n < 2) {
+          ;
+        }
+        else {
+          should_be_empty1 = get_piece1(gamept->board,57);
+          should_be_empty2 = get_piece1(gamept->board,58);
+          should_be_empty3 = get_piece1(gamept->board,59);
+          should_be_rook = get_piece1(gamept->board,56);
+
+          if (!should_be_empty1 && !should_be_empty2 && !should_be_empty3 && (should_be_rook == ROOK_ID * -1)) {
+            // make sure the neither the king nor the rook has previously moved */
+            if (!gamept->black_pieces[12].move_count && !gamept->black_pieces[8].move_count) {
+              gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_QUEENSIDE_CASTLE;
+              return 0;
+            }
           }
         }
       }
