@@ -47,21 +47,21 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
       return 4;
   }
 
-  /* make sure the rook hasn't previously moved */
-  if (direction == 1) {
-    if (gamept->white_pieces[7].move_count)
-      return 5;
-  }
-  else {
-    if (gamept->black_pieces[15].move_count)
-      return 6;
-  }
-
   if (wordlen == 3) {  /* kingside castle */
     /* make sure there is a rook in the corner: */
     if (get_piece2(gamept->board,rank,7) != 2 * direction) {
       do_castle_failures++;
-      return 7;
+      return 5;
+    }
+
+    /* make sure the rook hasn't previously moved */
+    if (direction == 1) {
+      if (gamept->white_pieces[7].move_count)
+        return 6;
+    }
+    else {
+      if (gamept->black_pieces[15].move_count)
+        return 7;
     }
 
     /* make sure there are empty squares between king and rook: */
@@ -99,10 +99,20 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
       return 10;
     }
 
+    /* make sure the rook hasn't previously moved */
+    if (direction == 1) {
+      if (gamept->white_pieces[0].move_count)
+        return 11;
+    }
+    else {
+      if (gamept->black_pieces[8].move_count)
+        return 12;
+    }
+
     /* make sure there are empty squares between king and rook: */
     if (get_piece2(gamept->board,rank,1) || get_piece2(gamept->board,rank,2) || get_piece2(gamept->board,rank,3)) {
       do_castle_failures++;
-      return 11;
+      return 13;
     }
 
     /* make sure the empty squares are not attacked */
@@ -112,7 +122,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     for (n = 0; n < 2; n++) {
       if (any_opponent_piece_attacks_square(squares_to_check[n],(direction != 1),gamept->board,gamept->curr_move)) {
         do_castle_failures++;
-        return 12;
+        return 14;
       }
     }
 
@@ -129,7 +139,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
   }
   else {
     do_castle_failures++;
-    return 13;
+    return 15;
   }
 
   move_ptr->special_move_info = special_move_info;
