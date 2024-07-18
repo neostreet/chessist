@@ -21,6 +21,11 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     fprint_piece_info(gamept,debug_fptr);
   }
 
+  // don't allow castling if the player is in check
+  if (gamept->moves[gamept->curr_move-1].special_move_info & SPECIAL_MOVE_CHECK) {
+    return 1;
+  }
+
   if (direction == 1)  /* if white's move: */
     rank = 0;
   else
@@ -29,40 +34,40 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
   /* make sure the king is on his original square: */
   if (get_piece2(gamept->board,rank,4) != 6 * direction) {
     do_castle_failures++;
-    return 1;
+    return 2;
   }
 
   /* make sure the king hasn't previously moved */
   if (direction == 1) {
     if (gamept->white_pieces[4].move_count)
-      return 2;
+      return 3;
   }
   else {
     if (gamept->black_pieces[12].move_count)
-      return 3;
+      return 4;
   }
 
   /* make sure the rook hasn't previously moved */
   if (direction == 1) {
     if (gamept->white_pieces[7].move_count)
-      return 4;
+      return 5;
   }
   else {
     if (gamept->black_pieces[15].move_count)
-      return 5;
+      return 6;
   }
 
   if (wordlen == 3) {  /* kingside castle */
     /* make sure there is a rook in the corner: */
     if (get_piece2(gamept->board,rank,7) != 2 * direction) {
       do_castle_failures++;
-      return 6;
+      return 7;
     }
 
     /* make sure there are empty squares between king and rook: */
     if (get_piece2(gamept->board,rank,5) || get_piece2(gamept->board,rank,6)) {
       do_castle_failures++;
-      return 7;
+      return 8;
     }
 
     /* make sure the empty squares are not attacked */
@@ -72,7 +77,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     for (n = 0; n < 2; n++) {
       if (any_opponent_piece_attacks_square(squares_to_check[n],(direction != 1),gamept->board,gamept->curr_move)) {
         do_castle_failures++;
-        return 8;
+        return 9;
       }
     }
 
@@ -91,13 +96,13 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     /* make sure there is a rook in the corner: */
     if (get_piece2(gamept->board,rank,0) != 2 * direction) {
       do_castle_failures++;
-      return 9;
+      return 10;
     }
 
     /* make sure there are empty squares between king and rook: */
     if (get_piece2(gamept->board,rank,1) || get_piece2(gamept->board,rank,2) || get_piece2(gamept->board,rank,3)) {
       do_castle_failures++;
-      return 10;
+      return 11;
     }
 
     /* make sure the empty squares are not attacked */
@@ -107,7 +112,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     for (n = 0; n < 2; n++) {
       if (any_opponent_piece_attacks_square(squares_to_check[n],(direction != 1),gamept->board,gamept->curr_move)) {
         do_castle_failures++;
-        return 11;
+        return 12;
       }
     }
 
@@ -124,7 +129,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
   }
   else {
     do_castle_failures++;
-    return 12;
+    return 13;
   }
 
   move_ptr->special_move_info = special_move_info;
@@ -860,11 +865,15 @@ int king_move(
   int should_be_empty3;
   int should_be_rook;
   int squares_to_check[2];
+  int dbg;
 
   if (debug_fptr) {
     fprintf(debug_fptr,"king_move: piece_info:\n");
     fprint_piece_info(gamept,debug_fptr);
   }
+
+  if (gamept->curr_move == dbg_move)
+    dbg = 1;
 
   // first, check if this is a castling move
   if (!(gamept->curr_move % 2)) {
