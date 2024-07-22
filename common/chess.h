@@ -42,10 +42,14 @@
 #define SPECIAL_MOVE_MATE                      0x0400
 #define SPECIAL_MOVE_STALEMATE                 0x0800
 
+#define WHITE_WIN 1
+#define BLACK_WIN 2
+#define DRAW      3
+
 #define ORIG_FORCE_VALUE (FORCE_VALUE_QUEEN + 2 * FORCE_VALUE_ROOK + \
 2 * FORCE_VALUE_KNIGHT + 2 * FORCE_VALUE_BISHOP + 8 * FORCE_VALUE_PAWN)
 
-#define WORDLEN 80
+#define WORDLEN 256
 #define MAX_MOVES 400
 #define MAX_LEGAL_MOVES 500
 
@@ -110,6 +114,7 @@ struct game {
   int orientation;
   int num_moves;
   int curr_move;
+  int result;
   struct move moves[MAX_MOVES];
   unsigned char board[CHARS_IN_BOARD];  /* 8 columns * 8 rows / 2 (nibbles per char) */
   struct piece_info white_pieces[NUM_PIECES_PER_PLAYER];
