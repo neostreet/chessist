@@ -215,14 +215,31 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
         if (!chara)
           break;
 
-        if (n < 79)
+        if (n < MAX_TITLE_LEN - 1) {
           if (chara == '\\')
             gamept->title[n++] = ' ';
           else
             gamept->title[n++] = chara;
+        }
       }
 
       gamept->title[n] = 0;
+
+      for (m = n-1; m >= 0; m--) {
+        if (gamept->title[m] == ' ')
+          break;
+      }
+
+      if (m >= 0) {
+        m++;
+
+        if (!strcmp(&gamept->title[m],"1-0"))
+          gamept->result = WHITE_WIN;
+        else if (!strcmp(&gamept->title[m],"0-1"))
+          gamept->result = BLACK_WIN;
+        else if (!strcmp(&gamept->title[m],"1/2-1/2"))
+          gamept->result = DRAW;
+      }
 
       continue;
     }
@@ -439,7 +456,7 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt)
       continue;
 
     /* comment marker ? */
-    if (chara == '/') {
+    if (!wordlen && (chara == '/')) {
       comment = 1;
       continue;
     }
