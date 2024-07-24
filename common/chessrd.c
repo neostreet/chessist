@@ -930,6 +930,10 @@ int get_piece2(unsigned char *board,int row,int column)
 void set_piece1(unsigned char *board,int board_offset,int piece)
 {
   unsigned int bit_offset;
+  int dbg;
+
+  if (board_offset < 0)
+    dbg = 1;
 
   bit_offset = board_offset * BITS_PER_BOARD_SQUARE;
   set_bits(BITS_PER_BOARD_SQUARE,board,bit_offset,piece);
