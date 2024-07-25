@@ -1253,6 +1253,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case IDM_SET_LAST_MOVE:
           curr_game.num_moves = curr_game.curr_move;
+          curr_game.moves[curr_game.curr_move].special_move_info = 0;
+
           break;
 
         case IDM_PRINT_BOARD:
@@ -1613,7 +1615,7 @@ LRESULT CALLBACK Promotion(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
     return FALSE;
 }
 
-#define MAX_MOVE_NUMBER_LEN 3
+#define MAX_MOVE_NUMBER_LEN 4
 static char move_number_buf[MAX_MOVE_NUMBER_LEN+1];
 
 //
