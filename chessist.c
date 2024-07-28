@@ -1874,8 +1874,14 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     update_board(&curr_game,invalid_squares,&num_invalid_squares,false);
     update_piece_info(&curr_game);
 
-    for (n = 0; n < num_invalid_squares; n++)
-      invalidate_square(hWnd,invalid_squares[n]);
+    if ((curr_game.curr_move >= 1) && (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_CHECK)) {
+      invalidate_board(hWnd);
+      redisplay_counts(hWnd,NULL);
+    }
+    else {
+      for (n = 0; n < num_invalid_squares; n++)
+        invalidate_square(hWnd,invalid_squares[n]);
+    }
 
     highlight_rank = -1;
     highlight_file = -1;
@@ -1890,6 +1896,8 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     get_legal_moves(&curr_game,&legal_moves[0],&legal_moves_count);
 
     if (player_is_in_check(bBlack,curr_game.board,curr_game.curr_move)) {
+      invalidate_board(hWnd);
+      redisplay_counts(hWnd,NULL);
       curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
 
       // now determine if this is a checkmate
