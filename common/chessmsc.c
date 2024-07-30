@@ -343,6 +343,28 @@ bool multiple_queens(unsigned char *board)
   return false;
 }
 
+bool no_queens(unsigned char *board)
+{
+  int n;
+  int piece;
+  int num_white_queens = 0;
+  int num_black_queens = 0;
+
+  for (n = 0; n < NUM_BOARD_SQUARES; n++) {
+    piece = get_piece1(board,n);
+
+    if (piece == QUEEN_ID)
+      num_white_queens++;
+    else if (piece == QUEEN_ID * -1)
+      num_black_queens++;
+  }
+
+  if (!num_white_queens && !num_black_queens)
+    return true;
+
+  return false;
+}
+
 bool opposite_colored_bishops(unsigned char *board)
 {
   int n;
