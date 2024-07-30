@@ -69,6 +69,7 @@ int get_piece2(unsigned char *board,int row,int column);
 void set_piece1(unsigned char *board,int board_offset,int piece);
 void set_piece2(unsigned char *board,int row,int column,int piece);
 bool multiple_queens(unsigned char *board);
+bool no_queens(unsigned char *board);
 bool opposite_colored_bishops(unsigned char *board);
 bool same_colored_bishops(unsigned char *board);
 bool two_bishops(unsigned char *board);
