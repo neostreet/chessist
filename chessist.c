@@ -635,7 +635,7 @@ void do_paint(HWND hWnd)
           else if (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_CHECK)
             bigbmp_row = 5;
           else if (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_QUEEN_IS_ATTACKED)
-            bigbmp_row = 4;
+            bigbmp_row = 6;
           else
             bigbmp_row = 0;
         }
