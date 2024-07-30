@@ -308,6 +308,9 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
 
     if (player_is_in_check(bBlack,gamept->board,gamept->curr_move))
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
+
+    if (queen_is_attacked(bBlack,gamept->board,gamept->curr_move))
+      gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_QUEEN_IS_ATTACKED;
   }
 
   fclose(fptr);
