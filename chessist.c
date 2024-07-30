@@ -894,7 +894,6 @@ void prev_move(HWND hWnd)
 
   position_game(&curr_game,curr_game.curr_move - 1);
   invalidate_board(hWnd);
-  redisplay_counts(hWnd,NULL);
 }
 
 void next_move(HWND hWnd)
@@ -908,7 +907,6 @@ void next_move(HWND hWnd)
       ((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_CHECK)) ||
       ((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_QUEEN_IS_ATTACKED))) {
     invalidate_board(hWnd);
-    redisplay_counts(hWnd,NULL);
   }
 }
 
@@ -916,14 +914,12 @@ void start_of_game(HWND hWnd)
 {
   position_game(&curr_game,0);
   invalidate_board(hWnd);
-  redisplay_counts(hWnd,NULL);
 }
 
 void end_of_game(HWND hWnd)
 {
   position_game(&curr_game,curr_game.num_moves);
   invalidate_board(hWnd);
-  redisplay_counts(hWnd,NULL);
 }
 
 void do_read(HWND hWnd,LPSTR name,struct game *gamept,bool bBinaryFormat)
@@ -1880,7 +1876,6 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
 
     if ((curr_game.curr_move >= 1) && (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_CHECK)) {
       invalidate_board(hWnd);
-      redisplay_counts(hWnd,NULL);
     }
     else {
       for (n = 0; n < num_invalid_squares; n++)
@@ -1894,6 +1889,12 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     curr_game.moves[curr_game.curr_move].special_move_info = 0;
     curr_game.num_moves = curr_game.curr_move;
 
+    if (((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_CHECK)) ||
+      ((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_QUEEN_IS_ATTACKED))) {
+
+      invalidate_board(hWnd);
+    }
+
     bBlack = curr_game.curr_move & 0x1;
 
     legal_moves_count = 0;
@@ -1901,7 +1902,6 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
 
     if (player_is_in_check(bBlack,curr_game.board,curr_game.curr_move)) {
       invalidate_board(hWnd);
-      redisplay_counts(hWnd,NULL);
       curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
 
       // now determine if this is a checkmate
@@ -1916,6 +1916,11 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
         curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_STALEMATE;
         invalidate_board(hWnd);
       }
+    }
+
+    if (queen_is_attacked(bBlack,curr_game.board,curr_game.curr_move)) {
+      invalidate_board(hWnd);
+      curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_QUEEN_IS_ATTACKED;
     }
 
     if (bPlayingVsMakeAMove) {
