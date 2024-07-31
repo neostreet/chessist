@@ -42,6 +42,7 @@
 #define SPECIAL_MOVE_MATE                      0x0400
 #define SPECIAL_MOVE_STALEMATE                 0x0800
 #define SPECIAL_MOVE_QUEEN_IS_ATTACKED         0x1000
+#define SPECIAL_MOVE_MATE_IN_ONE               0x2000
 
 #define WHITE_WIN 1
 #define BLACK_WIN 2
