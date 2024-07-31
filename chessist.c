@@ -908,7 +908,8 @@ void next_move(HWND hWnd)
       (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_QUEEN_IS_ATTACKED) ||
       (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_MATE_IN_ONE) ||
       ((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_CHECK)) ||
-      ((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_QUEEN_IS_ATTACKED))) {
+      ((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_QUEEN_IS_ATTACKED)) ||
+      ((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_MATE_IN_ONE))) {
     invalidate_board(hWnd);
   }
 }
