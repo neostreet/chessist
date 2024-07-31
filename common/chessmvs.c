@@ -1700,3 +1700,48 @@ int make_a_move(struct game *gamept)
 
   return 0;
 }
+
+static struct move work_legal_moves[MAX_LEGAL_MOVES];
+
+bool mate_in_one_exists(struct game *gamept)
+{
+  int n;
+  struct game work_game;
+  int work_legal_moves_count;
+  bool bBlack;
+
+  legal_moves_count = 0;
+  get_legal_moves(gamept,legal_moves,&legal_moves_count);
+
+  if (debug_fptr) {
+    fprintf(debug_fptr,"mate_in_one_exists: curr_move = %d, legal_moves_count = %d\n",
+      gamept->curr_move,legal_moves_count);
+  }
+
+  for (n = 0; n < legal_moves_count; n++) {
+    copy_game(&work_game,gamept);
+    work_game.moves[work_game.curr_move].from = legal_moves[n].from;
+    work_game.moves[work_game.curr_move].to = legal_moves[n].to;
+    work_game.moves[work_game.curr_move].special_move_info = 0;
+    update_board(&work_game,NULL,NULL,true);
+    work_game.curr_move++;
+
+    bBlack = work_game.curr_move & 0x1;
+
+    if (player_is_in_check(bBlack,work_game.board,work_game.curr_move)) {
+      work_legal_moves_count = 0;
+      get_legal_moves(&work_game,work_legal_moves,&work_legal_moves_count);
+
+      if (!work_legal_moves_count) {
+        if (debug_fptr) {
+          fprintf(debug_fptr,"mate_in_one_exists: curr_move = %d, returning true\n",
+            gamept->curr_move,legal_moves_count);
+        }
+
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
