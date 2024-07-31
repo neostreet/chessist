@@ -311,6 +311,9 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
 
     if (queen_is_attacked(bBlack,gamept->board,gamept->curr_move))
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_QUEEN_IS_ATTACKED;
+
+    if (mate_in_one_exists(gamept))
+      gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_MATE_IN_ONE;
   }
 
   fclose(fptr);
