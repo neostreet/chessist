@@ -183,7 +183,7 @@ void fprint_bd2(unsigned char *board,FILE *fptr)
   }
 }
 
-void print_moves(struct game *gamept)
+void print_moves(struct game *gamept,bool bHex)
 {
   int m;
   int n;
@@ -198,25 +198,31 @@ void print_moves(struct game *gamept)
     if (n == dbg_move)
       dbg = 1;
 
-    printf("%3d %2d %2d",n,gamept->moves[n].from,gamept->moves[n].to);
+    if (bHex) {
+      printf("%3d %2d %2d %04x\n",
+        n,gamept->moves[n].from,gamept->moves[n].to,gamept->moves[n].special_move_info);
+    }
+    else {
+      printf("%3d %2d %2d",n,gamept->moves[n].from,gamept->moves[n].to);
 
-    and_val = 0x1;
-    hit = 0;
+      and_val = 0x1;
+      hit = 0;
 
-    for (m = 0; m < num_special_moves; m++) {
-      if (gamept->moves[n].special_move_info & and_val) {
-        hit = 1;
-        putchar(' ' );
-        printf("%s",special_moves[m]);
+      for (m = 0; m < num_special_moves; m++) {
+        if (gamept->moves[n].special_move_info & and_val) {
+          hit = 1;
+          putchar(' ' );
+          printf("%s",special_moves[m]);
+        }
+
+        and_val <<= 1;
       }
 
-      and_val <<= 1;
+      if (!hit)
+        printf(" SPECIAL_MOVE_NONE");
+
+      putchar(0x0a);
     }
-
-    if (!hit)
-      printf(" SPECIAL_MOVE_NONE");
-
-    putchar(0x0a);
   }
 
   dbg = 1; // see if you get here
