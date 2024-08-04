@@ -183,6 +183,29 @@ void fprint_bd2(unsigned char *board,FILE *fptr)
   }
 }
 
+void fprint_bd3(unsigned char *board,int orientation,FILE *fptr)
+{
+  int m;
+  int n;
+  int square;
+
+  for (m = 0; m < 8; m++) {
+    for (n = 0; n < 8; n++) {
+      if (!orientation)
+        square = get_piece2(board,7 - m,n);
+      else
+        square = get_piece2(board,m,7 - n);
+
+      fprintf(fptr,"%c",format_square(square));
+
+      if (n < 7)
+        fputc(' ',fptr);
+    }
+
+    fputc(0x0a,fptr);
+  }
+}
+
 void print_moves(struct game *gamept,bool bHex)
 {
   int m;
