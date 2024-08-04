@@ -92,6 +92,7 @@ void fprint_game(struct game *gamept,char *filename);
 void fprint_game2(struct game *gamept,FILE *fptr);
 void fprint_bd(struct game *gamept,char *filename);
 void fprint_bd2(unsigned char *board,FILE *fptr);
+void fprint_bd3(unsigned char *board,int orientation,FILE *fptr);
 void print_moves(struct game *gamept,bool bHex);
 void fprint_moves(struct game *gamept,char *filename);
 void fprint_moves2(struct game *gamept,FILE *fptr);
