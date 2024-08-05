@@ -306,29 +306,29 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
 
     bBlack = gamept->curr_move & 0x1;
 
-    if (debug_fptr) {
+    if (debug_fptr && (debug_level == 3)) {
       fprintf(debug_fptr,"read_game: curr_move = %d\n",gamept->curr_move);
-      fprint_bd2(gamept->board,debug_fptr);
+      fprint_bd3(gamept->board,gamept->orientation,debug_fptr);
     }
 
     if (player_is_in_check(bBlack,gamept->board,gamept->curr_move)) {
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
 
-      if (debug_fptr)
+      if (debug_fptr && (debug_level == 3))
         fprintf(debug_fptr,"read_game: curr_move = %d, set SPECIAL_MOVE_CHECK\n",gamept->curr_move);
     }
 
     if (queen_is_attacked(bBlack,gamept->board,gamept->curr_move)) {
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_QUEEN_IS_ATTACKED;
 
-      if (debug_fptr)
+      if (debug_fptr && (debug_level == 3))
         fprintf(debug_fptr,"read_game: curr_move = %d, set SPECIAL_MOVE_QUEEN_IS_ATTACKED\n",gamept->curr_move);
     }
 
     if (mate_in_one_exists(gamept)) {
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_MATE_IN_ONE;
 
-      if (debug_fptr)
+      if (debug_fptr && (debug_level == 3))
         fprintf(debug_fptr,"read_game: curr_move = %d, set SPECIAL_MOVE_MATE_IN_ONE\n",gamept->curr_move);
     }
   }
@@ -343,13 +343,13 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
     if (gamept->moves[gamept->curr_move-1].special_move_info & SPECIAL_MOVE_CHECK) {
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_MATE;
 
-      if (debug_fptr)
+      if (debug_fptr && (debug_level == 3))
         fprintf(debug_fptr,"read_game: curr_move = %d, set SPECIAL_MOVE_MATE\n",gamept->curr_move);
     }
     else {
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_STALEMATE;
 
-      if (debug_fptr)
+      if (debug_fptr && (debug_level == 3))
         fprintf(debug_fptr,"read_game: curr_move = %d, set SPECIAL_MOVE_STALEMATE\n",gamept->curr_move);
     }
   }
@@ -543,7 +543,7 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
   if (!bScratch && (from_piece * to_piece < 0))
     gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_CAPTURE;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 15)) {
     fprintf(debug_fptr,"update_board (%d): curr_move = %d, special_move_info = %x\n",
       update_board_calls,gamept->curr_move,gamept->moves[gamept->curr_move].special_move_info);
   }
@@ -643,7 +643,7 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
       invalid_squares[(*num_invalid_squares)++] = square_to_clear;
   }
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 9)) {
     if (invalid_squares) {
       for (n = 0; n < *num_invalid_squares; n++) {
         fprintf(debug_fptr,"update_board (%d): invalid_squares[%d] = %d\n",
@@ -652,7 +652,7 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
     }
 
     if (!bScratch)
-      fprint_bd2(gamept->board,debug_fptr);
+      fprint_bd3(gamept->board,gamept->orientation,debug_fptr);
   }
 }
 
@@ -718,16 +718,14 @@ void update_piece_info(struct game *gamept)
         gamept->black_pieces[n].current_board_position = -1;
       }
 
-      if ((special_move_info & SPECIAL_MOVE_CAPTURE) && !(special_move_info & SPECIAL_MOVE_EN_PASSANT_CAPTURE)) {
+      if (!(special_move_info & SPECIAL_MOVE_EN_PASSANT_CAPTURE)) {
         for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
           if (gamept->black_pieces[n].current_board_position == to)
             break;
         }
 
-        if (n == NUM_PIECES_PER_PLAYER)
-          return; // should never happen
-
-        gamept->black_pieces[n].current_board_position = -1;
+        if (n < NUM_PIECES_PER_PLAYER)
+          gamept->black_pieces[n].current_board_position = -1;
       }
     }
   }
@@ -777,25 +775,23 @@ void update_piece_info(struct game *gamept)
         gamept->white_pieces[n].current_board_position = -1;
       }
 
-      if ((special_move_info & SPECIAL_MOVE_CAPTURE) && !(special_move_info & SPECIAL_MOVE_EN_PASSANT_CAPTURE)) {
+      if (!(special_move_info & SPECIAL_MOVE_EN_PASSANT_CAPTURE)) {
         for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
           if (gamept->white_pieces[n].current_board_position == to)
             break;
         }
 
-        if (n == NUM_PIECES_PER_PLAYER)
-          return; // should never happen
-
-        gamept->white_pieces[n].current_board_position = -1;
+        if (n < NUM_PIECES_PER_PLAYER)
+          gamept->white_pieces[n].current_board_position = -1;
       }
     }
   }
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 4)) {
     fprintf(debug_fptr,"update_piece_info: curr_move = %d, num_moves = %d\n",gamept->curr_move,gamept->num_moves);
     fprint_piece_info(gamept,debug_fptr);
     populate_board_from_piece_info(gamept,board);
-    fprint_bd2(board,debug_fptr);
+    fprint_bd3(board,gamept->orientation,debug_fptr);
   }
 }
 
@@ -848,15 +844,17 @@ void print_piece_info(struct game *gamept)
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
     if (gamept->white_pieces[n].current_board_position == -1) {
-      printf("  %s %d\n",
+      printf("  %s %d %d\n",
         piece_names[gamept->white_pieces[n].piece_id - 1],
-        gamept->white_pieces[n].current_board_position);
+        gamept->white_pieces[n].current_board_position,
+        gamept->white_pieces[n].move_count);
     }
     else {
-      printf("  %s %c%c\n",
+      printf("  %s %c%c %d\n",
         piece_names[gamept->white_pieces[n].piece_id - 1],
         'a' + FILE_OF(gamept->white_pieces[n].current_board_position),
-        '1' + RANK_OF(gamept->white_pieces[n].current_board_position));
+        '1' + RANK_OF(gamept->white_pieces[n].current_board_position),
+        gamept->white_pieces[n].move_count);
     }
   }
 
@@ -864,15 +862,17 @@ void print_piece_info(struct game *gamept)
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
     if (gamept->black_pieces[n].current_board_position == -1) {
-      printf("  %s %d\n",
+      printf("  %s %d %d\n",
         piece_names[(gamept->black_pieces[n].piece_id * -1) - 1],
-        gamept->black_pieces[n].current_board_position);
+        gamept->black_pieces[n].current_board_position,
+        gamept->black_pieces[n].move_count);
     }
     else {
-      printf("  %s %c%c\n",
+      printf("  %s %c%c %d\n",
         piece_names[(gamept->black_pieces[n].piece_id * -1) - 1],
         'a' + FILE_OF(gamept->black_pieces[n].current_board_position),
-        '1' + RANK_OF(gamept->black_pieces[n].current_board_position));
+        '1' + RANK_OF(gamept->black_pieces[n].current_board_position),
+        gamept->black_pieces[n].move_count);
     }
   }
 }
@@ -889,15 +889,17 @@ void print_piece_info2(struct piece_info *info_pt)
       piece_id *= -1;
 
     if (info_pt[n].current_board_position == -1) {
-      printf("  %s %d\n",
+      printf("  %s %d %d\n",
         piece_names[piece_id - 1],
-        info_pt[n].current_board_position);
+        info_pt[n].current_board_position,
+        info_pt[n].move_count);
     }
     else {
-      printf("  %s %c%c\n",
+      printf("  %s %c%c %d\n",
         piece_names[piece_id - 1],
         'a' + FILE_OF(info_pt[n].current_board_position),
-        '1' + RANK_OF(info_pt[n].current_board_position));
+        '1' + RANK_OF(info_pt[n].current_board_position),
+        info_pt[n].move_count);
     }
   }
 }
