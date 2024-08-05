@@ -206,7 +206,7 @@ void fprint_bd3(unsigned char *board,int orientation,FILE *fptr)
   }
 }
 
-void print_moves(struct game *gamept,bool bHex)
+void print_moves(struct move *moves,int num_moves,bool bHex)
 {
   int m;
   int n;
@@ -217,22 +217,22 @@ void print_moves(struct game *gamept,bool bHex)
 
   dbg_move = -1;
 
-  for (n = 0; n < gamept->num_moves; n++) {
+  for (n = 0; n < num_moves; n++) {
     if (n == dbg_move)
       dbg = 1;
 
     if (bHex) {
       printf("%3d %2d %2d %04x\n",
-        n,gamept->moves[n].from,gamept->moves[n].to,gamept->moves[n].special_move_info);
+        n,moves[n].from,moves[n].to,moves[n].special_move_info);
     }
     else {
-      printf("%3d %2d %2d",n,gamept->moves[n].from,gamept->moves[n].to);
+      printf("%3d %2d %2d",n,moves[n].from,moves[n].to);
 
       and_val = 0x1;
       hit = 0;
 
       for (m = 0; m < num_special_moves; m++) {
-        if (gamept->moves[n].special_move_info & and_val) {
+        if (moves[n].special_move_info & and_val) {
           hit = 1;
           putchar(' ' );
           printf("%s",special_moves[m]);
@@ -251,7 +251,7 @@ void print_moves(struct game *gamept,bool bHex)
   dbg = 1; // see if you get here
 }
 
-void fprint_moves(struct game *gamept,char *filename)
+void fprint_moves(struct move *moves,int num_moves,char *filename)
 {
   int n;
   FILE *fptr;
@@ -259,24 +259,24 @@ void fprint_moves(struct game *gamept,char *filename)
   if ((fptr = fopen(filename,"w")) == NULL)
     return;
 
-  for (n = 0; n < gamept->num_moves; n++) {
-    fprintf(fptr,"%d %d %d %x\n",n,gamept->moves[n].from,gamept->moves[n].to,gamept->moves[n].special_move_info);
+  for (n = 0; n < num_moves; n++) {
+    fprintf(fptr,"%d %d %d %x\n",n,moves[n].from,moves[n].to,moves[n].special_move_info);
   }
 
   fclose(fptr);
 }
 
-void fprint_moves2(struct game *gamept,FILE *fptr)
+void fprint_moves2(struct move *moves,int num_moves,FILE *fptr)
 {
   int n;
 
   fprintf(fptr,"fprint_moves2:\n");
 
-  for (n = 0; n < gamept->num_moves; n++) {
+  for (n = 0; n < num_moves; n++) {
     fprintf(fptr,"%d %d %x\n",
-      gamept->moves[n].from,
-      gamept->moves[n].to,
-      gamept->moves[n].special_move_info);
+      moves[n].from,
+      moves[n].to,
+      moves[n].special_move_info);
   }
 }
 
