@@ -1284,7 +1284,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_PRINT_MOVES:
           if (debug_level == 2) {
             if (debug_fptr)
-              fprint_moves2(&curr_game,debug_fptr);
+              fprint_moves2(curr_game.moves,curr_game.num_moves,debug_fptr);
           }
 
           break;
