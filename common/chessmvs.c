@@ -1761,7 +1761,7 @@ bool mate_in_one_exists(struct game *gamept)
     copy_game(&work_game,gamept);
     work_game.moves[work_game.curr_move].from = legal_moves[n].from;
     work_game.moves[work_game.curr_move].to = legal_moves[n].to;
-    work_game.moves[work_game.curr_move].special_move_info = 0;
+    work_game.moves[work_game.curr_move].special_move_info = legal_moves[n].special_move_info;
     update_board(&work_game,NULL,NULL,true);
 
     if ((work_game.curr_move == dbg_move) && (n == debug_n))
