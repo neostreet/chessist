@@ -16,7 +16,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
   int squares_to_check[2];
   int special_move_info;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 11)) {
     fprintf(debug_fptr,"do_castle: piece_info:\n");
     fprint_piece_info(gamept,debug_fptr);
   }
@@ -162,7 +162,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
   if (gamept->curr_move == dbg_move)
     dbg = 1;
 
-  if (debug_fptr)
+  if (debug_fptr && (debug_level == 11))
     fprintf(debug_fptr,"do_pawn_move: curr_move = %d, word = %s\n",gamept->curr_move,word);
 
   /*printf("%s\n",word);/*for now*/
@@ -374,7 +374,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
 check_for_illegal_move:
 
   if (!move_is_legal(gamept,move_ptr->from,move_ptr->to)) {
-    if (debug_fptr) {
+    if (debug_fptr && (debug_level == 11)) {
       fprintf(debug_fptr,"do_pawn_move: about to return 15, curr_move = %d\n",
         gamept->curr_move);
       fprint_bd2(gamept->board,debug_fptr);
@@ -540,7 +540,7 @@ int do_piece_move(struct game *gamept,int direction,char *word,int wordlen,struc
   if (gamept->curr_move == dbg_move)
     dbg = 1;
 
-  if (debug_fptr)
+  if (debug_fptr && (debug_level == 11))
     fprintf(debug_fptr,"do_piece_move: curr_move = %d, word = %s\n",gamept->curr_move,word);
 
   if (wordlen == 4) {
@@ -877,7 +877,7 @@ int king_move(
   int squares_to_check[2];
   int dbg;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 11)) {
     fprintf(debug_fptr,"king_move: piece_info:\n");
     fprint_piece_info(gamept,debug_fptr);
   }
@@ -1086,10 +1086,10 @@ bool move_is_legal(struct game *gamept,char from,char to)
   if (bAssumeMoveIsLegal) // this is only used for debugging
     return true;
 
-  if (debug_fptr && (gamept->curr_move == dbg_move)) {
+  if (debug_fptr && (debug_level == 5)) {
     fprintf(debug_fptr,"move_is_legal: curr_move = %d, special_move_info = %x, before update_board\n",
       gamept->curr_move,gamept->moves[gamept->curr_move].special_move_info);
-    fprint_bd2(gamept->board,debug_fptr);
+    fprint_bd3(gamept->board,gamept->orientation,debug_fptr);
   }
 
   bBlack = gamept->curr_move & 0x1;
@@ -1101,15 +1101,16 @@ bool move_is_legal(struct game *gamept,char from,char to)
   scratch.moves[scratch.curr_move].from = from;
   scratch.moves[scratch.curr_move].to = to;
   update_board(&scratch,NULL,NULL,true);
+  update_piece_info(&scratch);
 
-  if (debug_fptr && (gamept->curr_move == dbg_move)) {
+  if (debug_fptr && (debug_level == 5)) {
     fprintf(debug_fptr,"move_is_legal: curr_move = %d, special_move_info = %x, after update_board\n",
       gamept->curr_move,gamept->moves[gamept->curr_move].special_move_info);
-    fprint_bd2(scratch.board,debug_fptr);
+    fprint_bd3(scratch.board,scratch.orientation,debug_fptr);
   }
 
   if (player_is_in_check(bBlack,scratch.board,scratch.curr_move)) {
-    if (debug_fptr) {
+    if (debug_fptr && (debug_level == 5)) {
       fprintf(debug_fptr,"move_is_legal: about to return false, curr_move = %d\n",
         scratch.curr_move);
       fprint_bd2(scratch.board,debug_fptr);
@@ -1126,8 +1127,10 @@ void get_legal_moves(struct game *gamept,struct move *legal_moves,int *legal_mov
   int n;
   bool bWhiteToMove;
   struct piece_info *info_pt;
-  unsigned char board[CHARS_IN_BOARD];
+  unsigned char board1[CHARS_IN_BOARD];
+  unsigned char board2[CHARS_IN_BOARD];
   char piece_id;
+  int retval;
 
   bInGetLegalMoves = true;
   bWhiteToMove = !(gamept->curr_move % 2);
@@ -1137,7 +1140,26 @@ void get_legal_moves(struct game *gamept,struct move *legal_moves,int *legal_mov
   else
     info_pt = gamept->black_pieces;
 
-  populate_board_from_piece_info(gamept,board);
+  copy_board(gamept->board,board1);
+  populate_board_from_piece_info(gamept,board2);
+
+  retval = compare_boards(board1,board2);
+
+  if (debug_fptr && (debug_level == 10)) {
+    if (!retval) {
+      fprintf(debug_fptr,"get_legal_moves: board1 and board2 don't match, gamept->curr_move = %d\n",
+        gamept->curr_move);
+      fprintf(debug_fptr,"get_legal_moves: board1\n");
+      fprint_bd3(board1,gamept->orientation,debug_fptr);
+      fprintf(debug_fptr,"get_legal_moves: board2\n");
+      fprint_bd3(board2,gamept->orientation,debug_fptr);
+    }
+    else {
+      fprintf(debug_fptr,"get_legal_moves: board1 and board2 match, gamept->curr_move = %d\n",gamept->curr_move);
+      fprintf(debug_fptr,"get_legal_moves: board1\n");
+      fprint_bd3(board1,gamept->orientation,debug_fptr);
+    }
+  }
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
     if (info_pt[n].current_board_position == -1)
@@ -1357,7 +1379,7 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
 
   num_legal_moves = *legal_moves_count - num_legal_moves_before;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 12)) {
     fprintf(debug_fptr,"legal_pawn_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
       gamept->curr_move,current_board_position,num_legal_moves);
   }
@@ -1427,7 +1449,7 @@ void legal_rook_moves(struct game *gamept,char current_board_position,struct mov
 
   num_legal_moves = *legal_moves_count - num_legal_moves_before;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 12)) {
     fprintf(debug_fptr,"legal_rook_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
       gamept->curr_move,current_board_position,num_legal_moves);
   }
@@ -1494,7 +1516,7 @@ void legal_knight_moves(struct game *gamept,char current_board_position,struct m
 
   num_legal_moves = *legal_moves_count - num_legal_moves_before;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 12)) {
     fprintf(debug_fptr,"legal_knight_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
       gamept->curr_move,current_board_position,num_legal_moves);
   }
@@ -1564,7 +1586,7 @@ void legal_bishop_moves(struct game *gamept,char current_board_position,struct m
 
   num_legal_moves = *legal_moves_count - num_legal_moves_before;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 12)) {
     fprintf(debug_fptr,"legal_bishop_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
       gamept->curr_move,current_board_position,num_legal_moves);
   }
@@ -1582,7 +1604,7 @@ void legal_queen_moves(struct game *gamept,char current_board_position,struct mo
 
   num_legal_moves = *legal_moves_count - num_legal_moves_before;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 12)) {
     fprintf(debug_fptr,"legal_queen_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
       gamept->curr_move,current_board_position,num_legal_moves);
   }
@@ -1649,7 +1671,7 @@ void legal_king_moves(struct game *gamept,char current_board_position,struct mov
 
   num_legal_moves = *legal_moves_count - num_legal_moves_before;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 12)) {
     fprintf(debug_fptr,"legal_king_moves: curr_move = %d, current_board_position = %d, num_legal_moves = %d\n",
       gamept->curr_move,current_board_position,num_legal_moves);
   }
@@ -1660,7 +1682,7 @@ int make_a_move(struct game *gamept)
   legal_moves_count =  0;
   int work;
 
-  if (debug_fptr) {
+  if (debug_fptr && (debug_level == 13)) {
     fprintf(debug_fptr,"make_a_move: about to call get_legal_moves, curr_move = %d, num_moves = %d\n",
       gamept->curr_move,gamept->num_moves);
     fprint_bd2(gamept->board,debug_fptr);
@@ -1677,7 +1699,7 @@ int make_a_move(struct game *gamept)
       work %= legal_moves_count;
     }
 
-    if (debug_fptr) {
+    if (debug_fptr && (debug_level == 13)) {
       fprintf(debug_fptr,"make_a_move: curr_move = %d, num_moves = %d, legal_moves_count = %d, work = %d\n",
         gamept->curr_move,gamept->num_moves,legal_moves_count,work);
     }
@@ -1692,7 +1714,7 @@ int make_a_move(struct game *gamept)
     return 1;
   }
   else {
-    if (debug_fptr) {
+    if (debug_fptr && (debug_level == 13)) {
       fprintf(debug_fptr,"make_a_move: curr_move = %d, num_moves = %d, legal_moves_count = %d\n",
         gamept->curr_move,gamept->num_moves,legal_moves_count);
     }
@@ -1703,37 +1725,70 @@ int make_a_move(struct game *gamept)
 
 static struct move work_legal_moves[MAX_LEGAL_MOVES];
 
+static struct move debug_mate_in_one_move;
+static int debug_n;
+
 bool mate_in_one_exists(struct game *gamept)
 {
   int n;
   struct game work_game;
   int work_legal_moves_count;
   bool bBlack;
+  int dbg;
+  int dbg1;
+  int dbg2;
 
   legal_moves_count = 0;
   get_legal_moves(gamept,legal_moves,&legal_moves_count);
 
-  if (debug_fptr) {
+  if (gamept->curr_move == dbg_move)
+    dbg1 = 1;
+  else
+    dbg1 = 0;
+
+  if (debug_fptr && (debug_level == 14)) {
     fprintf(debug_fptr,"mate_in_one_exists: curr_move = %d, legal_moves_count = %d\n",
       gamept->curr_move,legal_moves_count);
   }
 
   for (n = 0; n < legal_moves_count; n++) {
+    if ((dbg1 == 1) && (legal_moves[n].from == debug_mate_in_one_move.from) && (legal_moves[n].to == debug_mate_in_one_move.to)) {
+      dbg2 = 1;
+    }
+    else
+      dbg2 = 0;
+
     copy_game(&work_game,gamept);
     work_game.moves[work_game.curr_move].from = legal_moves[n].from;
     work_game.moves[work_game.curr_move].to = legal_moves[n].to;
     work_game.moves[work_game.curr_move].special_move_info = 0;
     update_board(&work_game,NULL,NULL,true);
+
+    if ((work_game.curr_move == dbg_move) && (n == debug_n))
+      dbg = 1;
+
+    update_piece_info(&work_game);
     work_game.curr_move++;
 
     bBlack = work_game.curr_move & 0x1;
 
     if (player_is_in_check(bBlack,work_game.board,work_game.curr_move)) {
+      if (debug_fptr && (debug_level == 11)) {
+        fprintf(debug_fptr,"mate_in_one_exists: piece_info:\n");
+        fprint_piece_info(&work_game,debug_fptr);
+      }
+
       work_legal_moves_count = 0;
       get_legal_moves(&work_game,work_legal_moves,&work_legal_moves_count);
 
+      if (debug_fptr && (debug_level == 14)) {
+        fprintf(debug_fptr,"mate_in_one_exists: work_game.curr_move = %d, work_legal_moves_count = %d\n",
+          work_game.curr_move,work_legal_moves_count);
+        fprint_bd3(work_game.board,work_game.orientation,debug_fptr);
+      }
+
       if (!work_legal_moves_count) {
-        if (debug_fptr) {
+        if (debug_fptr && (debug_level == 14)) {
           fprintf(debug_fptr,"mate_in_one_exists: curr_move = %d, returning true\n",
             gamept->curr_move,legal_moves_count);
         }
