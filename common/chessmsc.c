@@ -222,11 +222,17 @@ void print_moves(struct move *moves,int num_moves,bool bHex)
       dbg = 1;
 
     if (bHex) {
-      printf("%3d %2d %2d %04x\n",
-        n,moves[n].from,moves[n].to,moves[n].special_move_info);
+      printf("%3d from: %c%c to: %c%c %04x\n",
+        n,
+        'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+        'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to),
+        moves[n].special_move_info);
     }
     else {
-      printf("%3d %2d %2d",n,moves[n].from,moves[n].to);
+      printf("%3d from: %c%c to: %c%c",
+        n,
+        'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+        'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to));
 
       and_val = 0x1;
       hit = 0;
