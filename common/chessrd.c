@@ -304,6 +304,9 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
     gamept->moves[gamept->curr_move].special_move_info = 0;
     gamept->num_moves = gamept->curr_move;
 
+    if (gamept->curr_move == dbg_move)
+      dbg = 1;
+
     bBlack = gamept->curr_move & 0x1;
 
     if (debug_fptr && (debug_level == 3)) {
