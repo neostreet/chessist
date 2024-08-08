@@ -259,14 +259,38 @@ void print_moves(struct move *moves,int num_moves,bool bHex)
 
 void fprint_moves(struct move *moves,int num_moves,char *filename)
 {
+  int m;
   int n;
+  int and_val;
+  int hit;
   FILE *fptr;
 
   if ((fptr = fopen(filename,"w")) == NULL)
     return;
 
   for (n = 0; n < num_moves; n++) {
-    fprintf(fptr,"%d %d %d %x\n",n,moves[n].from,moves[n].to,moves[n].special_move_info);
+    fprintf(fptr,"%3d from: %c%c to: %c%c",
+      n,
+      'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+      'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to));
+
+    and_val = 0x1;
+    hit = 0;
+
+    for (m = 0; m < num_special_moves; m++) {
+      if (moves[n].special_move_info & and_val) {
+        hit = 1;
+        fputc(' ',fptr);
+        fprintf(fptr,"%s",special_moves[m]);
+      }
+
+      and_val <<= 1;
+    }
+
+    if (!hit)
+      fprintf(fptr," SPECIAL_MOVE_NONE");
+
+    fputc(0x0a,fptr);
   }
 
   fclose(fptr);
