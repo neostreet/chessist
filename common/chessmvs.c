@@ -1367,6 +1367,37 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
       if (!move_is_legal(gamept,current_board_position,to))
         continue;
 
+      if (!bBlack) {
+        if (work_rank == NUM_RANKS - 1) {
+          for (m = 0; m < NUM_PROMOTIONS; m++) {
+            if (*legal_moves_count < MAX_LEGAL_MOVES) {
+              legal_moves[*legal_moves_count].from = current_board_position;
+              legal_moves[*legal_moves_count].to = to;
+              legal_moves[*legal_moves_count].special_move_info = SPECIAL_MOVE_CAPTURE | promotions[m];
+
+              (*legal_moves_count)++;
+            }
+          }
+
+          continue;
+        }
+      }
+      else {
+        if (!work_rank) {
+          for (m = 0; m < NUM_PROMOTIONS; m++) {
+            if (*legal_moves_count < MAX_LEGAL_MOVES) {
+              legal_moves[*legal_moves_count].from = current_board_position;
+              legal_moves[*legal_moves_count].to = to;
+              legal_moves[*legal_moves_count].special_move_info = SPECIAL_MOVE_CAPTURE | promotions[m];
+
+              (*legal_moves_count)++;
+            }
+          }
+
+          continue;
+        }
+      }
+
       if (*legal_moves_count < MAX_LEGAL_MOVES) {
         legal_moves[*legal_moves_count].from = current_board_position;
         legal_moves[*legal_moves_count].to = to;
