@@ -628,7 +628,9 @@ void do_paint(HWND hWnd)
         if ((m == highlight_rank) && (n == highlight_file))
           bigbmp_row = 2;
         else {
-          if (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_MATE)
+          if (!bDoColorChanges)
+            bigbmp_row = 0;
+          else if (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_MATE)
             bigbmp_row = 1;
           else if (curr_game.moves[curr_game.curr_move-1].special_move_info & SPECIAL_MOVE_STALEMATE)
             bigbmp_row = 3;
@@ -866,6 +868,11 @@ static void toggle_board_size(HWND hWnd)
 
   MoveWindow(hWnd,rect.left,rect.top,
     chess_window_width,chess_window_height,TRUE);
+}
+
+static void toggle_color_changes()
+{
+  bDoColorChanges ^= 1;
 }
 
 void do_new(HWND hWnd,struct game *gamept)
@@ -1333,6 +1340,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case IDM_TOGGLE_BOARD_SIZE:
           toggle_board_size(hWnd);
+
+          break;
+
+        case IDM_TOGGLE_COLOR_CHANGES:
+          toggle_color_changes();
 
           break;
 
