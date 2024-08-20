@@ -69,6 +69,7 @@ BEGIN
     BEGIN
         MENUITEM "&Toggle orientation (F2)",    IDM_TOGGLE_ORIENTATION
         MENUITEM "T&oggle board size (F3)",     IDM_TOGGLE_BOARD_SIZE
+        MENUITEM "To&ggle color changes",       IDM_TOGGLE_COLOR_CHANGES
     END
     POPUP "&Options"
     BEGIN
