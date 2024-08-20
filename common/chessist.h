@@ -22,18 +22,19 @@
 #define IDM_PLAY_VS_MAKE_A_MOVE        206
 #define IDM_GO_TO_MOVE_NUMBER  207
 
-#define IDM_TOGGLE_ORIENTATION 208
-#define IDM_TOGGLE_BOARD_SIZE  209
+#define IDM_TOGGLE_ORIENTATION   208
+#define IDM_TOGGLE_BOARD_SIZE    209
+#define IDM_TOGGLE_COLOR_CHANGES 210
 
-#define IDM_PREV_MOVE          210
-#define IDM_NEXT_MOVE          211
-#define IDM_START_OF_GAME      212
-#define IDM_END_OF_GAME        213
+#define IDM_PREV_MOVE          211
+#define IDM_NEXT_MOVE          212
+#define IDM_START_OF_GAME      213
+#define IDM_END_OF_GAME        214
 
-#define IDM_ABOUT              214
+#define IDM_ABOUT              215
 
-#define IDM_PREV_GAME          215
-#define IDM_NEXT_GAME          216
+#define IDM_PREV_GAME          216
+#define IDM_NEXT_GAME          217
 
 #define IDC_STATIC -1
 
