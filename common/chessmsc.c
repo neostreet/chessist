@@ -206,7 +206,7 @@ void fprint_bd3(unsigned char *board,int orientation,FILE *fptr)
   }
 }
 
-void print_moves(struct move *moves,int num_moves,bool bHex)
+void print_moves(struct move *moves,int num_moves,bool bHex,bool bMoveNumbers)
 {
   int m;
   int n;
@@ -222,17 +222,32 @@ void print_moves(struct move *moves,int num_moves,bool bHex)
       dbg = 1;
 
     if (bHex) {
-      printf("%3d from: %c%c to: %c%c %04x\n",
-        n,
-        'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
-        'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to),
-        moves[n].special_move_info);
+      if (bMoveNumbers) {
+        printf("%3d from: %c%c to: %c%c %04x\n",
+          n,
+          'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+          'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to),
+          moves[n].special_move_info);
+      }
+      else {
+        printf("from: %c%c to: %c%c %04x\n",
+          'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+          'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to),
+          moves[n].special_move_info);
+       }
     }
     else {
-      printf("%3d from: %c%c to: %c%c",
-        n,
-        'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
-        'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to));
+      if (bMoveNumbers) {
+        printf("%3d from: %c%c to: %c%c",
+          n,
+          'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+          'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to));
+      }
+      else {
+        printf("from: %c%c to: %c%c",
+          'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+          'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to));
+      }
 
       and_val = 0x1;
       hit = 0;
