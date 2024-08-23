@@ -158,6 +158,7 @@ int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct
   int piece;
   int which_piece;
   int dbg;
+  int move_distance;
 
   if (gamept->curr_move == dbg_move)
     dbg = 1;
@@ -381,6 +382,15 @@ check_for_illegal_move:
     }
 
     return 15;
+  }
+
+  move_distance = gamept->moves[gamept->curr_move].from - gamept->moves[gamept->curr_move].to;
+
+  if (move_distance < 0)
+    move_distance *= -1;
+
+  if (move_distance == NUM_FILES * 2) {
+    gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE;
   }
 
   return 0;
