@@ -1418,6 +1418,87 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
     }
   }
 
+  // now check for en passant captures
+
+  if (!bBlack) {
+    if (rank == 4) {
+      if (file > 0) {
+        square2 = get_piece2(gamept->board,rank,file-1);
+
+        if (square2 == PAWN_ID * -1) {
+          if ((gamept->moves[gamept->curr_move - 1].to == current_board_position - 1) &&
+              (gamept->moves[gamept->curr_move - 1].special_move_info & SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
+
+            if (*legal_moves_count < MAX_LEGAL_MOVES) {
+              legal_moves[*legal_moves_count].from = current_board_position;
+              legal_moves[*legal_moves_count].to = current_board_position + 7;
+              legal_moves[*legal_moves_count].special_move_info = SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
+
+              (*legal_moves_count)++;
+            }
+          }
+        }
+      }
+
+      if (file < NUM_FILES - 1) {
+        square2 = get_piece2(gamept->board,rank,file+1);
+
+        if (square2 == PAWN_ID * -1) {
+          if ((gamept->moves[gamept->curr_move - 1].to == current_board_position + 1) &&
+              (gamept->moves[gamept->curr_move - 1].special_move_info & SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
+
+            if (*legal_moves_count < MAX_LEGAL_MOVES) {
+              legal_moves[*legal_moves_count].from = current_board_position;
+              legal_moves[*legal_moves_count].to = current_board_position + 9;
+              legal_moves[*legal_moves_count].special_move_info = SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
+
+              (*legal_moves_count)++;
+            }
+          }
+        }
+      }
+    }
+  }
+  else {
+    if (rank == 3) {
+      if (file > 0) {
+        square2 = get_piece2(gamept->board,rank,file-1);
+
+        if (square2 == PAWN_ID) {
+          if ((gamept->moves[gamept->curr_move - 1].to == current_board_position - 1) &&
+              (gamept->moves[gamept->curr_move - 1].special_move_info & SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
+
+            if (*legal_moves_count < MAX_LEGAL_MOVES) {
+              legal_moves[*legal_moves_count].from = current_board_position;
+              legal_moves[*legal_moves_count].to = current_board_position - 7;
+              legal_moves[*legal_moves_count].special_move_info = SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
+
+              (*legal_moves_count)++;
+            }
+          }
+        }
+      }
+
+      if (file < NUM_FILES - 1) {
+        square2 = get_piece2(gamept->board,rank,file+1);
+
+        if (square2 == PAWN_ID) {
+          if ((gamept->moves[gamept->curr_move - 1].to == current_board_position + 1) &&
+              (gamept->moves[gamept->curr_move - 1].special_move_info & SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
+
+            if (*legal_moves_count < MAX_LEGAL_MOVES) {
+              legal_moves[*legal_moves_count].from = current_board_position;
+              legal_moves[*legal_moves_count].to = current_board_position - 9;
+              legal_moves[*legal_moves_count].special_move_info = SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
+
+              (*legal_moves_count)++;
+            }
+          }
+        }
+      }
+    }
+  }
+
   num_legal_moves = *legal_moves_count - num_legal_moves_before;
 
   if (debug_fptr && (debug_level == 12)) {
