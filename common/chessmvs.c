@@ -473,13 +473,13 @@ int do_pawn_move2(struct game *gamept)
       // check for en passant capture
       if (bWhiteMove && (start_rank == 4) &&
         (get_piece2(gamept->board,4,end_file) == PAWN_ID * -1) &&
-        (gamept->moves[gamept->curr_move-1].special_move_info == SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
+        (gamept->moves[gamept->curr_move-1].special_move_info & SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
 
         gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
       }
       else if (!bWhiteMove && (start_rank == 3) &&
         (get_piece2(gamept->board,3,end_file) == PAWN_ID) &&
-        (gamept->moves[gamept->curr_move-1].special_move_info == SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
+        (gamept->moves[gamept->curr_move-1].special_move_info & SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE)) {
 
         gamept->moves[gamept->curr_move].special_move_info = SPECIAL_MOVE_CAPTURE | SPECIAL_MOVE_EN_PASSANT_CAPTURE;
       }
@@ -1256,7 +1256,7 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
           if (*legal_moves_count < MAX_LEGAL_MOVES) {
             legal_moves[*legal_moves_count].from = current_board_position;
             legal_moves[*legal_moves_count].to = to;
-            legal_moves[*legal_moves_count].special_move_info = 0;
+            legal_moves[*legal_moves_count].special_move_info = SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE;
 
             (*legal_moves_count)++;
           }
