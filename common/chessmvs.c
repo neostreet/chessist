@@ -1273,7 +1273,7 @@ void legal_pawn_moves(struct game *gamept,char current_board_position,struct mov
           if (*legal_moves_count < MAX_LEGAL_MOVES) {
             legal_moves[*legal_moves_count].from = current_board_position;
             legal_moves[*legal_moves_count].to = to;
-            legal_moves[*legal_moves_count].special_move_info = 0;
+            legal_moves[*legal_moves_count].special_move_info = SPECIAL_MOVE_TWO_SQUARE_PAWN_ADVANCE;
 
             (*legal_moves_count)++;
           }
