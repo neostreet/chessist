@@ -247,7 +247,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   else
     window_extra_height = WINDOW_EXTRA_HEIGHT;
 
-  board_y_offset = TOOLBAR_HEIGHT; // + font_height * 3;
+  board_y_offset = TOOLBAR_HEIGHT + font_height; // * 3;
 
   // Initialize global strings
   lstrcpy (szAppName, appname);
@@ -681,7 +681,7 @@ void do_paint(HWND hWnd)
       bSelectedFont = TRUE;
     }
 
-    // TextOut(hdc,rect.left,rect.top,curr_game.title,lstrlen(curr_game.title));
+    TextOut(hdc,rect.left,rect.top,curr_game.title,lstrlen(curr_game.title));
   }
 
   rect.top = TOOLBAR_HEIGHT + 16;
