@@ -1397,3 +1397,26 @@ void print_piece_counts(int *piece_counts)
       printf("%c %d\n",format_square(square),piece_counts[n]);
   }
 }
+
+void print_move_counts(struct game *gamept)
+{
+  int n;
+
+  printf("white piece move counts: ");
+
+  for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+    if (n < NUM_PIECES_PER_PLAYER - 1)
+      printf("%d ",gamept->white_pieces[n].move_count);
+    else
+      printf("%d\n",gamept->white_pieces[n].move_count);
+  }
+
+  printf("black piece move counts: ");
+
+  for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+    if (n < NUM_PIECES_PER_PLAYER - 1)
+      printf("%d ",gamept->black_pieces[n].move_count);
+    else
+      printf("%d\n",gamept->black_pieces[n].move_count);
+  }
+}
