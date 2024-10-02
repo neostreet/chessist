@@ -83,6 +83,7 @@ int count_num_pieces(int color,struct game *gamept);
 void get_piece_counts(unsigned char *board,int *piece_counts);
 int piece_counts_match(int *piece_counts,int *match_piece_counts,bool bExactMatch);
 void print_piece_counts(int *piece_counts);
+void print_move_counts(struct game *gamept);
 
 int format_square(int square);
 void print_bd0(unsigned char *board,int orientation);
