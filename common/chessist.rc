@@ -67,22 +67,23 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
-        MENUITEM "&Toggle orientation (F2)",    IDM_TOGGLE_ORIENTATION
-        MENUITEM "T&oggle board size (F3)",     IDM_TOGGLE_BOARD_SIZE
-        MENUITEM "To&ggle color changes",       IDM_TOGGLE_COLOR_CHANGES
+        MENUITEM "Toggle &orientation (F2)",    IDM_TOGGLE_ORIENTATION
+        MENUITEM "Toggle &board size (F3)",     IDM_TOGGLE_BOARD_SIZE
+        MENUITEM "Toggle &color changes",       IDM_TOGGLE_COLOR_CHANGES
+        MENUITEM "Toggle &auto advance",        IDM_TOGGLE_AUTO_ADVANCE
     END
     POPUP "&Options"
     BEGIN
         MENUITEM "Go to &start of game (Home)", IDM_START_OF_GAME
         MENUITEM "Go to &end of game (End)",    IDM_END_OF_GAME
-        MENUITEM "Go to move number",           IDM_GO_TO_MOVE_NUMBER
+        MENUITEM "Go to &move number",          IDM_GO_TO_MOVE_NUMBER
         MENUITEM "Set &last move",              IDM_SET_LAST_MOVE
         MENUITEM "Print &board",                IDM_PRINT_BOARD
         MENUITEM "Print &game",                 IDM_PRINT_GAME
-        MENUITEM "Print &moves",                IDM_PRINT_MOVES
-        MENUITEM "Print &piece info",           IDM_PRINT_PIECE_INFO
-        MENUITEM "Ma&ke a move",                IDM_MAKE_A_MOVE
-        MENUITEM "Play vs. make-a-move",        IDM_PLAY_VS_MAKE_A_MOVE
+        MENUITEM "Print m&oves",                IDM_PRINT_MOVES
+        MENUITEM "&Toggle auto save",           IDM_TOGGLE_AUTO_SAVE
+        MENUITEM "Show pu&zzle_stats",          IDM_SHOW_PUZZLE_STATS
+        MENUITEM "&Clear puzzle_stats",         IDM_CLEAR_PUZZLE_STATS
     END
     POPUP "&Help"
     BEGIN
