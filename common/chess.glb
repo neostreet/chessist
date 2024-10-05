@@ -25,10 +25,15 @@ GLOBAL int do_castle_successes;
 GLOBAL int seed;
 GLOBAL bool bBinaryFormat;
 GLOBAL bool bAutoSave;
+GLOBAL bool bUnsavedChanges;
 GLOBAL bool bAssumeMoveIsLegal;
 GLOBAL bool bSkipChecks;
 GLOBAL bool bInGetLegalMoves;
 GLOBAL bool bDoColorChanges;
+GLOBAL bool bAutoAdvance;
+
+GLOBAL int puzzle_count;
+GLOBAL int puzzles_solved;
 
 #ifdef MAKE_GLOBALS_HERE
 char piece_ids[] = "RNBQK";
