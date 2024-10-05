@@ -180,6 +180,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   int cmd_len;
 
   bBig = TRUE;
+  bDoColorChanges = TRUE;
+  bAutoAdvance = TRUE;
 
   width_in_pixels = WIDTH_IN_PIXELS;
   height_in_pixels = HEIGHT_IN_PIXELS;
@@ -787,6 +789,7 @@ static void do_move(HWND hWnd)
   }
 
   curr_game.curr_move++;
+  bUnsavedChanges = true;
   redisplay_counts(hWnd,NULL);
 }
 
@@ -873,6 +876,38 @@ static void toggle_board_size(HWND hWnd)
 static void toggle_color_changes()
 {
   bDoColorChanges ^= 1;
+}
+
+static void toggle_auto_advance()
+{
+  bAutoAdvance ^= 1;
+}
+
+static void toggle_auto_save(HWND hWnd)
+{
+  bAutoSave ^= 1;
+}
+
+static void show_puzzle_stats(HWND hWnd)
+{
+  double correct_pct;
+  char buf[256];
+
+  if (!puzzle_count)
+    correct_pct = (double)0;
+  else
+    correct_pct = (double)puzzles_solved / (double)puzzle_count;
+
+  sprintf(buf,"puzzles solved: %d, puzzles attempted: %d, percent_correct: %lf",
+    puzzles_solved,puzzle_count,correct_pct);
+
+  MessageBox(hWnd,buf,NULL,MB_OK);
+}
+
+static void clear_puzzle_stats()
+{
+  puzzles_solved = 0;
+  puzzle_count = 0;
 }
 
 void do_new(HWND hWnd,struct game *gamept)
@@ -968,6 +1003,34 @@ void do_read(HWND hWnd,LPSTR name,struct game *gamept,bool bBinaryFormat)
 
     MessageBox(hWnd,buf,NULL,MB_OK);
   }
+}
+
+void advance_to_next_game(HWND hWnd,WPARAM wParam)
+{
+  if (bAutoSave && bUnsavedChanges) {
+    // toggle the orientation, and save
+    curr_game.orientation ^= 1;
+    write_binary_game(chess_file_list[curr_chess_file],&curr_game);
+  }
+
+  if (wParam == VK_F6) {
+    curr_chess_file++;
+
+    if (curr_chess_file == num_files_in_list)
+      curr_chess_file = 0;
+
+    bUnsavedChanges = false;
+  }
+  else {
+    curr_chess_file--;
+
+    if (curr_chess_file < 0)
+      curr_chess_file = num_files_in_list - 1;
+
+    bUnsavedChanges = false;
+  }
+
+  do_read(hWnd,chess_file_list[curr_chess_file],&curr_game,true);
 }
 
 //
@@ -1156,28 +1219,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case VK_F6:
         case VK_F7:
-          if (bHaveListFile) {
-            if (bAutoSave) {
-              // toggle the orientation, and save
-              curr_game.orientation ^= 1;
-              write_binary_game(chess_file_list[curr_chess_file],&curr_game);
-            }
-
-            if (wParam == VK_F6) {
-              curr_chess_file++;
-
-              if (curr_chess_file == num_files_in_list)
-                curr_chess_file = 0;
-            }
-            else {
-              curr_chess_file--;
-
-              if (curr_chess_file < 0)
-                curr_chess_file = num_files_in_list - 1;
-            }
-
-            do_read(hWnd,chess_file_list[curr_chess_file],&curr_game,bBinaryFormat);
-          }
+          if (bHaveListFile)
+            advance_to_next_game(hWnd,wParam);
 
           break;
 
@@ -1296,29 +1339,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           break;
 
-        case IDM_PRINT_PIECE_INFO:
-          if (debug_fptr)
-            fprint_piece_info(&curr_game,debug_fptr);
-
-          break;
-
-        case IDM_MAKE_A_MOVE:
-          // must not be in the middle of replaying the moves from the game
-          if (curr_game.curr_move == curr_game.num_moves) {
-            if (make_a_move(&curr_game))
-              do_move(hWnd);
-          }
-
-          break;
-
-        case IDM_PLAY_VS_MAKE_A_MOVE:
-          if (!bPlayingVsMakeAMove)
-            bPlayingVsMakeAMove = true;
-          else
-            bPlayingVsMakeAMove = false;
-
-          break;
-
         case IDM_GO_TO_MOVE_NUMBER:
            if (DialogBox(hInst,"MoveNumberBox",hWnd,(DLGPROC)MoveNumber)) {
              if (move_number < 0)
@@ -1345,6 +1365,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case IDM_TOGGLE_COLOR_CHANGES:
           toggle_color_changes();
+
+          break;
+
+        case IDM_TOGGLE_AUTO_ADVANCE:
+          toggle_auto_advance();
+
+          break;
+
+        case IDM_TOGGLE_AUTO_SAVE:
+          toggle_auto_save(hWnd);
+
+          break;
+
+        case IDM_SHOW_PUZZLE_STATS:
+          show_puzzle_stats(hWnd);
+
+          break;
+
+        case IDM_CLEAR_PUZZLE_STATS:
+          clear_puzzle_stats();
 
           break;
 
@@ -1389,20 +1429,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_PREV_GAME:
         case IDM_NEXT_GAME:
           if (bHaveListFile) {
-            if (wmId == IDM_NEXT_GAME) {
-              curr_chess_file++;
-
-              if (curr_chess_file == num_files_in_list)
-                curr_chess_file = 0;
-            }
-            else {
-              curr_chess_file--;
-
-              if (curr_chess_file < 0)
-                curr_chess_file = num_files_in_list - 1;
-            }
-
-            do_read(hWnd,chess_file_list[curr_chess_file],&curr_game,bBinaryFormat);
+            if (wmId == IDM_NEXT_GAME)
+              advance_to_next_game(hWnd,VK_F6);
+            else
+              advance_to_next_game(hWnd,VK_F7);
           }
 
           break;
@@ -1902,46 +1932,60 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     highlight_file = -1;
 
     curr_game.curr_move++;
-    curr_game.moves[curr_game.curr_move].special_move_info = 0;
-    curr_game.num_moves = curr_game.curr_move;
 
-    if (((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_CHECK)) ||
-      ((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_QUEEN_IS_ATTACKED))) {
+    if (bHaveListFile && bAutoAdvance) {
+      puzzle_count++;
+      legal_moves_count = 0;
+      get_legal_moves(&curr_game,&legal_moves[0],&legal_moves_count);
 
-      invalidate_board(hWnd);
-    }
+      if (!legal_moves_count)
+        puzzles_solved++;
 
-    bBlack = curr_game.curr_move & 0x1;
-
-    legal_moves_count = 0;
-    get_legal_moves(&curr_game,&legal_moves[0],&legal_moves_count);
-
-    if (player_is_in_check(bBlack,curr_game.board,curr_game.curr_move)) {
-      invalidate_board(hWnd);
-      curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
-
-      // now determine if this is a checkmate
-
-      if (!legal_moves_count) {
-        curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_MATE;
-        invalidate_board(hWnd);
-      }
+      advance_to_next_game(hWnd,VK_F6);
     }
     else {
-      if (!legal_moves_count) {
-        curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_STALEMATE;
+      bUnsavedChanges = true;
+      curr_game.moves[curr_game.curr_move].special_move_info = 0;
+      curr_game.num_moves = curr_game.curr_move;
+
+      if (((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_CHECK)) ||
+        ((curr_game.curr_move > 2) && (curr_game.moves[curr_game.curr_move-2].special_move_info & SPECIAL_MOVE_QUEEN_IS_ATTACKED))) {
+
         invalidate_board(hWnd);
       }
-    }
 
-    if (queen_is_attacked(bBlack,curr_game.board,curr_game.curr_move)) {
-      invalidate_board(hWnd);
-      curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_QUEEN_IS_ATTACKED;
-    }
+      bBlack = curr_game.curr_move & 0x1;
 
-    if (bPlayingVsMakeAMove) {
-      if (make_a_move(&curr_game))
-        do_move(hWnd);
+      legal_moves_count = 0;
+      get_legal_moves(&curr_game,&legal_moves[0],&legal_moves_count);
+
+      if (player_is_in_check(bBlack,curr_game.board,curr_game.curr_move)) {
+        invalidate_board(hWnd);
+        curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
+
+        // now determine if this is a checkmate
+
+        if (!legal_moves_count) {
+          curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_MATE;
+          invalidate_board(hWnd);
+        }
+      }
+      else {
+        if (!legal_moves_count) {
+          curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_STALEMATE;
+          invalidate_board(hWnd);
+        }
+      }
+
+      if (queen_is_attacked(bBlack,curr_game.board,curr_game.curr_move)) {
+        invalidate_board(hWnd);
+        curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_QUEEN_IS_ATTACKED;
+      }
+
+      if (bPlayingVsMakeAMove) {
+        if (make_a_move(&curr_game))
+          do_move(hWnd);
+      }
     }
   }
 }
