@@ -360,6 +360,8 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
   if (got_error)
     return got_error;
 
+  calculate_seirawan_counts(gamept);
+
   return 0;
 }
 
@@ -1418,5 +1420,52 @@ void print_move_counts(struct game *gamept)
       printf("%d ",gamept->black_pieces[n].move_count);
     else
       printf("%d\n",gamept->black_pieces[n].move_count);
+  }
+}
+
+void calculate_seirawan_counts(struct game *gamept)
+{
+  int m;
+  int n;
+  int o;
+  int direction;
+  int piece;
+  int low;
+  int high;
+
+  for (m = 0; m < 2; m++) {
+    seirawan_count[m] = 0;
+
+    if (!m)
+      direction = 1;
+    else
+      direction = -1;
+
+    for (n = 0; n < NUM_BOARD_SQUARES; n++) {
+      piece = get_piece1(gamept->board,n);
+
+      if (piece * direction > 0) {
+        if (piece < 0) {
+          low = 0;
+          high = 32;
+        }
+        else {
+          low = 32;
+          high = 64;
+        }
+
+        for (o = low; o < high; o++) {
+          if (square_attacks_square(gamept->board,n,o))
+            seirawan_count[m]++;
+        }
+      }
+    }
+  }
+
+  if (debug_fptr && (debug_level == 16)) {
+    fprintf(debug_fptr,"calculate_seirawan_counts: board:\n");
+    fprint_bd2(gamept->board,debug_fptr);
+    fprintf(debug_fptr,"calculate_seirawan_counts: White: %d Black: %d\n",
+      seirawan_count[0],seirawan_count[1]);
   }
 }
