@@ -637,4 +637,6 @@ void position_game(struct game *gamept,int move)
     update_board(gamept,NULL,NULL,false);
     update_piece_info(gamept);
   }
+
+  calculate_seirawan_counts(gamept);
 }
