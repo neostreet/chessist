@@ -141,6 +141,7 @@ static TBBUTTON tbButtons[] = {
 };
 
 static int special_move_info;
+static int default_bigbmp_row;
 static boolean bPlayingVsMakeAMove;
 static int move_number;
 
@@ -201,6 +202,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     debug_level = 0;
     debug_fptr = NULL;
   }
+
+  cpt = getenv("DEFAULT_BIGBMP_ROW");
+
+  if (cpt != NULL)
+    default_bigbmp_row = atoi(cpt);
 
   //if (getenv("BINARY_FORMAT"))
     bBinaryFormat = true;
@@ -626,7 +632,9 @@ void do_paint(HWND hWnd)
       if (piece_offset >= 0) {
         bigbmp_column = piece_offset;
 
-        if ((m == highlight_rank) && (n == highlight_file))
+        if (default_bigbmp_row)
+          bigbmp_row = default_bigbmp_row;
+        else if ((m == highlight_rank) && (n == highlight_file))
           bigbmp_row = 2;
         else {
           if (!bDoColorChanges)
