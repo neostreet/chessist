@@ -84,6 +84,7 @@ BEGIN
         MENUITEM "&Toggle auto save",           IDM_TOGGLE_AUTO_SAVE
         MENUITEM "Show pu&zzle_stats",          IDM_SHOW_PUZZLE_STATS
         MENUITEM "&Clear puzzle_stats",         IDM_CLEAR_PUZZLE_STATS
+        MENUITEM "Toggle &warning on wrong solution",      IDM_TOGGLE_WRONG_SOLUTION
     END
     POPUP "&Help"
     BEGIN
