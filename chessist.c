@@ -1964,8 +1964,10 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
 
       if (!legal_moves_count)
         puzzles_solved++;
-      else if (bWarnOnWrongSolution)
+      else if (bWarnOnWrongSolution) {
+        invalidate_board(hWnd);
         MessageBox(hWnd,"Wrong solution",NULL,MB_OK);
+      }
 
       advance_to_next_game(hWnd,VK_F6);
     }
