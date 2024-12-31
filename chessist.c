@@ -185,7 +185,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   bBig = TRUE;
   bDoColorChanges = TRUE;
   bAutoAdvance = TRUE;
-  bWarnOnWrongSolution = TRUE;
+  bPuzzleMode = TRUE;
 
   width_in_pixels = WIDTH_IN_PIXELS;
   height_in_pixels = HEIGHT_IN_PIXELS;
@@ -906,7 +906,7 @@ static void show_puzzle_stats(HWND hWnd)
   if (!puzzle_count)
     correct_pct = (double)0;
   else
-    correct_pct = (double)puzzles_solved / (double)puzzle_count;
+    correct_pct = (double)puzzles_solved / (double)puzzle_count * (double)100;
 
   sprintf(buf,"puzzles solved: %d, puzzles attempted: %d, percent_correct: %lf",
     puzzles_solved,puzzle_count,correct_pct);
@@ -920,9 +920,9 @@ static void clear_puzzle_stats()
   puzzle_count = 0;
 }
 
-static void toggle_wrong_solution(HWND hWnd)
+static void toggle_puzzle_mode(HWND hWnd)
 {
-  bWarnOnWrongSolution ^= 1;
+  bPuzzleMode ^= 1;
 }
 
 void do_new(HWND hWnd,struct game *gamept)
@@ -1406,8 +1406,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           break;
 
-        case IDM_TOGGLE_WRONG_SOLUTION:
-          toggle_wrong_solution(hWnd);
+        case IDM_TOGGLE_PUZZLE_MODE:
+          toggle_puzzle_mode(hWnd);
 
           break;
 
@@ -1957,21 +1957,19 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     curr_game.curr_move++;
     calculate_seirawan_counts(&curr_game);
 
-    if (bHaveListFile && bAutoAdvance) {
+    if (bHaveListFile && bPuzzleMode) {
       puzzle_count++;
       legal_moves_count = 0;
       get_legal_moves(&curr_game,&legal_moves[0],&legal_moves_count);
 
       if (!legal_moves_count)
         puzzles_solved++;
-      else if (bWarnOnWrongSolution) {
-        invalidate_board(hWnd);
-        MessageBox(hWnd,"Wrong solution",NULL,MB_OK);
-      }
 
-      advance_to_next_game(hWnd,VK_F6);
+      if (bAutoAdvance)
+        advance_to_next_game(hWnd,VK_F6);
     }
-    else {
+
+    if (!bHaveListFile || !bPuzzleMode || !bAutoAdvance) {
       bUnsavedChanges = true;
       curr_game.moves[curr_game.curr_move].special_move_info = 0;
       curr_game.num_moves = curr_game.curr_move;
