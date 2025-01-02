@@ -185,7 +185,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   bBig = TRUE;
   bDoColorChanges = TRUE;
   bAutoAdvance = TRUE;
-  bPuzzleMode = TRUE;
 
   width_in_pixels = WIDTH_IN_PIXELS;
   height_in_pixels = HEIGHT_IN_PIXELS;
