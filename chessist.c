@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <malloc.h>
 #include <memory.h>
 #include <time.h>
@@ -127,7 +131,7 @@ static int bHaveListFile;
 static int num_files_in_list;
 static int curr_chess_file;
 
-static CHESS_FILE_LIST chess_file_list;
+static CPPT chess_file_list;
 
 static int bHaveGame;
 static struct game curr_game;
@@ -153,7 +157,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 char *trim_name(char *name);
 
 int is_list_file(LPSTR file_name);
-int read_list_file(LPSTR file_name,CHESS_FILE_LIST *cfl_ptr,int *num_files);
+CPPT read_list_file(LPSTR file_name,int *num_files,int *retval);
 
 LRESULT CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK Promotion(HWND, UINT, WPARAM, LPARAM);
@@ -1183,8 +1187,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         retval = is_list_file(szFile);
 
         if (retval) {
-          if (!read_list_file(szFile,
-            &chess_file_list,&num_files_in_list)) {
+          chess_file_list = read_list_file(szFile,&num_files_in_list,&retval);
+
+          if (!retval) {
             name = chess_file_list[curr_chess_file];
             bHaveName = TRUE;
           }
@@ -1537,68 +1542,81 @@ int is_list_file(LPSTR file_name)
   return FALSE;
 }
 
-int read_list_file(LPSTR file_name,CHESS_FILE_LIST *cfl_ptr,int *num_files)
+CPPT read_list_file(LPSTR file_name,int *num_files,int *retval)
 {
-  int m;
   int n;
-  FILE *fptr;
-  int chara;
-  char *cpt;
+  struct stat statbuf;
+  off_t mem_amount;
+  char *in_buf;
+  int in_buf_ix;
+  int fhndl;
+  int bytes_to_io;
+  int lines;
+  CPPT cppt;
+  int curr_line;
 
-  if (chess_file_list != NULL) {
-    free(chess_file_list);
-    chess_file_list = NULL;
+  if (stat(file_name,&statbuf) == -1) {
+    *retval = 1;
+    return NULL;
   }
 
-  if ((fptr = fopen(file_name,"r")) == NULL)
-    return 1;
+  mem_amount = (size_t)statbuf.st_size;
 
-  num_files_in_list = 0;
-
-  for ( ; ; ) {
-    chara = fgetc(fptr);
-
-    if (feof(fptr))
-      break;
-
-    if (chara == 0x0a)
-      num_files_in_list++;
+  if ((in_buf = (char *)malloc(mem_amount)) == NULL) {
+    *retval = 2;
+    return NULL;
   }
 
-  fseek(fptr,0,SEEK_SET);
+  if ((fhndl = open(file_name,O_BINARY | O_RDONLY,0)) == -1) {
+    free(in_buf);
+    *retval = 3;
+    return NULL;
+  }
 
-  chess_file_list = (CHESS_FILE_LIST)malloc(MAX_FILE_NAME_LEN *
-    num_files_in_list);
+  bytes_to_io = (int)mem_amount;
 
-  if (chess_file_list == NULL)
-    return 2;
+  if (read(fhndl,in_buf,bytes_to_io) != bytes_to_io) {
+    free(in_buf);
+    close(fhndl);
+    *retval = 4;
+    return NULL;
+  }
 
-  n = 0;
-  m = 0;
-  cpt = (char *)chess_file_list[n];
+  lines = 0;
 
-  for ( ; ; ) {
-    chara = fgetc(fptr);
+  for (n = 0; n < bytes_to_io; n++) {
+    if (in_buf[n] == LINEFEED)
+      lines++;
+  }
 
-    if (feof(fptr))
-      break;
+  if ((cppt = (char **)malloc(lines * sizeof (char *))) == NULL) {
+    free(in_buf);
+    close(fhndl);
+    *retval = 5;
+    return NULL;
+  }
 
-    if (chara == 0x0a) {
-      cpt[m] = 0;
-      m = 0;
-      n++;
-      cpt = (char *)chess_file_list[n];
+  curr_line = 0;
+  cppt[curr_line++] = in_buf;
+
+  for (n = 0; n < bytes_to_io; n++) {
+    if (in_buf[n] == LINEFEED) {
+      in_buf[n] = 0;
+
+      if (curr_line < lines)
+        cppt[curr_line++] = &in_buf[n + 1];
     }
-    else
-      cpt[m++] = chara;
   }
 
-  fclose(fptr);
+  close(fhndl);
 
   bHaveListFile = TRUE;
   curr_chess_file = 0;
+  *num_files = lines;
 
-  return 0;
+  *retval = 0;
+
+  return cppt;
 }
 
 //
