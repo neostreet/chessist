@@ -32,6 +32,7 @@ GLOBAL bool bInGetLegalMoves;
 GLOBAL bool bDoColorChanges;
 GLOBAL bool bAutoAdvance;
 GLOBAL bool bPuzzleMode;
+GLOBAL bool bRandomizePuzzle;
 
 GLOBAL int puzzle_count;
 GLOBAL int puzzles_solved;
