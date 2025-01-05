@@ -189,6 +189,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   bBig = TRUE;
   bDoColorChanges = TRUE;
   bAutoAdvance = TRUE;
+  bRandomizePuzzle = TRUE;
 
   width_in_pixels = WIDTH_IN_PIXELS;
   height_in_pixels = HEIGHT_IN_PIXELS;
@@ -928,6 +929,11 @@ static void toggle_puzzle_mode(HWND hWnd)
   bPuzzleMode ^= 1;
 }
 
+static void toggle_randomize_puzzle(HWND hWnd)
+{
+  bRandomizePuzzle ^= 1;
+}
+
 void do_new(HWND hWnd,struct game *gamept)
 {
   char *cpt;
@@ -1412,6 +1418,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case IDM_TOGGLE_PUZZLE_MODE:
           toggle_puzzle_mode(hWnd);
+
+          break;
+
+        case IDM_TOGGLE_RANDOMIZE_PUZZLE:
+          toggle_randomize_puzzle(hWnd);
 
           break;
 
