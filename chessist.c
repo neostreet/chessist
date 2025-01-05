@@ -132,6 +132,8 @@ static int num_files_in_list;
 static int curr_chess_file;
 
 static CPPT chess_file_list;
+static int *random_sample_ixs;
+static int *random_sample_hits;
 
 static int bHaveGame;
 static struct game curr_game;
@@ -164,6 +166,7 @@ LRESULT CALLBACK Promotion(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK MoveNumber(HWND, UINT, WPARAM, LPARAM);
 BOOL CenterWindow (HWND, HWND);
 void do_lbuttondown(HWND hWnd,int file,int rank);
+void populate_random_sample_ixs(int sample_size,int *random_sample_ixs,int *random_sample_hits);
 
 //
 //  FUNCTION: WinMain(HANDLE, HANDLE, LPSTR, int)
@@ -189,7 +192,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   bBig = TRUE;
   bDoColorChanges = TRUE;
   bAutoAdvance = TRUE;
-  bRandomizePuzzle = TRUE;
 
   width_in_pixels = WIDTH_IN_PIXELS;
   height_in_pixels = HEIGHT_IN_PIXELS;
@@ -931,7 +933,20 @@ static void toggle_puzzle_mode(HWND hWnd)
 
 static void toggle_randomize_puzzle(HWND hWnd)
 {
+  int n;
+
   bRandomizePuzzle ^= 1;
+
+  if (!bRandomizePuzzle) {
+    for (n = 0; n < num_files_in_list; n++)
+      random_sample_ixs[n] = n;
+  }
+  else {
+    for (n = 0; n < num_files_in_list; n++)
+      random_sample_hits[n] = 0;
+
+    populate_random_sample_ixs(num_files_in_list,random_sample_ixs,random_sample_hits);
+  }
 }
 
 void do_new(HWND hWnd,struct game *gamept)
@@ -1037,7 +1052,7 @@ void advance_to_next_game(HWND hWnd,WPARAM wParam)
   if (bAutoSave && bUnsavedChanges) {
     // toggle the orientation, and save
     curr_game.orientation ^= 1;
-    write_binary_game(chess_file_list[curr_chess_file],&curr_game);
+    write_binary_game(chess_file_list[random_sample_ixs[curr_chess_file]],&curr_game);
   }
 
   if (wParam == VK_F6) {
@@ -1057,7 +1072,7 @@ void advance_to_next_game(HWND hWnd,WPARAM wParam)
     bUnsavedChanges = false;
   }
 
-  do_read(hWnd,chess_file_list[curr_chess_file],&curr_game,true);
+  do_read(hWnd,chess_file_list[random_sample_ixs[curr_chess_file]],&curr_game,true);
 }
 
 //
@@ -1090,6 +1105,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   HDC hdc;
   RECT rect;
   char buf[80];
+  int mem_amount;
 
   switch (message) {
     case WM_CREATE:
@@ -1196,7 +1212,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
           chess_file_list = read_list_file(szFile,&num_files_in_list,&retval);
 
           if (!retval) {
-            name = chess_file_list[curr_chess_file];
+            mem_amount = num_files_in_list * sizeof(int *);
+
+            if ((random_sample_ixs = (int *)malloc(mem_amount)) == NULL) {
+              ; // should never happen
+            }
+
+            if ((random_sample_hits = (int *)malloc(mem_amount)) == NULL) {
+              ; // should never happen
+            }
+
+            for (n = 0; n < num_files_in_list; n++) {
+              random_sample_ixs[n] = n;
+              random_sample_hits[n] = 0;
+            }
+
+            name = chess_file_list[random_sample_ixs[curr_chess_file]];
             bHaveName = TRUE;
           }
         }
@@ -2047,5 +2078,42 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
       if (make_a_move(&curr_game))
         do_move(hWnd);
     }
+  }
+}
+
+void populate_random_sample_ixs(int sample_size,int *random_sample_ixs,int *random_sample_hits)
+{
+  int m;
+  int n;
+  int work;
+  int curr_sample_size;
+  int unused_count;
+
+  curr_sample_size = sample_size;
+
+  for (n = 0; n < sample_size; n++)
+    random_sample_hits[n] = 0;
+
+  for (n = 0; n < sample_size; n++) {
+    work = rand();
+    work %= curr_sample_size;
+    work++;
+ 
+    unused_count = 0;
+ 
+    for (m = 0; m < sample_size; m++) {
+      if (!random_sample_hits[m]) {
+        unused_count++;
+ 
+        if (unused_count == work) {
+          random_sample_hits[m] = 1;
+          break;
+        }
+      }
+    }
+ 
+    random_sample_ixs[n] = m;
+ 
+    curr_sample_size--;
   }
 }
