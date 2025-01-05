@@ -85,6 +85,7 @@ BEGIN
         MENUITEM "Show pu&zzle_stats",          IDM_SHOW_PUZZLE_STATS
         MENUITEM "&Clear puzzle_stats",         IDM_CLEAR_PUZZLE_STATS
         MENUITEM "Toggle &puzzle mode",         IDM_TOGGLE_PUZZLE_MODE
+        MENUITEM "Toggle &randomize_puzzle",    IDM_TOGGLE_RANDOMIZE_PUZZLE
     END
     POPUP "&Help"
     BEGIN
@@ -104,8 +105,8 @@ CAPTION "About Chessistant"
 FONT 8, "System"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,36,35,32,14,WS_GROUP
-    CTEXT           "Chessistant 6.0",IDC_COMPANY,6,6,100,8
-    CTEXT           "c 2024 Ambergris Software",IDC_COMPANY2,3,20,100,8
+    CTEXT           "Chessistant 7.0",IDC_COMPANY,6,6,100,8
+    CTEXT           "c 2025 Ambergris Software",IDC_COMPANY2,3,20,100,8
 END
 
 PROMOTIONBOX DIALOG DISCARDABLE  22, 17, 148, 190
