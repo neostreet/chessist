@@ -1139,7 +1139,7 @@ static int fen2pos(char *line,int line_len,unsigned char *pos_buf,int *black_to_
 #define MAX_LINE_LEN 256
 static char line[MAX_LINE_LEN];
 
-int populate_board_from_board_file(unsigned char *board,char *filename)
+int populate_board_from_board_file(unsigned char *board,char *filename,int orientation)
 {
   int m;
   int n;
@@ -1168,15 +1168,31 @@ int populate_board_from_board_file(unsigned char *board,char *filename)
 
       if (chara == '.') {
         piece = 0;
-        set_piece2(board,7 - line_no,n,piece);
+
+        if (!orientation)
+          set_piece2(board,7 - line_no,n,piece);
+        else
+          set_piece2(board,line_no,7 - n,piece);
       }
       else {
-        if (chara == 'p')
-          set_piece2(board,7 - line_no,n,PAWN_ID);
-        else if (chara == 'P')
-          set_piece2(board,7 - line_no,n,PAWN_ID * -1);
-        else if (chara == 'e')
-          set_piece2(board,7 - line_no,n,EMPTY_ID);
+        if (chara == 'p') {
+          if (!orientation)
+            set_piece2(board,7 - line_no,n,PAWN_ID);
+          else
+            set_piece2(board,line_no,7 - n,PAWN_ID);
+        }
+        else if (chara == 'P') {
+          if (!orientation)
+            set_piece2(board,7 - line_no,n,PAWN_ID * -1);
+          else
+            set_piece2(board,line_no,7 - n,PAWN_ID * -1);
+        }
+        else if (chara == 'e') {
+          if (!orientation)
+            set_piece2(board,7 - line_no,n,EMPTY_ID);
+          else
+            set_piece2(board,line_no,7 - n,EMPTY_ID);
+        }
         else {
           for (m = 0; m < NUM_PIECE_TYPES; m++) {
             if (chara == piece_ids[m]) {
@@ -1189,8 +1205,12 @@ int populate_board_from_board_file(unsigned char *board,char *filename)
             }
           }
 
-          if (m < NUM_PIECE_TYPES)
-            set_piece2(board,7 - line_no,n,piece);
+          if (m < NUM_PIECE_TYPES) {
+            if (!orientation)
+              set_piece2(board,7 - line_no,n,piece);
+            else
+              set_piece2(board,line_no,7 - n,piece);
+          }
         }
       }
     }
@@ -1205,7 +1225,7 @@ int populate_board_from_board_file(unsigned char *board,char *filename)
 
 int populate_initial_board_from_board_file(char *filename)
 {
-  return populate_board_from_board_file(initial_board,filename);
+  return populate_board_from_board_file(initial_board,filename,0);
 }
 
 int populate_board_from_bin_board_file(unsigned char *board,char *filename)
