@@ -1353,7 +1353,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
           if (GetOpenFileName(&ReadBoardName)) {
             name = ReadBoardName.lpstrFile;
-            retval = populate_board_from_board_file(curr_game.board,name);
+            retval = populate_board_from_board_file(curr_game.board,name,0);
             invalidate_board(hWnd);
           }
 
