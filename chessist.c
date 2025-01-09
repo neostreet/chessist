@@ -1097,6 +1097,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   int n;
   int wmId, wmEvent;
+  int loword;
+  int hiword;
   int file;
   int rank;
   int retval;
@@ -1519,9 +1521,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_LBUTTONDOWN:
       if (curr_game.curr_move == curr_game.num_moves) {
-        file = (LOWORD(lParam) - board_x_offset) / width_in_pixels;
-        rank = (HIWORD(lParam) - board_y_offset) / height_in_pixels;
-        do_lbuttondown(hWnd,file,rank);
+        loword = LOWORD(lParam);
+        hiword = HIWORD(lParam);
+
+        if ((loword >= board_x_offset) && (hiword >= board_y_offset)) {
+          file = (loword - board_x_offset) / width_in_pixels;
+          rank = (hiword - board_y_offset) / height_in_pixels;
+          do_lbuttondown(hWnd,file,rank);
+        }
       }
 
       break;
