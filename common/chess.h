@@ -122,6 +122,11 @@ struct game {
   struct piece_info black_pieces[NUM_PIECES_PER_PLAYER];
 };
 
+struct game_position {
+  char orientation;
+  unsigned char board[CHARS_IN_BOARD];  /* 8 columns * 8 rows / 2 (nibbles per char) */
+};
+
 struct move_offset {
   char rank_offset;
   char file_offset;
