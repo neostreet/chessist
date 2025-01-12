@@ -929,7 +929,7 @@ void print_piece_info(struct game *gamept)
   }
 }
 
-void print_piece_info2(struct piece_info *info_pt)
+void print_piece_info2(struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool bOnlyRemaining)
 {
   int n;
   char piece_id;
@@ -941,17 +941,49 @@ void print_piece_info2(struct piece_info *info_pt)
       piece_id *= -1;
 
     if (info_pt[n].current_board_position == -1) {
-      printf("  %s %d %d\n",
-        piece_names[piece_id - 1],
-        info_pt[n].current_board_position,
-        info_pt[n].move_count);
+      if (!bOnlyRemaining) {
+        if (!bAbbrev) {
+          printf("  %s %d %d\n",
+            piece_names[piece_id - 1],
+            info_pt[n].current_board_position,
+            info_pt[n].move_count);
+        }
+        else if (bWhite) {
+          printf("  %c %d %d\n",
+            piece_names[piece_id - 1][0] + ('a' - 'A'),
+            info_pt[n].current_board_position,
+            info_pt[n].move_count);
+        }
+        else {
+          printf("  %c %d %d\n",
+            piece_names[piece_id - 1][0],
+            info_pt[n].current_board_position,
+            info_pt[n].move_count);
+        }
+      }
     }
     else {
-      printf("  %s %c%c %d\n",
-        piece_names[piece_id - 1],
-        'a' + FILE_OF(info_pt[n].current_board_position),
-        '1' + RANK_OF(info_pt[n].current_board_position),
-        info_pt[n].move_count);
+      if (!bAbbrev) {
+        printf("  %s %c%c %d\n",
+          piece_names[piece_id - 1],
+          'a' + FILE_OF(info_pt[n].current_board_position),
+          '1' + RANK_OF(info_pt[n].current_board_position),
+          info_pt[n].move_count);
+      }
+      else if (bWhite) {
+        printf("  %c %c%c %d\n",
+          piece_names[piece_id - 1][0] + ('a' - 'A'),
+          'a' + FILE_OF(info_pt[n].current_board_position),
+          '1' + RANK_OF(info_pt[n].current_board_position),
+          info_pt[n].move_count);
+      }
+      else {
+        printf("  %c %c%c %d\n",
+          piece_names[piece_id - 1][0],
+          'a' + FILE_OF(info_pt[n].current_board_position),
+          '1' + RANK_OF(info_pt[n].current_board_position),
+          info_pt[n].move_count);
+      }
     }
   }
 }
