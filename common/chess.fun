@@ -65,7 +65,7 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
 void update_piece_info(struct game *gamept);
 void fprint_piece_info(struct game *gamept,FILE *fptr);
 void print_piece_info(struct game *gamept);
-void print_piece_info2(struct piece_info *info_pt);
+void print_piece_info2(struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool bOnlyRemaining);
 void populate_board_from_piece_info(struct game *gamept,unsigned char *board);
 int compare_boards(unsigned char *board1,unsigned char *board2);
 int get_piece1(unsigned char *board,int board_offset);
