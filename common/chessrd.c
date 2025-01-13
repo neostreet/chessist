@@ -842,7 +842,7 @@ void update_piece_info(struct game *gamept)
   if (debug_fptr && (debug_level == 4)) {
     fprintf(debug_fptr,"update_piece_info: curr_move = %d, num_moves = %d\n",gamept->curr_move,gamept->num_moves);
     fprint_piece_info(gamept,debug_fptr);
-    populate_board_from_piece_info(gamept,board);
+    populate_board_from_piece_info(gamept->white_pieces,gamept->black_pieces,board);
     fprint_bd3(board,gamept->orientation,debug_fptr);
   }
 }
@@ -950,13 +950,13 @@ void print_piece_info2(struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool 
         }
         else if (bWhite) {
           printf("  %c %d %d\n",
-            piece_names[piece_id - 1][0] + ('a' - 'A'),
+            piece_ids2[piece_id - 1] + ('a' - 'A'),
             info_pt[n].current_board_position,
             info_pt[n].move_count);
         }
         else {
           printf("  %c %d %d\n",
-            piece_names[piece_id - 1][0],
+            piece_ids2[piece_id - 1],
             info_pt[n].current_board_position,
             info_pt[n].move_count);
         }
@@ -972,14 +972,14 @@ void print_piece_info2(struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool 
       }
       else if (bWhite) {
         printf("  %c %c%c %d\n",
-          piece_names[piece_id - 1][0] + ('a' - 'A'),
+          piece_ids2[piece_id - 1] + ('a' - 'A'),
           'a' + FILE_OF(info_pt[n].current_board_position),
           '1' + RANK_OF(info_pt[n].current_board_position),
           info_pt[n].move_count);
       }
       else {
         printf("  %c %c%c %d\n",
-          piece_names[piece_id - 1][0],
+          piece_ids2[piece_id - 1],
           'a' + FILE_OF(info_pt[n].current_board_position),
           '1' + RANK_OF(info_pt[n].current_board_position),
           info_pt[n].move_count);
@@ -988,7 +988,7 @@ void print_piece_info2(struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool 
   }
 }
 
-void populate_board_from_piece_info(struct game *gamept,unsigned char *board)
+void populate_board_from_piece_info(struct piece_info *white_pt,struct piece_info *black_pt,unsigned char *board)
 {
   int n;
   unsigned int bit_offset;
@@ -997,16 +997,59 @@ void populate_board_from_piece_info(struct game *gamept,unsigned char *board)
     board[n] = 0;
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-    if (gamept->white_pieces[n].current_board_position != -1) {
-      bit_offset = gamept->white_pieces[n].current_board_position * BITS_PER_BOARD_SQUARE;
-      set_bits(BITS_PER_BOARD_SQUARE,board,bit_offset,gamept->white_pieces[n].piece_id);
+    if (white_pt[n].current_board_position != -1) {
+      bit_offset = white_pt[n].current_board_position * BITS_PER_BOARD_SQUARE;
+      set_bits(BITS_PER_BOARD_SQUARE,board,bit_offset,white_pt[n].piece_id);
     }
 
-    if (gamept->black_pieces[n].current_board_position != -1) {
-      bit_offset = gamept->black_pieces[n].current_board_position * BITS_PER_BOARD_SQUARE;
-      set_bits(BITS_PER_BOARD_SQUARE,board,bit_offset,gamept->black_pieces[n].piece_id);
+    if (black_pt[n].current_board_position != -1) {
+      bit_offset = black_pt[n].current_board_position * BITS_PER_BOARD_SQUARE;
+      set_bits(BITS_PER_BOARD_SQUARE,board,bit_offset,black_pt[n].piece_id);
     }
   }
+}
+
+int populate_piece_info_from_board(unsigned char *board,struct piece_info *white_pt,struct piece_info *black_pt)
+{
+  int m;
+  int n;
+  int piece;
+  struct piece_info *info_pt;
+
+  for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+    white_pt[n].piece_id = EMPTY_ID;
+    white_pt[n].current_board_position = -1;
+    white_pt[n].move_count = 0;
+    black_pt[n].piece_id = EMPTY_ID;
+    black_pt[n].current_board_position = -1;
+    black_pt[n].move_count = 0;
+  }
+
+  for (n = 0; n < NUM_BOARD_SQUARES; n++) {
+    piece = get_piece1(board,n);
+
+    if (!piece)
+      continue;
+
+    if (piece < 0)
+      info_pt = black_pt;
+    else
+      info_pt = white_pt;
+
+    for (m = 0; m < NUM_PIECES_PER_PLAYER; m++) {
+      if (info_pt[m].piece_id != EMPTY_ID)
+        continue;
+
+      info_pt[m].piece_id = piece;
+      info_pt[m].current_board_position = n;
+      break;
+    }
+
+    if (m == NUM_PIECES_PER_PLAYER)
+      return 1;
+  }
+
+  return 0;
 }
 
 int compare_boards(unsigned char *board1,unsigned char *board2)
