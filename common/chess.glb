@@ -39,6 +39,7 @@ GLOBAL int puzzles_solved;
 
 #ifdef MAKE_GLOBALS_HERE
 char piece_ids[] = "RNBQK";
+char piece_ids2[] = "PRNBQK";
 char *piece_names[] = {
   "PAWN",
   "ROOK",
@@ -71,6 +72,7 @@ int legal_moves_count;
 short seirawan_count[NUM_PLAYERS];
 #else
 extern char piece_ids[];
+extern char piece_ids2[];
 extern char *piece_names[];
 extern char fmt_str[];
 extern char *special_moves[];
