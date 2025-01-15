@@ -1922,3 +1922,11 @@ bool mate_in_one_exists(struct game *gamept)
 
   return false;
 }
+
+bool white_to_move(struct game *gamept)
+{
+  if (!gamept->black_moves_first)
+    return !(gamept->curr_move % 2);
+  else
+    return (gamept->curr_move % 2);
+}
