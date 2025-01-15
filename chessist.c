@@ -1936,8 +1936,8 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
         move_start_square_piece,curr_game.curr_move);
     }
 
-    if ( ((move_start_square_piece > 0) && !((curr_game.curr_move) % 2)) ||
-         ((move_start_square_piece < 0) &&  ((curr_game.curr_move) % 2)) ) {
+    if ( ((move_start_square_piece > 0) && white_to_move(&curr_game)) ||
+         ((move_start_square_piece < 0) && !white_to_move(&curr_game)) ) {
       if (debug_fptr) {
         fprintf(debug_fptr,"do_lbuttondown:   setting highlight: rank = %d, file = %d\n",rank,file);
       }
@@ -1973,7 +1973,7 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     if (!retval) {
       // check if this was a pawn promotion
 
-      if (!((curr_game.curr_move) % 2)) {
+      if (white_to_move(&curr_game)) {
         // White
 
         if (!curr_game.orientation) {
