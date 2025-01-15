@@ -113,6 +113,7 @@ struct piece_info {
 struct game {
   char title[MAX_TITLE_LEN];
   int orientation;
+  int black_moves_first;
   int num_moves;
   int curr_move;
   int result;
