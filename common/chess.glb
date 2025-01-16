@@ -37,6 +37,8 @@ GLOBAL bool bRandomizePuzzle;
 GLOBAL int puzzle_count;
 GLOBAL int puzzles_solved;
 
+GLOBAL unsigned char custom_initial_board[CHARS_IN_BOARD];
+
 #ifdef MAKE_GLOBALS_HERE
 char piece_ids[] = "RNBQK";
 char piece_ids2[] = "PRNBQK";
