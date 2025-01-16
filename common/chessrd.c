@@ -16,7 +16,7 @@
 #include "chess.mac"
 #include "bitfuns.h"
 
-static unsigned char initial_board[] = {
+static unsigned char canonical_initial_board[] = {
   (unsigned char)0x23, (unsigned char)0x45, (unsigned char)0x64, (unsigned char)0x32,
   (unsigned char)0x11, (unsigned char)0x11, (unsigned char)0x11, (unsigned char)0x11,
   (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00, (unsigned char)0x00,
@@ -26,45 +26,6 @@ static unsigned char initial_board[] = {
   (unsigned char)0xff, (unsigned char)0xff, (unsigned char)0xff, (unsigned char)0xff,
   (unsigned char)0xed, (unsigned char)0xcb, (unsigned char)0xac, (unsigned char)0xde
 };
-
-static struct piece_info initial_white_pieces[] = {
-  ROOK_ID,0,0,
-  KNIGHT_ID,1,0,
-  BISHOP_ID,2,0,
-  QUEEN_ID,3,0,
-  KING_ID,4,0,
-  BISHOP_ID,5,0,
-  KNIGHT_ID,6,0,
-  ROOK_ID,7,0,
-  PAWN_ID,8,0,
-  PAWN_ID,9,0,
-  PAWN_ID,10,0,
-  PAWN_ID,11,0,
-  PAWN_ID,12,0,
-  PAWN_ID,13,0,
-  PAWN_ID,14,0,
-  PAWN_ID,15,0
-};
-
-static struct piece_info initial_black_pieces[] = {
-  PAWN_ID * -1,48,0,
-  PAWN_ID * -1,49,0,
-  PAWN_ID * -1,50,0,
-  PAWN_ID * -1,51,0,
-  PAWN_ID * -1,52,0,
-  PAWN_ID * -1,53,0,
-  PAWN_ID * -1,54,0,
-  PAWN_ID * -1,55,0,
-  ROOK_ID * -1,56,0,
-  KNIGHT_ID * -1,57,0,
-  BISHOP_ID * -1,58,0,
-  QUEEN_ID * -1,59,0,
-  KING_ID * -1,60,0,
-  BISHOP_ID * -1,61,0,
-  KNIGHT_ID * -1,62,0,
-  ROOK_ID * -1,63,0
-};
-
 
 static int force_values[] = {
   FORCE_VALUE_PAWN,
@@ -130,24 +91,16 @@ void set_initial_board(struct game *gamept)
 {
   int n;
 
-  for (n = 0; n < CHARS_IN_BOARD; n++)
-    gamept->board[n] = initial_board[n];
-
-  initialize_piece_info(gamept);
-}
-
-void initialize_piece_info(struct game *gamept)
-{
-  int n;
-
-  for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
-    gamept->white_pieces[n].piece_id = initial_white_pieces[n].piece_id;
-    gamept->white_pieces[n].current_board_position = initial_white_pieces[n].current_board_position;
-    gamept->white_pieces[n].move_count = initial_white_pieces[n].move_count;
-    gamept->black_pieces[n].piece_id = initial_black_pieces[n].piece_id;
-    gamept->black_pieces[n].current_board_position = initial_black_pieces[n].current_board_position;
-    gamept->black_pieces[n].move_count = initial_black_pieces[n].move_count;
+  if (gamept->has_custom_initial_board) {
+    for (n = 0; n < CHARS_IN_BOARD; n++)
+      gamept->board[n] = custom_initial_board[n];
   }
+  else {
+    for (n = 0; n < CHARS_IN_BOARD; n++)
+      gamept->board[n] = canonical_initial_board[n];
+  }
+
+  populate_piece_info_from_board(gamept->board,gamept->white_pieces,gamept->black_pieces);
 }
 
 int read_game(char *filename,struct game *gamept,char *err_msg)
@@ -395,6 +348,16 @@ int read_binary_game(char *filename,struct game *gamept)
     }
   }
 
+  if (gamept->has_custom_initial_board) {
+    bytes_to_read = CHARS_IN_BOARD;
+    bytes_read = read(fhndl,(char *)custom_initial_board,bytes_to_read);
+
+    if (bytes_read != bytes_to_read) {
+      close(fhndl);
+      return 4;
+    }
+  }
+
   close(fhndl);
 
   position_game(gamept,gamept->curr_move);
@@ -447,11 +410,23 @@ int write_binary_game(char *filename,struct game *gamept)
 
   bytes_to_write = gamept->num_moves * sizeof (struct move);
 
-  bytes_written = write(fhndl,(char *)gamept->moves,bytes_to_write);
+  if (bytes_to_write) {
+    bytes_written = write(fhndl,(char *)gamept->moves,bytes_to_write);
 
-  if (bytes_written != bytes_to_write) {
-    close(fhndl);
-    return 3;
+    if (bytes_written != bytes_to_write) {
+      close(fhndl);
+      return 3;
+    }
+  }
+
+  if (gamept->has_custom_initial_board) {
+    bytes_to_write = CHARS_IN_BOARD;
+    bytes_written = write(fhndl,(char *)custom_initial_board,bytes_to_write);
+
+    if (bytes_written != bytes_to_write) {
+      close(fhndl);
+      return 4;
+    }
   }
 
   close(fhndl);
@@ -706,6 +681,8 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
     if (!bScratch)
       fprint_bd3(gamept->board,gamept->orientation,debug_fptr);
   }
+
+  update_piece_info(gamept);
 }
 
 void update_piece_info(struct game *gamept)
@@ -1347,7 +1324,7 @@ int populate_board_from_board_file(unsigned char *board,char *filename,int orien
 
 int populate_initial_board_from_board_file(char *filename)
 {
-  return populate_board_from_board_file(initial_board,filename,0);
+  return populate_board_from_board_file(custom_initial_board,filename,0);
 }
 
 int populate_board_from_bin_board_file(unsigned char *board,char *filename)
@@ -1412,7 +1389,7 @@ int populate_piece_counts_from_piece_count_file(int *piece_counts,char *filename
 
 int populate_initial_board_from_bin_board_file(char *filename)
 {
-  return populate_board_from_bin_board_file(initial_board,filename);
+  return populate_board_from_bin_board_file(custom_initial_board,filename);
 }
 
 int write_board_to_binfile(unsigned char *board,char *filename)
