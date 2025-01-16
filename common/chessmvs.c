@@ -1111,7 +1111,6 @@ bool move_is_legal(struct game *gamept,char from,char to)
   scratch.moves[scratch.curr_move].from = from;
   scratch.moves[scratch.curr_move].to = to;
   update_board(&scratch,NULL,NULL,true);
-  update_piece_info(&scratch);
 
   if (debug_fptr && (debug_level == 5)) {
     fprintf(debug_fptr,"move_is_legal: curr_move = %d, special_move_info = %x, after update_board\n",
@@ -1889,7 +1888,6 @@ bool mate_in_one_exists(struct game *gamept)
     if ((work_game.curr_move == dbg_move) && (n == debug_n))
       dbg = 1;
 
-    update_piece_info(&work_game);
     work_game.curr_move++;
 
     bBlack = work_game.curr_move & 0x1;
