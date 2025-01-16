@@ -251,7 +251,6 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
       break;
 
     update_board(gamept,NULL,NULL,false);
-    update_piece_info(gamept);
 
     gamept->curr_move++;
     gamept->moves[gamept->curr_move].special_move_info = 0;
