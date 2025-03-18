@@ -100,6 +100,8 @@ void set_initial_board(struct game *gamept)
       gamept->board[n] = canonical_initial_board[n];
   }
 
+  calculate_force_counts(gamept);
+
   populate_piece_info_from_board(gamept->board,gamept->white_pieces,gamept->black_pieces);
 }
 
@@ -1580,10 +1582,33 @@ void calculate_seirawan_counts(struct game *gamept)
     }
   }
 
+  calculate_force_counts(gamept);
+
   if (debug_fptr && (debug_level == 16)) {
     fprintf(debug_fptr,"calculate_seirawan_counts: board:\n");
     fprint_bd2(gamept->board,debug_fptr);
     fprintf(debug_fptr,"calculate_seirawan_counts: White: %d Black: %d\n",
       seirawan_count[0],seirawan_count[1]);
+  }
+}
+
+void calculate_force_counts(struct game *gamept)
+{
+  int n;
+  short piece;
+
+  force_count[BLACK] = 0;
+  force_count[WHITE] = 0;
+
+  for (n = 0; n < NUM_BOARD_SQUARES; n++) {
+    piece = get_piece1(gamept->board,n);
+
+    if (!piece)
+      continue;
+
+    if (piece < 0)
+      force_count[BLACK] += force_value_of(piece);
+    else
+      force_count[WHITE] += force_value_of(piece);
   }
 }
