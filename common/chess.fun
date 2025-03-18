@@ -24,6 +24,7 @@ int populate_initial_board_from_bin_board_file(char *filename);
 int write_board_to_binfile(unsigned char *board,char *filename);
 int refresh_force_count(struct game *gamept);
 void calculate_seirawan_counts(struct game *gamept);
+void calculate_force_counts(struct game *gamept);
 
 int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct move *move_ptr);
 int do_pawn_move(struct game *gamept,int direction,char *word,int wordlen,struct move *move_ptr);
