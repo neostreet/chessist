@@ -72,6 +72,7 @@ int num_special_moves = (sizeof special_moves / sizeof (char *));
 struct move legal_moves[MAX_LEGAL_MOVES];
 int legal_moves_count;
 short seirawan_count[NUM_PLAYERS];
+short force_count[NUM_PLAYERS];
 #else
 extern char piece_ids[];
 extern char piece_ids2[];
@@ -82,4 +83,5 @@ extern int num_special_moves;
 extern struct move legal_moves[];
 extern int legal_moves_count;
 extern short seirawan_count[];
+extern short force_count[];
 #endif
