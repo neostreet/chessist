@@ -2030,6 +2030,7 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
 
     curr_game.curr_move++;
     calculate_seirawan_counts(&curr_game);
+    redisplay_counts(hWnd,NULL);
 
     if (bHaveListFile && bPuzzleMode) {
       puzzle_count++;
