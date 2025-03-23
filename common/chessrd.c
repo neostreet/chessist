@@ -188,12 +188,22 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
       if (m >= 0) {
         m++;
 
-        if (!strcmp(&gamept->title[m],"1-0"))
-          gamept->result = WHITE_WIN;
-        else if (!strcmp(&gamept->title[m],"0-1"))
-          gamept->result = BLACK_WIN;
+        gamept->result = RESULT_EMPTY;
+
+        if (!strcmp(&gamept->title[m],"1-0")) {
+          if (!gamept->orientation)
+            gamept->result = RESULT_WIN;
+          else
+            gamept->result = RESULT_LOSS;
+        }
+        else if (!strcmp(&gamept->title[m],"0-1")) {
+          if (gamept->orientation)
+            gamept->result = RESULT_WIN;
+          else
+            gamept->result = RESULT_LOSS;
+        }
         else if (!strcmp(&gamept->title[m],"1/2-1/2"))
-          gamept->result = DRAW;
+          gamept->result = RESULT_DRAW;
       }
 
       continue;
