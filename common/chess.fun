@@ -1,6 +1,6 @@
 /*** chess function declarations ***/
 
-int read_game(char *filename,struct game *gamept,char *err_msg);
+int read_game(char *filename,struct game *gamept);
 int read_binary_game(char *filename,struct game *gamept);
 int read_game_position(char *filename,struct game_position *position_pt);
 int read_game_and_display(FILE *fptr,struct game *gamept,char *err_msg);
