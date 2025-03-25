@@ -4,8 +4,6 @@
 #define GLOBAL extern
 #endif
 
-GLOBAL char err_msg[80];
-
 GLOBAL int dbg_move;
 GLOBAL int debug_level;
 GLOBAL FILE *debug_fptr;
