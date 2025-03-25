@@ -1025,7 +1025,7 @@ void do_read(HWND hWnd,LPSTR name,struct game *gamept,bool bBinaryFormat)
     fprintf(debug_fptr,"%s\n","do_read(): top of function");
 
   if (!bBinaryFormat)
-    retval = read_game(name,gamept,err_msg);
+    retval = read_game(name,gamept);
   else
     retval = read_binary_game(name,gamept);
 
