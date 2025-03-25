@@ -105,8 +105,9 @@ void set_initial_board(struct game *gamept)
   populate_piece_info_from_board(gamept->board,gamept->white_pieces,gamept->black_pieces);
 }
 
-int read_game(char *filename,struct game *gamept,char *err_msg)
+int read_game(char *filename,struct game *gamept)
 {
+  int filename_len;
   FILE *fptr;
   int chara;
   int end_of_file;
@@ -121,6 +122,13 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
   int retval;
   int got_error;
   bool bBlack;
+
+  filename_len = strlen(filename);
+
+  if (filename_len > 4) {
+    if (!strcmp(&filename[filename_len - 4],".bin"))
+      return read_binary_game(filename,gamept);
+  }
 
   bzero(gamept,sizeof (struct game));
 
@@ -223,7 +231,6 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
 
         if (retval) {
           /*printf(corrupted_msg);*/
-          strcpy(err_msg,bad_castle);
 
           got_error = 2;
         }
@@ -239,7 +246,6 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
 
         if (retval) {
           /*printf(corrupted_msg);*/
-          strcpy(err_msg,bad_piece_move[get_piece_type_ix(word[0])]);
 
           got_error = 3;
         }
@@ -251,7 +257,6 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
 
         if (retval) {
           /*printf(corrupted_msg);*/
-          strcpy(err_msg,bad_pawn_move);
 
           got_error = 4;
         }
@@ -331,9 +336,17 @@ int read_game(char *filename,struct game *gamept,char *err_msg)
 
 int read_binary_game(char *filename,struct game *gamept)
 {
+  int filename_len;
   int fhndl;
   unsigned int bytes_to_read;
   unsigned int bytes_read;
+
+  filename_len = strlen(filename);
+
+  if (filename_len > 3) {
+    if (!strcmp(&filename[filename_len - 3],".ch"))
+      return read_game(filename,gamept);
+  }
 
   if ((fhndl = open(filename,O_RDONLY | O_BINARY)) == -1)
     return 1;
