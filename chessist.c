@@ -140,6 +140,7 @@ static struct game curr_game;
 
 static char space_fmt[] = "Space: %2d - %2d";
 static char force_fmt[] = "Force: %2d - %2d";
+static char move_fmt[] =  "Move: %3d";
 
 static TBBUTTON tbButtons[] = {
     { 0, IDM_NEXT_GAME,                TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
@@ -265,7 +266,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   else
     window_extra_height = WINDOW_EXTRA_HEIGHT;
 
-  board_y_offset = TOOLBAR_HEIGHT + font_height * 3;
+  board_y_offset = TOOLBAR_HEIGHT + font_height * 4;
 
   // Initialize global strings
   lstrcpy (szAppName, appname);
@@ -582,6 +583,10 @@ static void redisplay_counts(HWND hWnd,HDC hdc)
 
   wsprintf(buf,force_fmt,force_count[WHITE],force_count[BLACK]);
   rect.top = TOOLBAR_HEIGHT + 32;
+  TextOut(local_hdc,rect.left,rect.top,buf,lstrlen(buf));
+
+  wsprintf(buf,move_fmt,curr_game.curr_move);
+  rect.top = TOOLBAR_HEIGHT + 48;
   TextOut(local_hdc,rect.left,rect.top,buf,lstrlen(buf));
 }
 
