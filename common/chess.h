@@ -110,9 +110,11 @@ struct piece_info {
 #define ANNOTATION_Y 5
 
 #define MAX_TITLE_LEN 128
+#define MAX_ECO_LEN 3
 
 struct game {
   char title[MAX_TITLE_LEN];
+  char eco[MAX_ECO_LEN+1];
   int orientation;
   int has_custom_initial_board;
   int black_moves_first;
