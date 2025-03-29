@@ -212,6 +212,23 @@ int read_game(char *filename,struct game *gamept)
         }
         else if (!strcmp(&gamept->title[m],"1/2-1/2"))
           gamept->result = RESULT_DRAW;
+
+        for (m -= 2; m >= 0; m--) {
+          if (gamept->title[m] != ' ')
+            break;
+        }
+
+        for (m -= 1; m >= 0; m--) {
+          if (gamept->title[m] == ' ')
+            break;
+        }
+
+        if (m >= 0) {
+         for (m++, n = 0; (gamept->title[m] != ' ') && (n < MAX_ECO_LEN); m++,n++)
+           gamept-> eco[n] = gamept->title[m];
+
+          gamept->eco[n] = 0;
+        }
       }
 
       continue;
