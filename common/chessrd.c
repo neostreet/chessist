@@ -536,8 +536,10 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt)
       break;
     }
 
-    // ignore carriage returns and other characters
-    if (ignore_character(chara))
+    // ignore carriage returns and other characters, except in the title
+    if ((wordlen >= 5) && !strncmp(word,"title",5))
+      ;
+    else if (ignore_character(chara))
       continue;
 
     /* end of line ? */
