@@ -1420,6 +1420,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
              position_game(&curr_game,move_number);
              invalidate_board(hWnd);
+             redisplay_counts(hWnd,NULL);
            }
 
            break;
