@@ -928,7 +928,7 @@ static void show_puzzle_stats(HWND hWnd)
   sprintf(buf,"puzzles solved: %d, puzzles attempted: %d, percent_correct: %lf",
     puzzles_solved,puzzle_count,correct_pct);
 
-  MessageBox(hWnd,buf,NULL,MB_OK);
+  MessageBox(hWnd,buf,"Puzzle stats",MB_OK);
 }
 
 static void clear_puzzle_stats()
