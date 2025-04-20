@@ -499,6 +499,30 @@ int write_game_position(char *filename,struct game_position *position_pt)
   return 0;
 }
 
+int write_board_comparison(char *filename,struct board_comparison *comparison_pt)
+{
+  int fhndl;
+  unsigned int bytes_to_write;
+  unsigned int bytes_written;
+
+  if ((fhndl = open(filename,O_CREAT | O_TRUNC | O_WRONLY | O_BINARY,
+      S_IREAD | S_IWRITE)) == -1)
+    return 1;
+
+  bytes_to_write = sizeof (struct board_comparison);
+
+  bytes_written = write(fhndl,(char *)comparison_pt,bytes_to_write);
+
+  if (bytes_written != bytes_to_write) {
+    close(fhndl);
+    return 2;
+  }
+
+  close(fhndl);
+
+  return 0;
+}
+
 int ignore_character(int chara)
 {
   if ((chara == 0x0d) ||
