@@ -132,6 +132,11 @@ struct game_position {
   unsigned char board[CHARS_IN_BOARD];  /* 8 columns * 8 rows / 2 (nibbles per char) */
 };
 
+struct board_comparison {
+  char orientation;
+  unsigned char board[2][CHARS_IN_BOARD];  /* 8 columns * 8 rows / 2 (nibbles per char) */
+};
+
 struct move_offset {
   char rank_offset;
   char file_offset;
