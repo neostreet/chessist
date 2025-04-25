@@ -1921,6 +1921,78 @@ bool mate_in_one_exists(struct game *gamept)
   return false;
 }
 
+bool stalemate_in_one_exists(struct game *gamept)
+{
+  int n;
+  struct game work_game;
+  int work_legal_moves_count;
+  bool bBlack;
+  int dbg;
+  int dbg1;
+  int dbg2;
+
+  legal_moves_count = 0;
+  get_legal_moves(gamept,legal_moves,&legal_moves_count);
+
+  if (gamept->curr_move == dbg_move)
+    dbg1 = 1;
+  else
+    dbg1 = 0;
+
+  if (debug_fptr && (debug_level == 14)) {
+    fprintf(debug_fptr,"stalemate_in_one_exists: curr_move = %d, legal_moves_count = %d\n",
+      gamept->curr_move,legal_moves_count);
+  }
+
+  for (n = 0; n < legal_moves_count; n++) {
+    if ((dbg1 == 1) && (legal_moves[n].from == debug_mate_in_one_move.from) && (legal_moves[n].to == debug_mate_in_one_move.to)) {
+      dbg2 = 1;
+    }
+    else
+      dbg2 = 0;
+
+    copy_game(&work_game,gamept);
+    work_game.moves[work_game.curr_move].from = legal_moves[n].from;
+    work_game.moves[work_game.curr_move].to = legal_moves[n].to;
+    work_game.moves[work_game.curr_move].special_move_info = legal_moves[n].special_move_info;
+    update_board(&work_game,NULL,NULL,true);
+
+    if ((work_game.curr_move == dbg_move) && (n == debug_n))
+      dbg = 1;
+
+    work_game.curr_move++;
+
+    bBlack = work_game.curr_move & 0x1;
+
+    if (!player_is_in_check(bBlack,work_game.board,work_game.curr_move)) {
+      if (debug_fptr && (debug_level == 11)) {
+        fprintf(debug_fptr,"stalemate_in_one_exists: piece_info:\n");
+        fprint_piece_info(&work_game,debug_fptr);
+      }
+
+      work_legal_moves_count = 0;
+      get_legal_moves(&work_game,work_legal_moves,&work_legal_moves_count);
+
+      if (debug_fptr && (debug_level == 14)) {
+        fprintf(debug_fptr,"stalemate_in_one_exists: work_game.curr_move = %d, work_legal_moves_count = %d\n",
+          work_game.curr_move,work_legal_moves_count);
+        fprint_bd3(work_game.board,work_game.orientation,debug_fptr);
+      }
+
+      if (!work_legal_moves_count) {
+        if (debug_fptr && (debug_level == 14)) {
+          fprintf(debug_fptr,"stalemate_in_one_exists: curr_move = %d, returning true\n",
+            gamept->curr_move,legal_moves_count);
+        }
+
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 bool white_to_move(struct game *gamept)
 {
   if (!gamept->black_moves_first)
