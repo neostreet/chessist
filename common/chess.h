@@ -43,6 +43,7 @@
 #define SPECIAL_MOVE_STALEMATE                 0x0800
 #define SPECIAL_MOVE_QUEEN_IS_ATTACKED         0x1000
 #define SPECIAL_MOVE_MATE_IN_ONE               0x2000
+#define SPECIAL_MOVE_STALEMATE_IN_ONE          0x4000
 
 #define RESULT_EMPTY 0
 #define RESULT_WIN   1
