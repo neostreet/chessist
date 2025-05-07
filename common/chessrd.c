@@ -314,13 +314,13 @@ int read_game(char *filename,struct game *gamept)
         fprintf(debug_fptr,"read_game: curr_move = %d, set SPECIAL_MOVE_QUEEN_IS_ATTACKED\n",gamept->curr_move);
     }
 
-    if (mate_in_one_exists(gamept)) {
+    if (bSetMateInOne && mate_in_one_exists(gamept)) {
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_MATE_IN_ONE;
 
       if (debug_fptr && (debug_level == 3))
         fprintf(debug_fptr,"read_game: curr_move = %d, set SPECIAL_MOVE_MATE_IN_ONE\n",gamept->curr_move);
     }
-    else if (stalemate_in_one_exists(gamept)) {
+    else if (bSetStalemateInOne && stalemate_in_one_exists(gamept)) {
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_STALEMATE_IN_ONE;
 
       if (debug_fptr && (debug_level == 3))
