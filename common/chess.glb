@@ -31,6 +31,8 @@ GLOBAL bool bDoColorChanges;
 GLOBAL bool bAutoAdvance;
 GLOBAL bool bPuzzleMode;
 GLOBAL bool bRandomizePuzzle;
+GLOBAL bool bSetMateInOne;
+GLOBAL bool bSetStalemateInOne;
 
 GLOBAL int puzzle_count;
 GLOBAL int puzzles_solved;
