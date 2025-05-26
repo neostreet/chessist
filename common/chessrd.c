@@ -113,6 +113,7 @@ int read_game(char *filename,struct game *gamept)
   int end_of_file;
   int m;
   int n;
+  int p;
   char word[WORDLEN];
   int wordlen;
   bool bHaveFirstWord;
@@ -224,10 +225,27 @@ int read_game(char *filename,struct game *gamept)
         }
 
         if (m >= 0) {
-         for (m++, n = 0; (gamept->title[m] != ' ') && (n < MAX_ECO_LEN); m++,n++)
-           gamept-> eco[n] = gamept->title[m];
+         for (p = m + 1, n = 0; (gamept->title[p] != ' ') && (n < MAX_ECO_LEN); p++,n++)
+           gamept->eco[n] = gamept->title[p];
 
           gamept->eco[n] = 0;
+        }
+
+        for (m -= 2; m >= 0; m--) {
+          if (gamept->title[m] != ' ')
+            break;
+        }
+
+        for (m -= 1; m >= 0; m--) {
+          if (gamept->title[m] == ' ')
+            break;
+        }
+
+        if (m >= 0) {
+         for (p = m + 1, n = 0; (gamept->title[p] != ' ') && (n < MAX_DATE_LEN); p++,n++)
+           gamept->date[n] = gamept->title[p];
+
+          gamept->date[n] = 0;
         }
       }
 
