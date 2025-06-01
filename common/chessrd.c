@@ -1013,6 +1013,7 @@ void print_piece_info2(struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool 
 {
   int n;
   char piece_id;
+  char original_piece_id;
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
     piece_id = info_pt[n].piece_id;
@@ -1020,49 +1021,69 @@ void print_piece_info2(struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool 
     if (piece_id < 0)
       piece_id *= -1;
 
+    original_piece_id = info_pt[n].original_piece_id;
+
+    if (original_piece_id < 0)
+      original_piece_id *= -1;
+
     if (info_pt[n].current_board_position == -1) {
       if (!bOnlyRemaining) {
         if (!bAbbrev) {
-          printf("  %s %d %d\n",
+          printf("  %s %d %d %s %d\n",
             piece_names[piece_id - 1],
             info_pt[n].current_board_position,
-            info_pt[n].move_count);
+            info_pt[n].move_count,
+            piece_names[original_piece_id - 1],
+            info_pt[n].original_board_position);
         }
         else if (bWhite) {
-          printf("  %c %d %d\n",
+          printf("  %c %d %d %c %d\n",
             piece_ids2[piece_id - 1] + ('a' - 'A'),
             info_pt[n].current_board_position,
-            info_pt[n].move_count);
+            info_pt[n].move_count,
+            piece_ids2[original_piece_id - 1] + ('a' - 'A'),
+            info_pt[n].original_board_position);
         }
         else {
-          printf("  %c %d %d\n",
+          printf("  %c %d %d %c %d\n",
             piece_ids2[piece_id - 1],
             info_pt[n].current_board_position,
-            info_pt[n].move_count);
+            info_pt[n].move_count,
+            piece_ids2[original_piece_id - 1],
+            info_pt[n].original_board_position);
         }
       }
     }
     else {
       if (!bAbbrev) {
-        printf("  %s %c%c %d\n",
+        printf("  %s %c%c %d %s %c%c\n",
           piece_names[piece_id - 1],
           'a' + FILE_OF(info_pt[n].current_board_position),
           '1' + RANK_OF(info_pt[n].current_board_position),
-          info_pt[n].move_count);
+          info_pt[n].move_count,
+          piece_names[original_piece_id - 1],
+          'a' + FILE_OF(info_pt[n].original_board_position),
+          '1' + RANK_OF(info_pt[n].original_board_position));
       }
       else if (bWhite) {
-        printf("  %c %c%c %d\n",
+        printf("  %c %c%c %d %c %c%c\n",
           piece_ids2[piece_id - 1] + ('a' - 'A'),
           'a' + FILE_OF(info_pt[n].current_board_position),
           '1' + RANK_OF(info_pt[n].current_board_position),
-          info_pt[n].move_count);
+          info_pt[n].move_count,
+          piece_ids2[original_piece_id - 1] + ('a' - 'A'),
+          'a' + FILE_OF(info_pt[n].original_board_position),
+          '1' + RANK_OF(info_pt[n].original_board_position));
       }
       else {
-        printf("  %c %c%c %d\n",
+        printf("  %c %c%c %d %c %c%c\n",
           piece_ids2[piece_id - 1],
           'a' + FILE_OF(info_pt[n].current_board_position),
           '1' + RANK_OF(info_pt[n].current_board_position),
-          info_pt[n].move_count);
+          info_pt[n].move_count,
+          piece_ids2[original_piece_id - 1],
+          'a' + FILE_OF(info_pt[n].original_board_position),
+          '1' + RANK_OF(info_pt[n].original_board_position));
       }
     }
   }
