@@ -23,7 +23,6 @@ int populate_board_from_bin_board_file(unsigned char *board,char *filename);
 int populate_piece_counts_from_piece_count_file(int *piece_counts,char *filename);
 int populate_initial_board_from_bin_board_file(char *filename);
 int write_board_to_binfile(unsigned char *board,char *filename);
-int refresh_force_count(struct game *gamept);
 void calculate_seirawan_counts(struct game *gamept);
 void calculate_force_counts(struct game *gamept);
 
