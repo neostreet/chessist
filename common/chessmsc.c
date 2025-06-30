@@ -325,6 +325,72 @@ void fprint_moves2(struct move *moves,int num_moves,FILE *fptr)
   }
 }
 
+void fprint_moves3(FILE *fptr,struct move *moves,int num_moves,bool bHex,bool bMoveNumbers)
+{
+  int m;
+  int n;
+  int and_val;
+  int hit;
+  int dbg_move;
+  int dbg;
+
+  dbg_move = -1;
+
+  for (n = 0; n < num_moves; n++) {
+    if (n == dbg_move)
+      dbg = 1;
+
+    if (bHex) {
+      if (bMoveNumbers) {
+        fprintf(fptr,"%3d from: %c%c to: %c%c %04x\n",
+          n,
+          'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+          'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to),
+          moves[n].special_move_info);
+      }
+      else {
+        fprintf(fptr,"from: %c%c to: %c%c %04x\n",
+          'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+          'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to),
+          moves[n].special_move_info);
+       }
+    }
+    else {
+      if (bMoveNumbers) {
+        fprintf(fptr,"%3d from: %c%c to: %c%c",
+          n,
+          'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+          'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to));
+      }
+      else {
+        fprintf(fptr,"from: %c%c to: %c%c",
+          'a' + FILE_OF(moves[n].from),'1' + RANK_OF(moves[n].from),
+          'a' + FILE_OF(moves[n].to),'1' + RANK_OF(moves[n].to));
+      }
+
+      and_val = 0x1;
+      hit = 0;
+
+      for (m = 0; m < num_special_moves; m++) {
+        if (moves[n].special_move_info & and_val) {
+          hit = 1;
+          putchar(' ' );
+          fprintf(fptr,"%s",special_moves[m]);
+        }
+
+        and_val <<= 1;
+      }
+
+      if (!hit)
+        fprintf(fptr," SPECIAL_MOVE_NONE");
+
+      putchar(0x0a);
+    }
+  }
+
+  dbg = 1; // see if you get here
+}
+
 void print_special_moves(struct game *gamept)
 {
   int n;
