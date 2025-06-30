@@ -104,6 +104,7 @@ void fprint_bd3(unsigned char *board,int orientation,FILE *fptr);
 void print_moves(struct move *moves,int num_moves,bool bHex,bool bMoveNumbers);
 void fprint_moves(struct move *moves,int num_moves,char *filename);
 void fprint_moves2(struct move *moves,int num_moves,FILE *fptr);
+void fprint_moves3(FILE *fptr,struct move *moves,int num_moves,bool bHex,bool bMoveNumbers);
 
 int match_board(unsigned char *board1,unsigned char *board2,bool bExactMatch);
 
