@@ -1089,6 +1089,86 @@ void print_piece_info2(struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool 
   }
 }
 
+void fprint_piece_info2(FILE *fptr,struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool bOnlyRemaining)
+{
+  int n;
+  char piece_id;
+  char original_piece_id;
+
+  for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+    piece_id = info_pt[n].piece_id;
+
+    if (piece_id < 0)
+      piece_id *= -1;
+
+    original_piece_id = info_pt[n].original_piece_id;
+
+    if (original_piece_id < 0)
+      original_piece_id *= -1;
+
+    if (info_pt[n].current_board_position == -1) {
+      if (!bOnlyRemaining) {
+        if (!bAbbrev) {
+          fprintf(fptr,"  %s %d %d %s %d\n",
+            piece_names[piece_id - 1],
+            info_pt[n].current_board_position,
+            info_pt[n].move_count,
+            piece_names[original_piece_id - 1],
+            info_pt[n].original_board_position);
+        }
+        else if (bWhite) {
+          fprintf(fptr,"  %c %d %d %c %d\n",
+            piece_ids2[piece_id - 1] + ('a' - 'A'),
+            info_pt[n].current_board_position,
+            info_pt[n].move_count,
+            piece_ids2[original_piece_id - 1] + ('a' - 'A'),
+            info_pt[n].original_board_position);
+        }
+        else {
+          fprintf(fptr,"  %c %d %d %c %d\n",
+            piece_ids2[piece_id - 1],
+            info_pt[n].current_board_position,
+            info_pt[n].move_count,
+            piece_ids2[original_piece_id - 1],
+            info_pt[n].original_board_position);
+        }
+      }
+    }
+    else {
+      if (!bAbbrev) {
+        fprintf(fptr,"  %s %c%c %d %s %c%c\n",
+          piece_names[piece_id - 1],
+          'a' + FILE_OF(info_pt[n].current_board_position),
+          '1' + RANK_OF(info_pt[n].current_board_position),
+          info_pt[n].move_count,
+          piece_names[original_piece_id - 1],
+          'a' + FILE_OF(info_pt[n].original_board_position),
+          '1' + RANK_OF(info_pt[n].original_board_position));
+      }
+      else if (bWhite) {
+        fprintf(fptr,"  %c %c%c %d %c %c%c\n",
+          piece_ids2[piece_id - 1] + ('a' - 'A'),
+          'a' + FILE_OF(info_pt[n].current_board_position),
+          '1' + RANK_OF(info_pt[n].current_board_position),
+          info_pt[n].move_count,
+          piece_ids2[original_piece_id - 1] + ('a' - 'A'),
+          'a' + FILE_OF(info_pt[n].original_board_position),
+          '1' + RANK_OF(info_pt[n].original_board_position));
+      }
+      else {
+        fprintf(fptr,"  %c %c%c %d %c %c%c\n",
+          piece_ids2[piece_id - 1],
+          'a' + FILE_OF(info_pt[n].current_board_position),
+          '1' + RANK_OF(info_pt[n].current_board_position),
+          info_pt[n].move_count,
+          piece_ids2[original_piece_id - 1],
+          'a' + FILE_OF(info_pt[n].original_board_position),
+          '1' + RANK_OF(info_pt[n].original_board_position));
+      }
+    }
+  }
+}
+
 void populate_board_from_piece_info(struct piece_info *white_pt,struct piece_info *black_pt,unsigned char *board)
 {
   int n;
@@ -1116,6 +1196,9 @@ int populate_piece_info_from_board(unsigned char *board,struct piece_info *white
   int n;
   int piece;
   struct piece_info *info_pt;
+  static int got_here;
+
+  got_here++;
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
     white_pt[n].piece_id = EMPTY_ID;
