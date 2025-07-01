@@ -374,7 +374,7 @@ void fprint_moves3(FILE *fptr,struct move *moves,int num_moves,bool bHex,bool bM
       for (m = 0; m < num_special_moves; m++) {
         if (moves[n].special_move_info & and_val) {
           hit = 1;
-          putchar(' ' );
+          fputc(' ',fptr);
           fprintf(fptr,"%s",special_moves[m]);
         }
 
@@ -384,7 +384,7 @@ void fprint_moves3(FILE *fptr,struct move *moves,int num_moves,bool bHex,bool bM
       if (!hit)
         fprintf(fptr," SPECIAL_MOVE_NONE");
 
-      putchar(0x0a);
+      fputc(0x0a,fptr);
     }
   }
 
