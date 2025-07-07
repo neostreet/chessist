@@ -113,11 +113,13 @@ struct piece_info {
 #define ANNOTATION_Y 5
 
 #define MAX_TITLE_LEN 128
+#define MAX_SITE_LEN 28
 #define MAX_DATE_LEN 10
 #define MAX_ECO_LEN 3
 
 struct game {
   char title[MAX_TITLE_LEN];
+  char site[MAX_SITE_LEN+1];
   char date[MAX_DATE_LEN+1];
   char eco[MAX_ECO_LEN+1];
   int orientation;
