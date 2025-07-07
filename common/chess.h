@@ -122,6 +122,7 @@ struct game {
   char site[MAX_SITE_LEN+1];
   char date[MAX_DATE_LEN+1];
   char eco[MAX_ECO_LEN+1];
+  int time_forfeit;
   int orientation;
   int has_custom_initial_board;
   int black_moves_first;
