@@ -8,7 +8,7 @@ int write_binary_game(char *filename,struct game *gamept);
 int write_game_position(char *filename,struct game_position *position_pt);
 int write_board_comparison(char *filename,struct board_comparison *comparison_pt);
 char xlate_piece(char);
-int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt);
+int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,struct game *gamept);
 int get_draw_input(struct game *gamept);
 int get_xstart(struct game *gamept,int board_offset);
 int get_ystart(struct game *gamept,int board_offset);
