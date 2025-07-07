@@ -621,6 +621,8 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,struct game *gamept
 
           gamept->site[n] = 0;
         }
+        else if ((cpt = strstr(comment,"[Termination \"Time forfeit\"")))
+          gamept->time_forfeit = 1;
 
         bComment = false;
         comment_ix = 0;
