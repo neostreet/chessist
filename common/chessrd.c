@@ -141,7 +141,7 @@ int read_game(char *filename,struct game *gamept)
   fscanf(fptr,"%d",&gamept->orientation);  /* get board orientation */
                                    /* 0 = standard, 1 = black on bottom */
 
-  end_of_file = get_word(fptr,word,WORDLEN,&wordlen);
+  end_of_file = get_word(fptr,word,WORDLEN,&wordlen,gamept);
   bHaveFirstWord = true;
 
   set_initial_board(gamept);
@@ -155,7 +155,7 @@ int read_game(char *filename,struct game *gamept)
 
   for ( ; ; ) {
     if (word_no || !bHaveFirstWord)
-      end_of_file = get_word(fptr,word,WORDLEN,&wordlen);
+      end_of_file = get_word(fptr,word,WORDLEN,&wordlen,gamept);
 
     if (end_of_file)
       break;
@@ -561,18 +561,27 @@ int ignore_character(int chara)
   return false;
 }
 
-int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt)
+#define MAX_COMMENT_LEN 128
+static char comment[MAX_COMMENT_LEN+1];
+static int get_word_calls;
+
+int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,struct game *gamept)
 {
+  int n;
   int chara;
   int started;
-  int comment;
+  bool bComment;
+  int comment_ix;
   int end_of_file;
   int wordlen;
+  char *cpt;
 
   wordlen = 0;
   started = 0;
-  comment = 0;
+  bComment = false;
+  comment_ix = 0;
   end_of_file = 0;
+  get_word_calls++;
 
   for ( ; ; ) {
     chara = fgetc(fptr);
@@ -584,8 +593,8 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt)
       break;
     }
 
-    // ignore carriage returns and other characters, except in the title
-    if ((wordlen >= 5) && !strncmp(word,"title",5))
+    // ignore carriage returns and other characters, except in the title or in a comment
+    if (((wordlen >= 5) && !strncmp(word,"title",5)) || bComment)
       ;
     else if (ignore_character(chara))
       continue;
@@ -595,18 +604,42 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt)
       if (started)
         break;
       else {
-        comment = 0;
+        comment[comment_ix] = 0;
+
+        if (debug_fptr && (debug_level == 17))
+          fprintf(debug_fptr,"get_word(): %d, comment: %s\n",get_word_calls,comment);
+
+        if ((cpt = strstr(comment,"[Site \""))) {
+          cpt += 7;
+
+          for (n = 0; n < MAX_SITE_LEN; n++) {
+            if (!cpt[n])
+              break;
+
+            gamept->site[n] = cpt[n];
+          }
+
+          gamept->site[n] = 0;
+        }
+
+        bComment = false;
+        comment_ix = 0;
+
         continue;
       }
     }
 
     /* in comment ? */
-    if (comment)
+    if (bComment) {
+      if (comment_ix < MAX_COMMENT_LEN - 1)
+        comment[comment_ix++] = chara;
+
       continue;
+    }
 
     /* comment marker ? */
     if (!wordlen && (chara == '/')) {
-      comment = 1;
+      bComment = true;
       continue;
     }
 
@@ -626,6 +659,11 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt)
 
   word[wordlen] = 0;
   *wordlenpt = wordlen;
+
+  if (debug_fptr && (debug_level == 17)) {
+    if (!end_of_file)
+      fprintf(debug_fptr,"get_word(): %d, word: %s\n",get_word_calls,word);
+  }
 
   return end_of_file;
 }
