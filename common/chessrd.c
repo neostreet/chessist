@@ -565,6 +565,32 @@ int ignore_character(int chara)
 static char comment[MAX_COMMENT_LEN+1];
 static int get_word_calls;
 
+#define MAX_TMP_BUF_LEN 20
+static char tmp_buf[MAX_TMP_BUF_LEN+1];
+
+int get_datum(char *comment,char *datum_name,char *datum,int max_len)
+{
+  int n;
+  char *cpt;
+
+  if ((cpt = strstr(comment,datum_name))) {
+    cpt += strlen(datum_name);
+
+    for (n = 0; n < max_len; n++) {
+      if (!cpt[n])
+        break;
+
+      datum[n] = cpt[n];
+    }
+
+    datum[n] = 0;
+
+    return 1;
+  }
+
+  return 0;
+}
+
 int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,struct game *gamept)
 {
   int n;
@@ -609,20 +635,25 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,struct game *gamept
         if (debug_fptr && (debug_level == 17))
           fprintf(debug_fptr,"get_word(): %d, comment: %s\n",get_word_calls,comment);
 
-        if ((cpt = strstr(comment,"[Site \""))) {
-          cpt += 7;
-
-          for (n = 0; n < MAX_SITE_LEN; n++) {
-            if (!cpt[n])
-              break;
-
-            gamept->site[n] = cpt[n];
-          }
-
-          gamept->site[n] = 0;
+        if (get_datum(comment,"[Site \"",gamept->site,MAX_SITE_LEN)) {
+          ;
         }
-        else if ((cpt = strstr(comment,"[Termination \"Time forfeit\"")))
-          gamept->time_forfeit = 1;
+        else if (get_datum(comment,"[Termination \"",tmp_buf,MAX_TMP_BUF_LEN)) {
+          if (strstr(tmp_buf,"Time forfeit"))
+            gamept->time_forfeit = 1;
+        }
+        else if (get_datum(comment,"[WhiteElo \"",tmp_buf,MAX_TMP_BUF_LEN)) {
+          sscanf(tmp_buf,"%d",&gamept->white_elo);
+        }
+        else if (get_datum(comment,"[BlackElo \"",tmp_buf,MAX_TMP_BUF_LEN)) {
+          sscanf(tmp_buf,"%d",&gamept->black_elo);
+        }
+        else if (get_datum(comment,"[WhiteRatingDiff \"",tmp_buf,MAX_TMP_BUF_LEN)) {
+          sscanf(tmp_buf,"%d",&gamept->white_rating_diff);
+        }
+        else if (get_datum(comment,"[BlackRatingDiff \"",tmp_buf,MAX_TMP_BUF_LEN)) {
+          sscanf(tmp_buf,"%d",&gamept->black_rating_diff);
+        }
 
         bComment = false;
         comment_ix = 0;
