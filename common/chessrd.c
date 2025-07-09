@@ -643,16 +643,28 @@ int get_word(FILE *fptr,char *word,int maxlen,int *wordlenpt,struct game *gamept
             gamept->time_forfeit = 1;
         }
         else if (get_datum(comment,"[WhiteElo \"",tmp_buf,MAX_TMP_BUF_LEN)) {
-          sscanf(tmp_buf,"%d",&gamept->white_elo);
+          if (!gamept->orientation)
+            sscanf(tmp_buf,"%d",&gamept->my_elo_before);
+          else
+            sscanf(tmp_buf,"%d",&gamept->opponent_elo_before);
         }
         else if (get_datum(comment,"[BlackElo \"",tmp_buf,MAX_TMP_BUF_LEN)) {
-          sscanf(tmp_buf,"%d",&gamept->black_elo);
+          if (!gamept->orientation)
+            sscanf(tmp_buf,"%d",&gamept->opponent_elo_before);
+          else
+            sscanf(tmp_buf,"%d",&gamept->my_elo_before);
         }
         else if (get_datum(comment,"[WhiteRatingDiff \"",tmp_buf,MAX_TMP_BUF_LEN)) {
-          sscanf(tmp_buf,"%d",&gamept->white_rating_diff);
+          if (!gamept->orientation)
+            sscanf(tmp_buf,"%d",&gamept->my_elo_delta);
+          else
+            sscanf(tmp_buf,"%d",&gamept->opponent_elo_delta);
         }
         else if (get_datum(comment,"[BlackRatingDiff \"",tmp_buf,MAX_TMP_BUF_LEN)) {
-          sscanf(tmp_buf,"%d",&gamept->black_rating_diff);
+          if (!gamept->orientation)
+            sscanf(tmp_buf,"%d",&gamept->opponent_elo_delta);
+          else
+            sscanf(tmp_buf,"%d",&gamept->my_elo_delta);
         }
 
         bComment = false;
