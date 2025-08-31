@@ -53,6 +53,7 @@ static OPENFILENAME ReadBoardName;
 static TCHAR szReadBoardName[MAX_PATH];
 static OPENFILENAME WriteFileName;
 static TCHAR szWriteFileName[MAX_PATH];
+static TCHAR szBoard[MAX_PATH];
 
 static char chess_filter[] = "\
 Chess files\0\
@@ -1086,6 +1087,31 @@ void advance_to_next_game(HWND hWnd,WPARAM wParam)
   do_read(hWnd,chess_file_list[random_sample_ixs[curr_chess_file]],&curr_game,true);
 }
 
+static int build_bd_filename(
+  char *pos_filename,
+  int pos_filename_len,
+  char *bd_filename,
+  int max_filename_len)
+{
+  int n;
+
+  for (n = 0; n < pos_filename_len; n++) {
+    if (pos_filename[n] == '.')
+      break;
+  }
+
+  if (n == pos_filename_len)
+    return 1;
+
+  if (n + 3 > max_filename_len - 1)
+    return 2;
+
+  strcpy(bd_filename,pos_filename);
+  strcpy(&bd_filename[n+1],"bd");
+
+  return 0;
+}
+
 //
 //  FUNCTION: WndProc(HWND, unsigned, WORD, LONG)
 //
@@ -1506,6 +1532,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             lstrcpy(szFile,szWriteFileName);
             write_binary_game(szFile,&curr_game);
           }
+
+          break;
+
+        case IDM_SAVE_BOARD:
+          if (!build_bd_filename(szFile,MAX_PATH,szBoard,MAX_PATH))
+            write_board_to_binfile(curr_game.board,szBoard);
 
           break;
 
