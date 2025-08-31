@@ -4,14 +4,15 @@
 #define IDM_READ_BOARD         103
 #define IDM_SAVE               104
 #define IDM_SAVEAS             105
-#define IDM_PRINT              106
-#define IDM_PRINTSETUP         107
-#define IDM_EXIT               108
+#define IDM_SAVE_BOARD         106
+#define IDM_PRINT              107
+#define IDM_PRINTSETUP         108
+#define IDM_EXIT               109
 
-#define IDI_CHESSIST           109
-#define IDI_SMALL              110
+#define IDI_CHESSIST           110
+#define IDI_SMALL              111
 
-#define IDB_TOOLBAR            111
+#define IDB_TOOLBAR            112
 
 #define IDM_SET_LAST_MOVE      200
 #define IDM_PRINT_BOARD        201
