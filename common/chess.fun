@@ -57,6 +57,7 @@ int make_a_move(struct game *gamept);
 bool mate_in_one_exists(struct game *gamept);
 bool stalemate_in_one_exists(struct game *gamept);
 bool white_to_move(struct game *gamept);
+bool back_rank_mate(struct game *gamept);
 
 int get_to_position(char *word,int wordlen,int *to_filept,int *to_rankpt);
 
