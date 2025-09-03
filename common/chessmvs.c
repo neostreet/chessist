@@ -2000,3 +2000,97 @@ bool white_to_move(struct game *gamept)
   else
     return (gamept->curr_move % 2);
 }
+
+bool back_rank_mate(struct game *gamept)
+{
+  int n;
+  int mating_piece;
+  int mating_square_rank;
+  int mating_square_file;
+  int mated_square;
+  int mated_square_rank;
+  int mated_square_file;
+  int file_distance;
+  bool bWhiteIsMated;
+  int impeding_rank;
+  int impeding_file_start;
+  int impeding_file;
+  int impeding_piece;
+
+  mating_square_rank = RANK_OF(gamept->moves[gamept->num_moves-1].to);
+
+  if (gamept->num_moves % 2)
+    mated_square = gamept->black_pieces[12].current_board_position;
+  else
+    mated_square = gamept->white_pieces[4].current_board_position;
+
+  mated_square_rank = RANK_OF(mated_square);
+
+  if (mating_square_rank != mated_square_rank)
+    return false;
+
+  mating_square_file = FILE_OF(gamept->moves[gamept->num_moves-1].to);
+  mated_square_file = FILE_OF(mated_square);
+  file_distance = mating_square_file - mated_square_file;
+
+  if (file_distance < 0)
+    file_distance *= -1;
+
+  if (file_distance < 2)
+    return false;
+
+  mating_piece = get_piece1(gamept->board,gamept->moves[gamept->num_moves-1].to);
+
+  if (mating_piece < 0) {
+    mating_piece *= -1;
+    bWhiteIsMated = true;
+  }
+  else
+    bWhiteIsMated = false;
+
+  if ((mating_piece != QUEEN_ID) && (mating_piece != ROOK_ID))
+    return false;
+
+  if (bWhiteIsMated) {
+    if (mating_square_rank != 0)
+      return false;
+  }
+  else {
+    if (mating_square_rank != 7)
+      return false;
+  }
+
+  // now make sure the king is impeded by his own pawns
+  if (bWhiteIsMated) {
+    impeding_rank = mated_square_rank + 1;
+    impeding_file_start = mated_square_file - 1;
+
+    for (n = 0; n < 3; n++) {
+      impeding_file = impeding_file_start + n;
+
+      if ((impeding_file >= 0) && (impeding_file <= 7)) {
+        impeding_piece = get_piece2(gamept->board,impeding_rank,impeding_file);
+
+        if (impeding_piece != PAWN_ID)
+          return false;
+      }
+    }
+  }
+  else {
+    impeding_rank = mated_square_rank - 1;
+    impeding_file_start = mated_square_file - 1;
+
+    for (n = 0; n < 3; n++) {
+      impeding_file = impeding_file_start + n;
+
+      if ((impeding_file >= 0) && (impeding_file <= 7)) {
+        impeding_piece = get_piece2(gamept->board,impeding_rank,impeding_file);
+
+        if (impeding_piece != PAWN_ID * -1)
+          return false;
+      }
+    }
+  }
+
+  return true;
+}
