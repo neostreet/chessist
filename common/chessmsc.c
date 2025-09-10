@@ -59,6 +59,10 @@ void print_bd(struct game *gamept)
   int m;
   int n;
   int square;
+  int dbg;
+
+  if (gamept->curr_move == dbg_move)
+    dbg = 1;
 
   for (m = 0; m < 8; m++) {
     for (n = 0; n < 8; n++) {
