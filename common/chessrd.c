@@ -1334,6 +1334,30 @@ int compare_boards(unsigned char *board1,unsigned char *board2)
   return 1;
 }
 
+bool board_is_mirrored(struct game *gamept)
+{
+  int m;
+  int n;
+  int square1;
+  int square2;
+  int dbg;
+
+  if (gamept->curr_move == dbg_move)
+    dbg = 1;
+
+  for (m = 0; m < (NUM_RANKS / 2); m++) {
+    for (n = 0; n < NUM_FILES; n++) {
+      square1 = get_piece2(gamept->board,(NUM_RANKS - 1) - m,n);
+      square2 = get_piece2(gamept->board,m,n);
+
+      if (square1 + square2)
+        return false;
+    }
+  }
+
+  return true;
+}
+
 int get_piece1(unsigned char *board,int board_offset)
 {
   unsigned int bit_offset;
