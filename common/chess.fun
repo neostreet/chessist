@@ -73,6 +73,7 @@ void fprint_piece_info2(FILE *fptr,struct piece_info *info_pt,bool bWhite,bool b
 void populate_board_from_piece_info(struct piece_info *white_pt,struct piece_info *black_pt,unsigned char *board);
 int populate_piece_info_from_board(unsigned char *board,struct piece_info *white_pt,struct piece_info *black_pt);
 int compare_boards(unsigned char *board1,unsigned char *board2);
+bool board_is_mirrored(struct game *gamept);
 int get_piece1(unsigned char *board,int board_offset);
 int get_piece2(unsigned char *board,int row,int column);
 void set_piece1(unsigned char *board,int board_offset,int piece);
