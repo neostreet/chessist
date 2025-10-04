@@ -160,6 +160,9 @@ int read_game(char *filename,struct game *gamept)
     if (end_of_file)
       break;
 
+    if (!strcmp(word,"1-0") || !strcmp(word,"0-1") || !strcmp(word,"1/2-1/2"))
+      break;
+
     word_no++;
 
     if (gamept->curr_move == dbg_move)
