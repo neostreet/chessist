@@ -706,10 +706,19 @@ bool exchange_sac(struct game *gamept)
 {
   int captured_piece;
 
+  if (gamept->curr_move == gamept->num_moves - 1)
+    return false;
+
   if (!(gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_CAPTURE))
     return false;
-  else
-    captured_piece = gamept->moves[gamept->curr_move].captured_piece;
+
+  if (!(gamept->moves[gamept->curr_move+1].special_move_info & SPECIAL_MOVE_CAPTURE))
+    return false;
+
+  if (gamept->moves[gamept->curr_move].to != gamept->moves[gamept->curr_move+1].to)
+    return false;
+
+  captured_piece = gamept->moves[gamept->curr_move].captured_piece;
 
   if (!(gamept->curr_move % 2)) {
     if (get_piece1(gamept->board,gamept->moves[gamept->curr_move].to) != ROOK_ID)
