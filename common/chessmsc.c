@@ -658,6 +658,77 @@ bool less_than_2_castles(struct game *gamept)
   return (castles < 2);
 }
 
+bool white_pigs(unsigned char *board)
+{
+  int n;
+  int piece;
+  int num_white_pigs = 0;
+
+  for (n = 48; n < 56; n++) {
+    piece = get_piece1(board,n);
+
+    if (piece == ROOK_ID) {
+      num_white_pigs++;
+
+      if (num_white_pigs == 2)
+        return true;
+    }
+    else if ((num_white_pigs == 1) && (piece))
+      return false;
+  }
+
+  return false;
+}
+
+bool black_pigs(unsigned char *board)
+{
+  int n;
+  int piece;
+  int num_black_pigs = 0;
+
+  for (n = 8; n < 16; n++) {
+    piece = get_piece1(board,n);
+
+    if (piece == ROOK_ID * -1) {
+      num_black_pigs++;
+
+      if (num_black_pigs == 2)
+        return true;
+    }
+    else if ((num_black_pigs == 1) && (piece))
+      return false;
+  }
+
+  return false;
+}
+
+bool exchange_sac(struct game *gamept)
+{
+  int captured_piece;
+
+  if (!(gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_CAPTURE))
+    return false;
+  else
+    captured_piece = gamept->moves[gamept->curr_move].captured_piece;
+
+  if (!(gamept->curr_move % 2)) {
+    if (get_piece1(gamept->board,gamept->moves[gamept->curr_move].to) != ROOK_ID)
+      return false;
+
+    if ((captured_piece != KNIGHT_ID * -1) && (captured_piece != BISHOP_ID * -1))
+      return false;
+  }
+  else {
+    if (get_piece1(gamept->board,gamept->moves[gamept->curr_move].to) != ROOK_ID * -1)
+      return false;
+
+    if ((captured_piece != KNIGHT_ID) && (captured_piece != BISHOP_ID))
+      return false;
+  }
+
+  return true;
+}
+
 int get_enemy_king_file_and_rank(struct game *gamept,int *file_pt,int *rank_pt)
 {
   int m;
