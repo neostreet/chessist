@@ -744,8 +744,10 @@ void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squa
   from_piece = get_piece1(gamept->board,gamept->moves[gamept->curr_move].from);
   to_piece = get_piece1(gamept->board,gamept->moves[gamept->curr_move].to);
 
-  if (!bScratch && (from_piece * to_piece < 0))
+  if (!bScratch && (from_piece * to_piece < 0)) {
     gamept->moves[gamept->curr_move].special_move_info |= SPECIAL_MOVE_CAPTURE;
+    gamept->moves[gamept->curr_move].captured_piece = to_piece;
+  }
 
   if (debug_fptr && (debug_level == 15)) {
     fprintf(debug_fptr,"update_board (%d): curr_move = %d, special_move_info = %x\n",
