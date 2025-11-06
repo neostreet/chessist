@@ -89,6 +89,7 @@ struct move {
   char from;
   char to;
   int special_move_info;
+  char captured_piece;
 };
 
 struct piece_info {
