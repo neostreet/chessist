@@ -738,6 +738,42 @@ bool exchange_sac(struct game *gamept)
   return true;
 }
 
+bool queen_sac(struct game *gamept)
+{
+  int captured_piece;
+
+  if (gamept->curr_move == gamept->num_moves - 1)
+    return false;
+
+  if (!(gamept->moves[gamept->curr_move].special_move_info & SPECIAL_MOVE_CAPTURE))
+    return false;
+
+  if (!(gamept->moves[gamept->curr_move+1].special_move_info & SPECIAL_MOVE_CAPTURE))
+    return false;
+
+  if (gamept->moves[gamept->curr_move].to != gamept->moves[gamept->curr_move+1].to)
+    return false;
+
+  captured_piece = gamept->moves[gamept->curr_move].captured_piece;
+
+  if (!(gamept->curr_move % 2)) {
+    if (get_piece1(gamept->board,gamept->moves[gamept->curr_move].to) != QUEEN_ID)
+      return false;
+
+    if ((captured_piece != ROOK_ID * -1) && (captured_piece != KNIGHT_ID * -1) && (captured_piece != BISHOP_ID * -1))
+      return false;
+  }
+  else {
+    if (get_piece1(gamept->board,gamept->moves[gamept->curr_move].to) != QUEEN_ID * -1)
+      return false;
+
+    if ((captured_piece != ROOK_ID) && (captured_piece != KNIGHT_ID) && (captured_piece != BISHOP_ID))
+      return false;
+  }
+
+  return true;
+}
+
 int get_enemy_king_file_and_rank(struct game *gamept,int *file_pt,int *rank_pt)
 {
   int m;
@@ -788,4 +824,19 @@ void position_game(struct game *gamept,int move)
   }
 
   calculate_seirawan_counts(gamept);
+}
+
+double chess_win_pct(int wins,int draws,int losses)
+{
+  int games;
+  double win_pct;
+
+  games = wins + draws + losses;
+
+  if (!games)
+    win_pct = (double)0;
+  else
+    win_pct = ((double)wins + ((double)draws / (double) 2)) / (double)games * (double)100;
+
+  return win_pct;
 }
