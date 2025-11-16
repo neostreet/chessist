@@ -63,6 +63,7 @@ int get_to_position(char *word,int wordlen,int *to_filept,int *to_rankpt);
 
 void set_initial_board(struct game *gamept);
 void position_game(struct game *gamept,int move);
+double chess_win_pct(int wins,int draws,int losses);
 void print_special_moves(struct game *gamept);
 void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares,bool bScratch);
 void update_piece_info(struct game *gamept);
@@ -89,6 +90,7 @@ bool less_than_2_castles(struct game *gamept);
 bool white_pigs(unsigned char *board);
 bool black_pigs(unsigned char *board);
 bool exchange_sac(struct game *gamept);
+bool queen_sac(struct game *gamept);
 int get_enemy_king_file_and_rank(struct game *gamept,int *file_pt,int *rank_pt);
 void copy_board(unsigned char *from_board,unsigned char *to_board);
 int count_num_pieces(int color,struct game *gamept);
