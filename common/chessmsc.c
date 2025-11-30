@@ -774,6 +774,23 @@ bool queen_sac(struct game *gamept)
   return true;
 }
 
+bool four_knights(struct game *gamept)
+{
+  if (get_piece1(gamept->board,18) != KNIGHT_ID)
+    return false;
+
+  if (get_piece1(gamept->board,21) != KNIGHT_ID)
+    return false;
+
+  if (get_piece1(gamept->board,42) != KNIGHT_ID * -1)
+    return false;
+
+  if (get_piece1(gamept->board,45) != KNIGHT_ID * -1)
+    return false;
+
+  return true;
+}
+
 int get_enemy_king_file_and_rank(struct game *gamept,int *file_pt,int *rank_pt)
 {
   int m;
