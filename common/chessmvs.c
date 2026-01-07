@@ -2094,3 +2094,36 @@ bool back_rank_mate(struct game *gamept)
 
   return true;
 }
+
+bool mated_king_not_on_back_rank(struct game *gamept)
+{
+  int mating_piece;
+  int mated_square;
+  int mated_square_rank;
+  bool bWhiteIsMated;
+
+  mating_piece = get_piece1(gamept->board,gamept->moves[gamept->num_moves-1].to);
+
+  if (mating_piece < 0)
+    bWhiteIsMated = true;
+  else
+    bWhiteIsMated = false;
+
+  if (gamept->num_moves % 2)
+    mated_square = gamept->black_pieces[12].current_board_position;
+  else
+    mated_square = gamept->white_pieces[4].current_board_position;
+
+  mated_square_rank = RANK_OF(mated_square);
+
+  if (bWhiteIsMated) {
+    if (!mated_square_rank)
+      return false;
+  }
+  else {
+    if (mated_square_rank == 7)
+      return false;
+  }
+
+  return true;
+}
