@@ -69,7 +69,7 @@ void print_special_moves(struct game *gamept);
 void update_board(struct game *gamept,int *invalid_squares,int *num_invalid_squares,bool bScratch);
 void update_piece_info(struct game *gamept);
 void fprint_piece_info(struct game *gamept,FILE *fptr);
-void print_piece_info(struct game *gamept);
+void print_piece_info(struct game *gamept,bool bOnlyRemaining);
 void print_piece_info2(struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool bOnlyRemaining);
 void fprint_piece_info2(FILE *fptr,struct piece_info *info_pt,bool bWhite,bool bAbbrev,bool bOnlyRemaining);
 void populate_board_from_piece_info(struct piece_info *white_pt,struct piece_info *black_pt,unsigned char *board);
