@@ -1044,7 +1044,7 @@ void fprint_piece_info(struct game *gamept,FILE *fptr)
   }
 }
 
-void print_piece_info(struct game *gamept)
+void print_piece_info(struct game *gamept,bool bOnlyRemaining)
 {
   int n;
 
@@ -1052,13 +1052,15 @@ void print_piece_info(struct game *gamept)
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
     if (gamept->white_pieces[n].current_board_position == -1) {
-      printf("  %s %d %d %s %c%c\n",
-        piece_names[gamept->white_pieces[n].piece_id - 1],
-        gamept->white_pieces[n].current_board_position,
-        gamept->white_pieces[n].move_count,
-        piece_names[gamept->white_pieces[n].original_piece_id - 1],
-        'a' + FILE_OF(gamept->white_pieces[n].original_board_position),
-        '1' + RANK_OF(gamept->white_pieces[n].original_board_position));
+      if (!bOnlyRemaining) {
+        printf("  %s %d %d %s %c%c\n",
+          piece_names[gamept->white_pieces[n].piece_id - 1],
+          gamept->white_pieces[n].current_board_position,
+          gamept->white_pieces[n].move_count,
+          piece_names[gamept->white_pieces[n].original_piece_id - 1],
+          'a' + FILE_OF(gamept->white_pieces[n].original_board_position),
+          '1' + RANK_OF(gamept->white_pieces[n].original_board_position));
+      }
     }
     else {
       printf("  %s %c%c %d %s %c%c\n",
@@ -1076,13 +1078,15 @@ void print_piece_info(struct game *gamept)
 
   for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
     if (gamept->black_pieces[n].current_board_position == -1) {
-      printf("  %s %d %d %s %c%c\n",
-        piece_names[(gamept->black_pieces[n].piece_id * -1) - 1],
-        gamept->black_pieces[n].current_board_position,
-        gamept->black_pieces[n].move_count,
-        piece_names[(gamept->black_pieces[n].original_piece_id * -1) - 1],
-        'a' + FILE_OF(gamept->black_pieces[n].original_board_position),
-        '1' + RANK_OF(gamept->black_pieces[n].original_board_position));
+      if (!bOnlyRemaining) {
+        printf("  %s %d %d %s %c%c\n",
+          piece_names[(gamept->black_pieces[n].piece_id * -1) - 1],
+          gamept->black_pieces[n].current_board_position,
+          gamept->black_pieces[n].move_count,
+          piece_names[(gamept->black_pieces[n].original_piece_id * -1) - 1],
+          'a' + FILE_OF(gamept->black_pieces[n].original_board_position),
+          '1' + RANK_OF(gamept->black_pieces[n].original_board_position));
+      }
     }
     else {
       printf("  %s %c%c %d %s %c%c\n",
