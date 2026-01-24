@@ -93,6 +93,8 @@ bool black_pigs(unsigned char *board);
 bool exchange_sac(struct game *gamept);
 bool queen_sac(struct game *gamept);
 bool four_knights(struct game *gamept);
+bool force_diff_ge(struct game *gamept,int force_diff_geval);
+bool force_diff_le(struct game *gamept,int force_diff_leval);
 int get_enemy_king_file_and_rank(struct game *gamept,int *file_pt,int *rank_pt);
 void copy_board(unsigned char *from_board,unsigned char *to_board);
 int count_num_pieces(int color,struct game *gamept);
