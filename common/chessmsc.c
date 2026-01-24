@@ -797,6 +797,8 @@ bool force_diff_ge(struct game *gamept,int force_diff_geval)
 
   if (!gamept->orientation)
     force_diff = force_count[WHITE] - force_count[BLACK];
+  else
+    force_diff = force_count[BLACK] - force_count[WHITE];
 
   if (force_diff >= force_diff_geval)
     return true;
@@ -810,6 +812,8 @@ bool force_diff_le(struct game *gamept,int force_diff_leval)
 
   if (!gamept->orientation)
     force_diff = force_count[WHITE] - force_count[BLACK];
+  else
+    force_diff = force_count[BLACK] - force_count[WHITE];
 
   if (force_diff <= force_diff_leval)
     return true;
