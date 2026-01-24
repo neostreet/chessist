@@ -791,6 +791,32 @@ bool four_knights(struct game *gamept)
   return true;
 }
 
+bool force_diff_ge(struct game *gamept,int force_diff_geval)
+{
+  int force_diff;
+
+  if (!gamept->orientation)
+    force_diff = force_count[WHITE] - force_count[BLACK];
+
+  if (force_diff >= force_diff_geval)
+    return true;
+
+  return false;
+}
+
+bool force_diff_le(struct game *gamept,int force_diff_leval)
+{
+  int force_diff;
+
+  if (!gamept->orientation)
+    force_diff = force_count[WHITE] - force_count[BLACK];
+
+  if (force_diff <= force_diff_leval)
+    return true;
+
+  return false;
+}
+
 int get_enemy_king_file_and_rank(struct game *gamept,int *file_pt,int *rank_pt)
 {
   int m;
