@@ -418,6 +418,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
   else
     debug_y_offset = 0;
 
+  bSetMateInOne = true;
+
   hInst = hInstance; // Store instance handle in our global variable
 
   chess_window_width = board_x_offset + BOARD_WIDTH + window_extra_width;
