@@ -116,7 +116,6 @@ int read_game(char *filename,struct game *gamept)
   int p;
   char word[WORDLEN];
   int wordlen;
-  bool bHaveFirstWord;
   int direction;
   int word_no;
   int dbg;
@@ -142,7 +141,6 @@ int read_game(char *filename,struct game *gamept)
                                    /* 0 = standard, 1 = black on bottom */
 
   end_of_file = get_word(fptr,word,WORDLEN,&wordlen,gamept);
-  bHaveFirstWord = true;
 
   set_initial_board(gamept);
 
@@ -154,7 +152,7 @@ int read_game(char *filename,struct game *gamept)
   got_error = 0;
 
   for ( ; ; ) {
-    if (word_no || !bHaveFirstWord)
+    if (word_no)
       end_of_file = get_word(fptr,word,WORDLEN,&wordlen,gamept);
 
     if (end_of_file)
