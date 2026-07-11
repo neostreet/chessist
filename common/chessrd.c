@@ -122,6 +122,7 @@ int read_game(char *filename,struct game *gamept)
   int retval;
   int got_error;
   bool bBlack;
+  int count;
 
   filename_len = strlen(filename);
 
@@ -319,7 +320,7 @@ int read_game(char *filename,struct game *gamept)
       fprint_bd3(gamept->board,gamept->orientation,debug_fptr);
     }
 
-    if (player_is_in_check(bBlack,gamept->board,gamept->curr_move)) {
+    if (player_is_in_check(bBlack,gamept->board,gamept->curr_move,&count)) {
       gamept->moves[gamept->curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
 
       if (debug_fptr && (debug_level == 3))
