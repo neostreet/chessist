@@ -1921,6 +1921,7 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
   int num_invalid_squares;
   bool bBlack;
   int dbg;
+  int count;
 
   if (bAdvance) {
     bAdvance = false;
@@ -2105,7 +2106,7 @@ void do_lbuttondown(HWND hWnd,int file,int rank)
     legal_moves_count = 0;
     get_legal_moves(&curr_game,&legal_moves[0],&legal_moves_count);
 
-    if (player_is_in_check(bBlack,curr_game.board,curr_game.curr_move)) {
+    if (player_is_in_check(bBlack,curr_game.board,curr_game.curr_move,&count)) {
       invalidate_board(hWnd);
       curr_game.moves[curr_game.curr_move-1].special_move_info |= SPECIAL_MOVE_CHECK;
 
