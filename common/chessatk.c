@@ -294,7 +294,7 @@ bool any_opponent_piece_attacks_square(int square,bool bBlack,unsigned char *boa
   return false;
 }
 
-bool player_is_in_check(bool bBlack,unsigned char *board,int curr_move)
+bool player_is_in_check(bool bBlack,unsigned char *board,int curr_move,int *count)
 {
   int n;
   int movers_king;
