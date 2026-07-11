@@ -1085,6 +1085,7 @@ bool move_is_legal(struct game *gamept,char from,char to)
 
   bool bBlack;
   int dbg;
+  int count;
 
   if (!bInGetLegalMoves) {
     if (gamept->curr_move == dbg_move)
@@ -1118,7 +1119,7 @@ bool move_is_legal(struct game *gamept,char from,char to)
     fprint_bd3(scratch.board,scratch.orientation,debug_fptr);
   }
 
-  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move)) {
+  if (player_is_in_check(bBlack,scratch.board,scratch.curr_move,&count)) {
     if (debug_fptr && (debug_level == 5)) {
       fprintf(debug_fptr,"move_is_legal: about to return false, curr_move = %d\n",
         scratch.curr_move);
@@ -1858,6 +1859,7 @@ bool mate_in_one_exists(struct game *gamept)
   int dbg;
   int dbg1;
   int dbg2;
+  int count;
 
   legal_moves_count = 0;
   get_legal_moves(gamept,legal_moves,&legal_moves_count);
@@ -1892,7 +1894,7 @@ bool mate_in_one_exists(struct game *gamept)
 
     bBlack = work_game.curr_move & 0x1;
 
-    if (player_is_in_check(bBlack,work_game.board,work_game.curr_move)) {
+    if (player_is_in_check(bBlack,work_game.board,work_game.curr_move,&count)) {
       if (debug_fptr && (debug_level == 11)) {
         fprintf(debug_fptr,"mate_in_one_exists: piece_info:\n");
         fprint_piece_info(&work_game,debug_fptr);
@@ -1930,6 +1932,7 @@ bool stalemate_in_one_exists(struct game *gamept)
   int dbg;
   int dbg1;
   int dbg2;
+  int count;
 
   legal_moves_count = 0;
   get_legal_moves(gamept,legal_moves,&legal_moves_count);
@@ -1964,7 +1967,7 @@ bool stalemate_in_one_exists(struct game *gamept)
 
     bBlack = work_game.curr_move & 0x1;
 
-    if (!player_is_in_check(bBlack,work_game.board,work_game.curr_move)) {
+    if (!player_is_in_check(bBlack,work_game.board,work_game.curr_move,&count)) {
       if (debug_fptr && (debug_level == 11)) {
         fprintf(debug_fptr,"stalemate_in_one_exists: piece_info:\n");
         fprint_piece_info(&work_game,debug_fptr);
