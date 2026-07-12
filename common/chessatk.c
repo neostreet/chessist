@@ -266,6 +266,9 @@ int count_opponent_pieces_attacking_square(int square,bool bBlack,unsigned char 
 {
   int n;
   int piece;
+  int count;
+
+  count = 0;
 
   for (n = 0; n < NUM_BOARD_SQUARES; n++) {
     piece = get_piece1(board,n);
@@ -287,11 +290,11 @@ int count_opponent_pieces_attacking_square(int square,bool bBlack,unsigned char 
         fprint_bd2(board,debug_fptr);
       }
 
-      return true;
+      count++;
     }
   }
 
-  return false;
+  return count;
 }
 
 bool player_is_in_check(bool bBlack,unsigned char *board,int curr_move,int *count)
