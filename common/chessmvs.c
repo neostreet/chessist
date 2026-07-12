@@ -75,7 +75,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     squares_to_check[1] = POS_OF(rank,6);
 
     for (n = 0; n < 2; n++) {
-      if (any_opponent_piece_attacks_square(squares_to_check[n],(direction != 1),gamept->board,gamept->curr_move)) {
+      if (count_opponent_pieces_attacking_square(squares_to_check[n],(direction != 1),gamept->board,gamept->curr_move)) {
         do_castle_failures++;
         return 9;
       }
@@ -120,7 +120,7 @@ int do_castle(struct game *gamept,int direction,char *word,int wordlen,struct mo
     squares_to_check[1] = POS_OF(rank,3);
 
     for (n = 0; n < 2; n++) {
-      if (any_opponent_piece_attacks_square(squares_to_check[n],(direction != 1),gamept->board,gamept->curr_move)) {
+      if (count_opponent_pieces_attacking_square(squares_to_check[n],(direction != 1),gamept->board,gamept->curr_move)) {
         do_castle_failures++;
         return 14;
       }
@@ -911,7 +911,7 @@ int king_move(
         squares_to_check[1] = 6;
 
         for (n = 0; n < 2; n++) {
-          if (any_opponent_piece_attacks_square(squares_to_check[n],false,gamept->board,gamept->curr_move))
+          if (count_opponent_pieces_attacking_square(squares_to_check[n],false,gamept->board,gamept->curr_move))
             break;
         }
 
@@ -946,7 +946,7 @@ int king_move(
         squares_to_check[1] = 3;
 
         for (n = 0; n < 2; n++) {
-          if (any_opponent_piece_attacks_square(squares_to_check[n],false,gamept->board,gamept->curr_move))
+          if (count_opponent_pieces_attacking_square(squares_to_check[n],false,gamept->board,gamept->curr_move))
             break;
         }
 
@@ -985,7 +985,7 @@ int king_move(
         squares_to_check[1] = 62;
 
         for (n = 0; n < 2; n++) {
-          if (any_opponent_piece_attacks_square(squares_to_check[n],true,gamept->board,gamept->curr_move))
+          if (count_opponent_pieces_attacking_square(squares_to_check[n],true,gamept->board,gamept->curr_move))
             break;
         }
 
@@ -1020,7 +1020,7 @@ int king_move(
         squares_to_check[1] = 59;
 
         for (n = 0; n < 2; n++) {
-          if (any_opponent_piece_attacks_square(squares_to_check[n],true,gamept->board,gamept->curr_move))
+          if (count_opponent_pieces_attacking_square(squares_to_check[n],true,gamept->board,gamept->curr_move))
             break;
         }
 
