@@ -131,7 +131,7 @@ int knight_attacks_square(unsigned char *board,int square1,int square2);
 int bishop_attacks_square(unsigned char *board,int square1,int square2);
 int queen_attacks_square(unsigned char *board,int square1,int square2);
 int king_attacks_square(unsigned char *board,int square1,int square2);
-bool any_opponent_piece_attacks_square(int square,bool bBlack,unsigned char *board,int curr_move);
+int count_opponent_pieces_attacking_square(int square,bool bBlack,unsigned char *board,int curr_move);
 bool player_is_in_check(bool bBlack,unsigned char *board,int curr_move,int *count_pt);
 bool queen_is_attacked(bool bBlack,unsigned char *board,int curr_move);
 int calc_square(char *algebraic_notation);
