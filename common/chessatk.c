@@ -267,6 +267,7 @@ int count_opponent_pieces_attacking_square(int square,bool bBlack,unsigned char 
   int n;
   int piece;
   int count;
+  int dbg;
 
   count = 0;
 
@@ -294,10 +295,13 @@ int count_opponent_pieces_attacking_square(int square,bool bBlack,unsigned char 
     }
   }
 
+  if (count > 1)
+    dbg = 1;
+
   return count;
 }
 
-bool player_is_in_check(bool bBlack,unsigned char *board,int curr_move,int *count)
+int player_is_in_check(bool bBlack,unsigned char *board,int curr_move)
 {
   int n;
   int movers_king;
@@ -333,11 +337,7 @@ bool player_is_in_check(bool bBlack,unsigned char *board,int curr_move,int *coun
   if (n == NUM_BOARD_SQUARES)
     return false; // should never happen
 
-  // now determine if any of the opponent's pieces attack the mover's king
-  if (count_opponent_pieces_attacking_square(movers_king_square,bBlack,board,curr_move))
-    return true;
-
-  return false;
+  return count_opponent_pieces_attacking_square(movers_king_square,bBlack,board,curr_move);
 }
 
 bool queen_is_attacked(bool bBlack,unsigned char *board,int curr_move)
