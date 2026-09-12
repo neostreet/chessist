@@ -821,6 +821,69 @@ bool force_diff_le(struct game *gamept,int force_diff_leval)
   return false;
 }
 
+bool have_force(struct game *gamept,int force_bits)
+{
+  int m;
+  int n;
+  int and_val;
+
+  and_val = 0x1;
+
+  for (m = 0; m < QUEEN_ID; m++) {
+    if (force_bits & and_val) {
+      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+        if ((gamept->white_pieces[n].piece_id == m + 1) &&
+          (gamept->white_pieces[n].current_board_position != -1)) {
+
+          break;
+        }
+      }
+
+      if (n == NUM_PIECES_PER_PLAYER)
+        return false;
+
+      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+        if ((gamept->black_pieces[n].piece_id * -1 == m + 1) &&
+          (gamept->black_pieces[n].current_board_position != -1)) {
+
+          break;
+        }
+      }
+
+      if (n == NUM_PIECES_PER_PLAYER)
+        return false;
+    }
+    else {
+      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+        if ((gamept->white_pieces[n].piece_id == m + 1) &&
+          (gamept->white_pieces[n].current_board_position != -1)) {
+
+          break;
+        }
+      }
+
+      if (n < NUM_PIECES_PER_PLAYER)
+        return false;
+
+      for (n = 0; n < NUM_PIECES_PER_PLAYER; n++) {
+        if ((gamept->black_pieces[n].piece_id * -1 == m + 1) &&
+          (gamept->black_pieces[n].current_board_position != -1)) {
+
+          break;
+        }
+      }
+
+      if (n < NUM_PIECES_PER_PLAYER)
+        return false;
+    }
+
+    if (m < QUEEN_ID - 1)
+      and_val <<= 1;
+  }
+
+  return true;
+}
+
 int get_enemy_king_file_and_rank(struct game *gamept,int *file_pt,int *rank_pt)
 {
   int m;
