@@ -791,6 +791,26 @@ bool four_knights(struct game *gamept)
   return true;
 }
 
+bool long_king_walk(struct game *gamept)
+{
+  int king_rank;
+
+  if (!(gamept->curr_move % 2)) {
+    king_rank = RANK_OF(gamept->white_pieces[4].current_board_position);
+
+    if (king_rank == NUM_RANKS - 1)
+      return true;
+  }
+  else {
+    king_rank = RANK_OF(gamept->black_pieces[12].current_board_position);
+
+    if (!king_rank)
+      return true;
+  }
+
+  return false;
+}
+
 bool force_diff_ge(struct game *gamept,int force_diff_geval)
 {
   int force_diff;
