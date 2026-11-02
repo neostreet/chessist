@@ -93,6 +93,7 @@ bool black_pigs(unsigned char *board);
 bool exchange_sac(struct game *gamept);
 bool queen_sac(struct game *gamept);
 bool four_knights(struct game *gamept);
+bool long_king_walk(struct game *gamept);
 bool force_diff_ge(struct game *gamept,int force_diff_geval);
 bool force_diff_le(struct game *gamept,int force_diff_leval);
 bool have_force(struct game *gamept,int force_bits);
